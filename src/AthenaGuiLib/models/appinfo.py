@@ -40,3 +40,9 @@ class AppInfo:
             name="UNDEFINED",
             # others don't need to be set to anything, as this all have default values
         )
+
+    def version_to_str(self) -> str:
+        """
+        Returns the full version in string format
+        """
+        return f"{self.version.major}.{self.version.minor}.{self.version.fix}"
