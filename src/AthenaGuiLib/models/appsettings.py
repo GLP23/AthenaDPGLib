@@ -22,7 +22,7 @@ from AthenaLib.models import Version
 )
 class AppSettings:
     """
-    Application Settings class, houses all of the changable information of an application
+    Application Settings class, houses all the changable information of an application
     Aka: fullscreen state, position, etc
     """
     fullscreen:bool
