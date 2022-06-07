@@ -9,6 +9,8 @@ from pathlib import Path
 # Custom Library
 from AthenaLib.models import Version
 
+from AthenaColor import RGB, RGBA
+
 # Custom Packages
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -25,7 +27,8 @@ class AppInfo:
     Application Info relating to the current version, name, id, etc...
     All data is frozen after creation to make sure that the information stays the same
     """
-    name:str
+    name:str="UNDEFINED"
+    icon_to_taskbar:bool = True
     icon_path:str|Path = None
     version:Version = field(default_factory=Version.factory)
     min_width:int = 0
@@ -33,13 +36,13 @@ class AppInfo:
     min_height:int = 0
     max_height:int = 10000 #todo, maybe set this to the max width of the windows screen?
     resizable:bool = True
+    always_on_top:bool = False
+    decorated:bool=True
+    clear_color:RGBA=RGBA(0,0,0,0) #todo this is a style option!
 
     @classmethod
     def factory(cls) -> AppInfo:
-        return AppInfo(
-            name="UNDEFINED",
-            # others don't need to be set to anything, as this all have default values
-        )
+        return AppInfo()
 
     def version_to_str(self) -> str:
         """
