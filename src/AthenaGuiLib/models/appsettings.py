@@ -40,7 +40,10 @@ class AppSettings:
     def export_to_dict(self) -> dict[str:Any]:
         return {
             "fullscreen": self.fullscreen,
-            **self._export_to_dict_other()
+            "width": self.width,
+            "height": self.height,
+            "x_pos": self.x_pos,
+            "y_pos": self.y_pos,
         }
 
     @classmethod

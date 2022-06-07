@@ -38,7 +38,6 @@ class AppInfo:
     resizable:bool = True
     always_on_top:bool = False
     decorated:bool=True
-    clear_color:RGBA=RGBA(0,0,0,0) #todo this is a style option!
 
     @classmethod
     def factory(cls) -> AppInfo:
