@@ -28,11 +28,11 @@ class AppInfo:
     name:str
     icon_path:str|Path = None
     version:Version = field(default_factory=Version.factory)
-    min_width: int =0
-    max_width: int = 10000 #todo, maybe set this to the max width of the windows screen?
-    min_height: int =0
-    max_height: int = 10000 #todo, maybe set this to the max width of the windows screen?
-    resizable: bool =True
+    min_width:int = 0
+    max_width:int = 10000 #todo, maybe set this to the max width of the windows screen?
+    min_height:int = 0
+    max_height:int = 10000 #todo, maybe set this to the max width of the windows screen?
+    resizable:bool = True
 
     @classmethod
     def factory(cls) -> AppInfo:
