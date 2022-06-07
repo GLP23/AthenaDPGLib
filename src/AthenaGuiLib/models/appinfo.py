@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------------------------------------------------------
 # General Packages
 from __future__ import annotations
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 
 # Custom Library
@@ -26,17 +26,16 @@ class AppInfo:
     All data is frozen after creation to make sure that the information stays the same
     """
     name:str
-    icon_path:str|Path|None
-    version:Version
+    icon_path:str|Path|None = None
+    version:Version = field(default_factory=Version.factory)
+    min_width: int =0
+    max_width: int = 10000 #todo, maybe set this to the max width of the windows screen?
+    min_height: int =0
+    max_height: int = 10000 #todo, maybe set this to the max width of the windows screen?
+    resizable: bool =True
 
     @classmethod
     def factory(cls) -> AppInfo:
         return AppInfo(
             name="UNDEFINED",
-            icon_path=None,
-            version=Version(
-                major=0,
-                minor=0,
-                fix=0
-            )
         )
