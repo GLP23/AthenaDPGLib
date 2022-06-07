@@ -27,8 +27,8 @@ class Application:
 
     """
     # Keyword arguments on init
-    info: AppInfo = field(default_factory=AppInfo.factory)
-    settings: AppSettings = field(default_factory=AppSettings.factory)
+    info: AppInfo = field(default_factory=AppInfo.factory)  # All info data is frozen across the instance of an application
+    settings: AppSettings = field(default_factory=AppSettings.factory) # All settings can be changed while the application is running
 
     # class attributes not to be setup on init
     _viewport_setup:bool = field(init=False, default=False)
