@@ -7,7 +7,7 @@ import dearpygui.dearpygui as dpg
 from dataclasses import dataclass, field
 
 # Custom Library
-from AthenaGuiLib.models import AppInfo
+from AthenaGuiLib.models import (AppInfo, AppSettings)
 
 # Custom Packages
 
@@ -18,6 +18,7 @@ from AthenaGuiLib.models import AppInfo
 class Application:
     # Keyword arguments on init
     info: AppInfo = field(default_factory=AppInfo.factory)
+    settings: AppSettings = field(default_factory=AppSettings.factory)
 
     # Internal stuff
 
@@ -25,9 +26,6 @@ class Application:
     # - Class Init -
     # ------------------------------------------------------------------------------------------------------------------
     def __post_init__(self):
-        # Makes sure some app information is set up, if the setting is enabled.
-        #   A force to generate new app info is intyegerated to easily create new applications in tests
-
         # set up the basicis of the dpg
         dpg.create_context()
         dpg.setup_dearpygui()
@@ -38,8 +36,15 @@ class Application:
 
 
     # ------------------------------------------------------------------------------------------------------------------
-    # - DearPyGui stuff -
+    # - Viewport related settings -
     # ------------------------------------------------------------------------------------------------------------------
+
+
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # - Propeties -
+    # ------------------------------------------------------------------------------------------------------------------
+
     def launch(self):
         dpg.start_dearpygui() # blocking
         dpg.destroy_context()

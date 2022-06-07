@@ -18,10 +18,12 @@ from AthenaGuiLib.application.application import Application
 # ----------------------------------------------------------------------------------------------------------------------
 @dataclass(kw_only=True, slots=True)
 class Viewport:
-    def __post_init__(self):
+    @staticmethod
+    def __post_init__():
         dpg.create_viewport()
 
-    def set_icon(self, app:Application):
+    @staticmethod
+    def set_icon(app:Application):
         # Define application ICON,
         #   makes sure the application icon is shown in the taskbar
         if sys.platform == "win32":  # WINDODWS NEEDS THIS to make this possible
@@ -32,11 +34,14 @@ class Viewport:
         dpg.set_viewport_small_icon(app.info.icon)
         dpg.set_viewport_large_icon(app.info.icon)
 
-    def show(self):
+    @staticmethod
+    def show():
         dpg.show_viewport()
 
-    def set_title(self, app:Application):
+    @staticmethod
+    def set_title(app:Application):
         dpg.set_viewport_title(app.info.name)
 
-    def toggle_fullscreen(self):
+    @staticmethod
+    def toggle_fullscreen():
         dpg.toggle_viewport_fullscreen()
