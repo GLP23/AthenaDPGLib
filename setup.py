@@ -28,6 +28,7 @@ setuptools.setup(
     python_requires=">=3.10",
     install_requires=[
         "DearPyGui>=1.6.2",
-        "AthenaLib>=0.2.0"
+        "AthenaLib>=0.2.0",
+        "AthenaColor>=5.1.0"
     ]
 )

@@ -4,10 +4,7 @@
 # General Packages
 from __future__ import annotations
 import dearpygui.dearpygui as dpg
-import ctypes
 from dataclasses import dataclass, field
-import sys
-from typing import Any
 
 # Custom Library
 
@@ -26,12 +23,6 @@ class Application:
     # Internal stuff
     info:AppInfo=field(init=False)
 
-    _icon_small:str=field(init=False, repr=False)
-    _icon_large:str=field(init=False, repr=False)
-
-    context:Any = field(init=False)
-    viewport:Any = field(init=False)
-
     # ------------------------------------------------------------------------------------------------------------------
     # - Class Init -
     # ------------------------------------------------------------------------------------------------------------------
@@ -46,6 +37,10 @@ class Application:
             app_info = AppInfo(_empty=True)
         self.info = app_info
 
+        # set up the basicis of the dpg
+        dpg.create_context()
+        dpg.setup_dearpygui()
+
     # ------------------------------------------------------------------------------------------------------------------
     # - Propeties -
     # ------------------------------------------------------------------------------------------------------------------
@@ -55,22 +50,5 @@ class Application:
     # - DearPyGui stuff -
     # ------------------------------------------------------------------------------------------------------------------
     def launch(self):
-
-        dpg.create_context()
-        dpg.create_viewport()
-        dpg.create_viewport()
-        dpg.setup_dearpygui()
-
-        # Define application ICON,
-        #   makes sure the application icon is shown in the taskbar
-        if sys.platform == "win32":  # WINDODWS NEEDS THIS to make this possible
-            ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(f"{self.info.name}[{self.info.version}]")
-        elif sys.platform in ("linux", "linux2"):
-            raise NotImplementedError #TODO fix this!
-
-        dpg.set_viewport_small_icon(self.info.icon)
-        dpg.set_viewport_large_icon(self.info.icon)
-
-        dpg.show_viewport()
         dpg.start_dearpygui()
         dpg.destroy_context()
