@@ -18,34 +18,9 @@ from typing import Any
     kw_only=True,
     slots=True
 )
-class AppSettings:
+class Settings:
     """
     Application Settings class, houses all the changable information of an application
     Aka: fullscreen state, position, etc
     """
-    fullscreen:bool = False
-    width:int = 255
-    height:int = 255
-    x_pos:int = 0
-    y_pos:int = 0
-
-    def _export_to_dict_other(self) -> dict[str:Any]:
-        """
-        Method used to make sure other defined settings can be exported as well.
-        This needs to be populated if there are other settings set
-        :return:
-        """
-        pass
-
-    def export_to_dict(self) -> dict[str:Any]:
-        return {
-            "fullscreen": self.fullscreen,
-            "width": self.width,
-            "height": self.height,
-            "x_pos": self.x_pos,
-            "y_pos": self.y_pos,
-        }
-
-    @classmethod
-    def factory(cls) -> AppSettings:
-        return AppSettings()
+    pass
