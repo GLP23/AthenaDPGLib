@@ -4,9 +4,10 @@
 # General Packages
 from __future__ import annotations
 from dataclasses import dataclass
-from typing import Any
+from pathlib import Path
 
 # Custom Library
+from AthenaLib.models import Version
 
 # Custom Packages
 
@@ -23,4 +24,6 @@ class Settings:
     Application Settings class, houses all the changable information of an application
     Aka: fullscreen state, position, etc
     """
-    pass
+    version: Version
+    name: str
+    icon_path:str|Path

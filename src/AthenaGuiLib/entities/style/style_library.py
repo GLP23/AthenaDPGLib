@@ -6,9 +6,9 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 
 # Custom Library
-from AthenaGuiLib.entities.style.style_sheet import StyleSheet
 
 # Custom Packages
+from AthenaGuiLib.entities.style.style_sheet import StyleSheet
 
 # ----------------------------------------------------------------------------------------------------------------------
 # - Code -

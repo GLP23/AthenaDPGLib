@@ -41,7 +41,7 @@ class ViewportController:
     def get_icon(self) -> str|Path:
         return self._viewport.icon_path
 
-    def set_icon(self, icon_path:str|Path, ModelID:str=None):
+    def set_icon(self, icon_path:str|Path, ModelID:str):
         # Define application ICON,
         #   makes sure the APPLICATION icon is shown in the taskbar
         if sys.platform == "win32":  # WINDODWS NEEDS THIS to make this possible
