@@ -14,7 +14,7 @@ import setuptools
 # ----------------------------------------------------------------------------------------------------------------------
 setuptools.setup(
     name="AthenaGuiLib",
-    version="0.2.0",
+    version="0.3.0",
     author="Andreas Sas",
     author_email="",
     description="A Library of DearPyGui elements, to be used in Directive Athena projects",
