@@ -11,3 +11,12 @@ from __future__ import annotations
 # ----------------------------------------------------------------------------------------------------------------------
 # - Code -
 # ----------------------------------------------------------------------------------------------------------------------
+
+# ----------------------------------------------------------------------------------------------------------------------
+# - Frequently occuring exceptions -
+# ----------------------------------------------------------------------------------------------------------------------
+linux_notimplementederror = """
+The developer of this library unfortunatly doesn't work on Linux nativly
+If you have information on how to implement this, 
+please make a pull request on https://github.com/DirectiveAthena/AthenaGuiLib
+"""

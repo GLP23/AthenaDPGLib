@@ -3,15 +3,20 @@
 # ----------------------------------------------------------------------------------------------------------------------
 # General Packages
 from __future__ import annotations
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 # Custom Library
 
 # Custom Packages
+from AthenaGuiLib.entities.style.style_sheet import StyleSheet
 
 # ----------------------------------------------------------------------------------------------------------------------
 # - Code -
 # ----------------------------------------------------------------------------------------------------------------------
-@dataclass(kw_only=True, slots=True)
-class Settings:
-    fullscreen:bool=False
+@dataclass(
+    eq=False, # no need for equal check
+    kw_only=True,
+    slots=True
+)
+class StyleLibrary:
+    styles:dict[str:StyleSheet] = field(default_factory=dict)
