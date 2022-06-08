@@ -10,6 +10,7 @@ import json
 from typing import Callable
 
 # Custom Library
+from AthenaLib.models import Version
 
 # Custom Packages
 from AthenaGuiLib.controllers import ViewportController
@@ -20,6 +21,11 @@ from AthenaGuiLib.entities import Settings
 # ----------------------------------------------------------------------------------------------------------------------
 @dataclass(kw_only=True, slots=True, eq=False)
 class Application:
+    # hard coded stuff
+    version: Version
+    name: str
+    icon_path: str | Path
+
     settings_json_path:str|Path = None
     settings_handlers:dict[int:Callable] = field(default_factory=dict)
 
@@ -30,6 +36,7 @@ class Application:
 
     restart:bool=field(init=False, default=True)
 
+
     # ------------------------------------------------------------------------------------------------------------------
     # - Init -
     # ------------------------------------------------------------------------------------------------------------------
@@ -39,7 +46,7 @@ class Application:
         # Put all othert stuff below here in correct order
         self.viewport = ViewportController()
 
-    def setup(self) -> Application:
+    def setup_settings(self) -> Application:
         # import settings if they are present
         if self.settings_json_path is not None:
             with open(self.settings_json_path, "r") as settings_file:
@@ -51,13 +58,15 @@ class Application:
                     raise KeyError("Settings json file was incorrectly formatted, did not hold a 'SettingsVersion' key")
 
             # parse and store settings
-            self.settings = self._handle_settings(settings_version, settings_content)
+            if settings_version not in self.settings_handlers:
+                raise KeyError("No setting handler found")
+            self.settings_handlers[settings_version](content=settings_content)
         return self
 
     def setup_viewport(self) -> Application:
         # at the end of the post_init, populate the viewport with all the available settings
-        self.viewport.title = self.settings.name
-        self.viewport.set_icon(icon_path=self.settings.icon_path,ModelID=f"{self.settings.name}[{self.settings.version}]")
+        self.viewport.title = self.name
+        self.viewport.set_icon(icon_path=self.icon_path,ModelID=f"{self.name}[{self.version}]")
 
         return self
 
@@ -68,13 +77,7 @@ class Application:
         if version in self.settings_handlers:
             raise KeyError("No duplicate handlers allowed")
         self.settings_handlers[version] = fnc
-
         return self
-
-    def _handle_settings(self, settings_version:int, content=dict) -> Settings:
-        if settings_version not in self.settings_handlers:
-            raise KeyError("No setting handler found")
-        return self.settings_handlers[settings_version](content=content)
 
     # ------------------------------------------------------------------------------------------------------------------
     # - DPG related Methods -
