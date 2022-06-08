@@ -13,7 +13,7 @@ from typing import Callable
 from AthenaLib.models import Version
 
 # Custom Packages
-from AthenaGuiLib.controllers import ViewportController
+from AthenaGuiLib.controllers import ViewportController, WindowController
 from AthenaGuiLib.entities import Settings
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -28,6 +28,9 @@ class Application:
 
     settings_json_path:str|Path = None
     settings_handlers:dict[int:Callable] = field(default_factory=dict)
+
+    # items and content
+    windows:dict[int:WindowController] = field(default_factory=dict)
 
     # all the bellow attributes are not to be setup with the init
     viewport:ViewportController=field(init=False)
@@ -80,6 +83,15 @@ class Application:
         return self
 
     # ------------------------------------------------------------------------------------------------------------------
+    # - Content Handlers -
+    # ------------------------------------------------------------------------------------------------------------------
+    def add_window(self, window: WindowController):
+        window.assemble()
+        self.windows[window.id] = window
+
+
+
+    # ------------------------------------------------------------------------------------------------------------------
     # - DPG related Methods -
     # ------------------------------------------------------------------------------------------------------------------
     def launch(self):
@@ -95,4 +107,3 @@ class Application:
             if self.restart:
                 continue
             break
-            # else, the restart option is set, and this will allow for a new application startup
