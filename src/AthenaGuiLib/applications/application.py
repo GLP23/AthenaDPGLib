@@ -40,7 +40,7 @@ class Application:
     # ------------------------------------------------------------------------------------------------------------------
     # - Viewport stuff -
     # ------------------------------------------------------------------------------------------------------------------
-    def viewport_get(self) -> Viewport:
+    def get_viewport(self) -> Viewport:
         # if no viewport has been defined yet, you need to make one
         #   Else dpg will fail
         if not self.viewports:
@@ -56,7 +56,7 @@ class Application:
     # ------------------------------------------------------------------------------------------------------------------
     def fix_icon_for_taskbar(self):
         # retrieve the viewport object, if it hasn't been done before, it'll set up a new one
-        viewport:Viewport = self.viewport_get()
+        viewport:Viewport = self.get_viewport()
 
         # Define application ICON,
         #   makes sure the APPLICATION icon is shown in the taskbar
