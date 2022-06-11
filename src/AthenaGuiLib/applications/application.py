@@ -15,6 +15,7 @@ from AthenaLib.models import Version
 
 # Custom Packages
 from AthenaGuiLib.viewports import Viewport
+from AthenaGuiLib.settings import Settings
 
 # ----------------------------------------------------------------------------------------------------------------------
 # - Code -
@@ -39,6 +40,11 @@ class Application: # made a singleton to make sure that there is only one applic
     icon_path:str=None
     settings_path:str=None
 
+    # --- special classes ---
+    # Settings
+    settings_class:type = Settings
+    settings:Settings = field(init=False)
+
     # ------------------------------------------------------------------------------------------------------------------
     # - Init stuff-
     # ------------------------------------------------------------------------------------------------------------------
@@ -49,14 +55,15 @@ class Application: # made a singleton to make sure that there is only one applic
     # ------------------------------------------------------------------------------------------------------------------
     # - Settings stuff -
     # ------------------------------------------------------------------------------------------------------------------
-    def get_settings_from_file(self):
+    def set_settings(self):
         # check if te filepath has been defined or not
         if self.settings_path is None or not os.path.isfile(self.settings_path):
             raise FileNotFoundError("No settings file could be found")
 
         with open(self.settings_path, "r") as file:
             settings_dict = json.load(file)
-        return settings_dict
+
+        self.settings = self.settings_class(settings_dict)
 
     # ------------------------------------------------------------------------------------------------------------------
     # - Properties -
