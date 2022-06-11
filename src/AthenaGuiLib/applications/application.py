@@ -9,7 +9,7 @@ import sys
 import dearpygui.dearpygui as dpg
 
 # Custom Library
-from AthenaLib.models import Version, Singleton
+from AthenaLib.models import Version
 
 # Custom Packages
 from AthenaGuiLib.viewports import Viewport
@@ -21,7 +21,7 @@ from AthenaGuiLib.viewports import Viewport
     slots=True,
     kw_only=True
 )
-class Application(Singleton): # made a singleton to make sure that there is only one application per run
+class Application: # made a singleton to make sure that there is only one application per run
     """
     A DearPyGui application.
     Because DPG is a functional based wrapper, there is no inheritance from any DPG application class, as this doesn't exist.
