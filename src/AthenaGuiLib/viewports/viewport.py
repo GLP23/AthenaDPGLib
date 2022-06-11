@@ -24,7 +24,7 @@ class Viewport:
     # ------------------------------------------------------------------------------------------------------------------
     # - Icon -
     # ------------------------------------------------------------------------------------------------------------------
-    @staticmethod
+    @staticmethod # will probably eventually become a normal method, but current dpg versions only allow for one viewport
     def set_icon(*, icon_path:str):
         dpg.set_viewport_large_icon(icon_path)
         dpg.set_viewport_small_icon(icon_path)
