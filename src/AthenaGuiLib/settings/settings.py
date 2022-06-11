@@ -15,7 +15,8 @@ from AthenaLib.models import Vector2D
 # ----------------------------------------------------------------------------------------------------------------------
 # - Support Code -
 # ----------------------------------------------------------------------------------------------------------------------
-class _SettingsValues(NamedTuple):
+@dataclass(slots=True)
+class _SettingsValues:
     """Value Storage, holds no logic behind the settings, only it's pure values"""
     fullscreen:bool
     maximized:bool
@@ -27,7 +28,6 @@ class _TempValues:
 # ----------------------------------------------------------------------------------------------------------------------
 # - Code -
 # ----------------------------------------------------------------------------------------------------------------------
-@dataclass(init=False, slots=True)
 class Settings:
     _values:_SettingsValues
     _temp_values:_TempValues
@@ -44,7 +44,7 @@ class Settings:
 
     def to_dict(self):
         """Method to dump all settings to a dict format. Needs to be defined on a case by case basis"""
-        return self._values._asdict()
+        return self._values.__dict__
 
     # ------------------------------------------------------------------------------------------------------------------
     # - Predefined Settings -
@@ -63,9 +63,9 @@ class Settings:
         else:
             # retrieve stored information, so we can get back to where we were
             pos,size = self._temp_values.maximized_viewport_pos_size
-            dpg.set_viewport_pos([pos.x, pos.y])
             dpg.set_viewport_width(size.x)
             dpg.set_viewport_height(size.y)
+            dpg.set_viewport_pos([pos.x, pos.y])
 
         # set it to the reverse of the current
         self._values.maximized = not self._values.maximized
