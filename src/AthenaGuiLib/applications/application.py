@@ -44,6 +44,7 @@ class Application: # made a singleton to make sure that there is only one applic
     # Settings
     settings_class:type = Settings
     settings:Settings = field(init=False)
+    _settings_defined:bool = field(init=False, default=False)
 
     # ------------------------------------------------------------------------------------------------------------------
     # - Init stuff-
@@ -56,14 +57,17 @@ class Application: # made a singleton to make sure that there is only one applic
     # - Settings stuff -
     # ------------------------------------------------------------------------------------------------------------------
     def set_settings(self):
-        # check if te filepath has been defined or not
-        if self.settings_path is None or not os.path.isfile(self.settings_path):
-            raise FileNotFoundError("No settings file could be found")
+        # only allowed to do this once
+        if not self._settings_defined:
+            # check if te filepath has been defined or not
+            if self.settings_path is None or not os.path.isfile(self.settings_path):
+                raise FileNotFoundError("No settings file could be found")
 
-        with open(self.settings_path, "r") as file:
-            settings_dict = json.load(file)
+            with open(self.settings_path, "r") as file:
+                settings_dict = json.load(file)
 
-        self.settings = self.settings_class(settings_dict)
+            self.settings = self.settings_class(settings_dict)
+            self._settings_defined = True
 
     # ------------------------------------------------------------------------------------------------------------------
     # - Properties -
