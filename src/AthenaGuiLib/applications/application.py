@@ -9,6 +9,7 @@ from dataclasses import dataclass, field
 import ctypes
 import sys
 import dearpygui.dearpygui as dpg
+from typing import Callable
 
 # Custom Library
 from AthenaLib.models import Version
@@ -45,6 +46,8 @@ class Application: # made a singleton to make sure that there is only one applic
     settings_class:type = Settings
     settings:Settings = field(init=False)
     _settings_defined:bool = field(init=False, default=False)
+    _post_settings_call:list[Callable] = field(init=False, default_factory=list)
+    process_custom_settings:Callable = None
 
     # ------------------------------------------------------------------------------------------------------------------
     # - Init stuff-
@@ -67,6 +70,18 @@ class Application: # made a singleton to make sure that there is only one applic
                 settings_dict = json.load(file)
 
             self.settings = self.settings_class(settings_dict)
+
+            # Process settings at the beginning of the application
+            if self.settings.values.fullscreen:
+                dpg.toggle_viewport_fullscreen()
+            if self.settings.values.maximized:
+                self._post_settings_call.append(dpg.maximize_viewport)
+
+            # process the custom defined settings
+            #   This is done by defining a function to handle this
+            if self.process_custom_settings is not None:
+                self.process_custom_settings()
+
             self._settings_defined = True
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -124,6 +139,10 @@ class Application: # made a singleton to make sure that there is only one applic
         try:
             dpg.setup_dearpygui()
             dpg.show_viewport()
+            # after viewport has been show, do the post settings call
+            #   as this is the only way the maximize function can be called correctly
+            for call in self._post_settings_call:
+                call()
             # launching of the actual application
             dpg.start_dearpygui() # blocking call
         except KeyboardInterrupt: # made sure to do a "graceful" shutdown:
@@ -134,3 +153,6 @@ class Application: # made a singleton to make sure that there is only one applic
         # everything after is done after dpg has been shut down
         #   should handle things like dumping the settings to file
         #   etc...
+
+        with open(self.settings_path, "w") as settings_file:
+            settings_file.write(json.dumps(self.settings.to_dict()))

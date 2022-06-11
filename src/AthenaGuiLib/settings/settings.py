@@ -4,7 +4,6 @@
 # General Packages
 from __future__ import annotations
 from dataclasses import dataclass
-from typing import NamedTuple
 import dearpygui.dearpygui as dpg
 
 # Custom Library
@@ -23,13 +22,13 @@ class _SettingsValues:
 
 class _TempValues:
     """Value storage to be used for storage of info inbetween states of settings"""
-    maximized_viewport_pos_size: tuple[Vector2D, Vector2D]
+    maximized_viewport_pos_size: tuple[Vector2D, Vector2D] = (Vector2D(100,100), Vector2D(600, 300))
 
 # ----------------------------------------------------------------------------------------------------------------------
 # - Code -
 # ----------------------------------------------------------------------------------------------------------------------
 class Settings:
-    _values:_SettingsValues
+    values:_SettingsValues
     _temp_values:_TempValues
     values_class:_SettingsValues = _SettingsValues
     temp_values_class:_TempValues = _TempValues
@@ -39,21 +38,28 @@ class Settings:
     """
 
     def __init__(self, settings_dict:dict):
-        self._values = self.values_class(**settings_dict)
+        self.values = self.values_class(**settings_dict)
         self._temp_values = self.temp_values_class()
 
-    def to_dict(self):
+    # ------------------------------------------------------------------------------------------------------------------
+    # - Casting -
+    # ------------------------------------------------------------------------------------------------------------------
+    def to_dict(self) -> dict:
         """Method to dump all settings to a dict format. Needs to be defined on a case by case basis"""
-        return self._values.__dict__
+        return {
+            slot:getattr(self.values, slot) for slot in self.values.__slots__
+        }
 
     # ------------------------------------------------------------------------------------------------------------------
     # - Predefined Settings -
     # ------------------------------------------------------------------------------------------------------------------
     def toggle_fullscreen(self):
+        # temp solution
+        self.values.fullscreen = not self.values.fullscreen
         dpg.toggle_viewport_fullscreen()
 
     def toggle_maximize(self):
-        if not self._values.maximized:
+        if not self.values.maximized:
             # store information so that this can be retrieved at a later point in time
             self._temp_values.maximized_viewport_pos_size = (
                 Vector2D(*dpg.get_viewport_pos()), # POSITION
@@ -68,4 +74,4 @@ class Settings:
             dpg.set_viewport_pos([pos.x, pos.y])
 
         # set it to the reverse of the current
-        self._values.maximized = not self._values.maximized
+        self.values.maximized = not self.values.maximized
