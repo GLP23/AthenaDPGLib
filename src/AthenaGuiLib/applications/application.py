@@ -70,4 +70,4 @@ class Application:
             raise NotImplementedError
 
         # actually set the icon
-        viewport.icon_define(icon_path=self.icon_path)
+        viewport.set_icon(icon_path=self.icon_path)

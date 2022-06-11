@@ -25,6 +25,6 @@ class Viewport:
     # - Icon -
     # ------------------------------------------------------------------------------------------------------------------
     @staticmethod
-    def icon_define(*, icon_path:str):
+    def set_icon(*, icon_path:str):
         dpg.set_viewport_large_icon(icon_path)
         dpg.set_viewport_small_icon(icon_path)
