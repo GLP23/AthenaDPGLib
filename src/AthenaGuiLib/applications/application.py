@@ -9,7 +9,7 @@ import sys
 import dearpygui.dearpygui as dpg
 
 # Custom Library
-from AthenaLib.models import Version
+from AthenaLib.models import Version, Singleton
 
 # Custom Packages
 from AthenaGuiLib.viewports import Viewport
@@ -19,23 +19,34 @@ from AthenaGuiLib.viewports import Viewport
 # ----------------------------------------------------------------------------------------------------------------------
 @dataclass(
     slots=True,
-    kw_only=True # done to make sure the programmer knows what the hell they are doing
+    kw_only=True
 )
-class Application:
-    title:str="UNDEFINED"
+class Application(Singleton): # made a singleton to make sure that there is only one application per run
+    """
+    A DearPyGui application.
+    Because DPG is a functional based wrapper, there is no inheritance from any DPG application class, as this doesn't exist.
+    This class is meant to store various information about the application and run certain events in certain manners.
+    """
+
+    title:str="UNDEFINED"   # application title, shown at the top of the window, and is the name you find in the taskbar
     version:Version=field(default_factory=lambda:Version(0,"PreAlpha",0))
     icon_path:str=None
     icon_enabled:bool=True
     viewports:set[Viewport,...]=field(default_factory=set)
 
-    # post init stuff
-    model_id:str=field(init=False)
-
     # ------------------------------------------------------------------------------------------------------------------
     # - Init stuff-
     # ------------------------------------------------------------------------------------------------------------------
     def __post_init__(self):
-        self.model_id = f"{self.title}[{self.version.to_str(sep='.')}]"
+        # create the context to make sure it is always loaded
+        dpg.create_context() # doesn't return a value, so can just be dne here, without setting the resul to a slot
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # - Properties -
+    # ------------------------------------------------------------------------------------------------------------------
+    @property
+    def model_id(self):
+        return f"{self.title}[{self.version.to_str(sep='.')}]"
 
     # ------------------------------------------------------------------------------------------------------------------
     # - Viewport stuff -
@@ -70,4 +81,5 @@ class Application:
             raise NotImplementedError
 
         # actually set the icon
-        viewport.set_icon(icon_path=self.icon_path)
+        if self.icon_enabled:
+            viewport.set_icon(icon_path=self.icon_path)
