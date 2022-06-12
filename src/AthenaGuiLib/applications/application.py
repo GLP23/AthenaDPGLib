@@ -10,7 +10,7 @@ from dataclasses import dataclass, field
 import ctypes
 import sys
 import dearpygui.dearpygui as dpg
-from typing import Callable, Coroutine
+from typing import Callable
 
 # Custom Library
 from AthenaLib.models import Version
@@ -50,7 +50,7 @@ class Application: # made a singleton to make sure that there is only one applic
     settings_class:type = Settings
     settings:Settings = field(init=False)
     _settings_defined:bool = field(init=False, default=False)
-    _post_dpg_launchers:list[Callable] = field(init=False, default_factory=list)
+    post_dpg_launchers:list[Callable] = field(init=False, default_factory=list)
     process_custom_settings:Callable = None
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -70,28 +70,25 @@ class Application: # made a singleton to make sure that there is only one applic
     # ------------------------------------------------------------------------------------------------------------------
     # - Settings stuff -
     # ------------------------------------------------------------------------------------------------------------------
-    def settings_set(self) -> Application:
-        # only allowed to do this once
-        if not self._settings_defined:
-            # check if te filepath has been defined or not
-            if self.settings_path is None or not os.path.isfile(self.settings_path):
-                raise FileNotFoundError("No settings file could be found")
+    def settings_retrieve_from_file(self) -> Application:
+        # check if te filepath has been defined or not
+        if self.settings_path is None or not os.path.isfile(self.settings_path):
+            raise FileNotFoundError("No settings file could be found")
 
-            with open(self.settings_path, "r") as file:
-                self.settings = self.settings_class(json.load(file))
+        with open(self.settings_path, "r") as file:
+            self.settings = self.settings_class(json.load(file))
 
-            # Process settings at the beginning of the application
-            if self.settings.values.fullscreen:
-                dpg.toggle_viewport_fullscreen()
-            if self.settings.values.maximized:
-                self._post_dpg_launchers.append(dpg.maximize_viewport)
+        # Process settings at the beginning of the application
+        if self.settings.values.fullscreen:
+            dpg.toggle_viewport_fullscreen()
+        if self.settings.values.maximized:
+            self.post_dpg_launchers.append(dpg.maximize_viewport)
 
-            # process the custom defined settings
-            #   This is done by defining a function to handle this
-            if self.process_custom_settings is not None:
-                self.process_custom_settings()
+        # process the custom defined settings
+        #   This is done by defining a function to handle this
+        if self.process_custom_settings is not None:
+            self.process_custom_settings()
 
-            self._settings_defined = True
         # return itself to make these functions chainable
         return self
 
@@ -140,18 +137,13 @@ class Application: # made a singleton to make sure that there is only one applic
     # ------------------------------------------------------------------------------------------------------------------
     # - Startup and Close down -
     # ------------------------------------------------------------------------------------------------------------------
-    def graceful_minimum_shutdown(self):
-        """the bare minimum that needs to happen to make sure the shutdown is handled correctly"""
-        # destroy the context, else dpg will freak out
-        dpg.destroy_context()
-
     def launch(self):
         try:
             dpg.setup_dearpygui()
             dpg.show_viewport()
             # after viewport has been show, do the post settings call
             #   as this is the only way the maximize function can be called correctly
-            for call in self._post_dpg_launchers:
+            for call in self.post_dpg_launchers:
                 call()
             # launching of the actual application
             dpg.start_dearpygui() # blocking call
@@ -159,7 +151,18 @@ class Application: # made a singleton to make sure that there is only one applic
             self.graceful_minimum_shutdown()
             raise
         else:
-            self.graceful_minimum_shutdown() # always make sure there is some form of 'graceful' shutdown
+            self.graceful_full_shutdown() # always make sure there is some form of 'graceful' shutdown
+
+    @staticmethod
+    def graceful_minimum_shutdown():
+        """the bare minimum that needs to happen to make sure the shutdown is handled correctly"""
+        # destroy the context, else dpg will freak out
+        dpg.destroy_context()
+
+    def graceful_full_shutdown(self):
+        """the full suite of how to handle the shutdown"""
+        # first do the bare minimum, which can just use the already existing function
+        self.graceful_minimum_shutdown()
 
         # everything else is done after dpg has been shut down
         #   should handle things like dumping the settings to file
