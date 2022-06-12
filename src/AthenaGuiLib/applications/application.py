@@ -3,13 +3,14 @@
 # ----------------------------------------------------------------------------------------------------------------------
 # General Packages
 from __future__ import annotations
+import asyncio
 import json
 import os
 from dataclasses import dataclass, field
 import ctypes
 import sys
 import dearpygui.dearpygui as dpg
-from typing import Callable
+from typing import Callable, Coroutine
 
 # Custom Library
 from AthenaLib.models import Version
@@ -41,12 +42,15 @@ class Application: # made a singleton to make sure that there is only one applic
     icon_path:str=None
     settings_path:str=None
 
+    # asyncio stuff
+    loop:asyncio.AbstractEventLoop = field(default_factory=asyncio.new_event_loop)
+
     # --- special classes ---
     # Settings
     settings_class:type = Settings
     settings:Settings = field(init=False)
     _settings_defined:bool = field(init=False, default=False)
-    _post_settings_call:list[Callable] = field(init=False, default_factory=list)
+    _post_dpg_launchers:list[Callable] = field(init=False, default_factory=list)
     process_custom_settings:Callable = None
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -57,9 +61,16 @@ class Application: # made a singleton to make sure that there is only one applic
         dpg.create_context() # doesn't return a value, so can just be dne here, without setting the resul to a slot
 
     # ------------------------------------------------------------------------------------------------------------------
+    # - Properties -
+    # ------------------------------------------------------------------------------------------------------------------
+    @property
+    def model_id(self):
+        return f"{self.title}[{self.version.to_str(sep='.')}]"
+
+    # ------------------------------------------------------------------------------------------------------------------
     # - Settings stuff -
     # ------------------------------------------------------------------------------------------------------------------
-    def set_settings(self):
+    def settings_set(self) -> Application:
         # only allowed to do this once
         if not self._settings_defined:
             # check if te filepath has been defined or not
@@ -67,15 +78,13 @@ class Application: # made a singleton to make sure that there is only one applic
                 raise FileNotFoundError("No settings file could be found")
 
             with open(self.settings_path, "r") as file:
-                settings_dict = json.load(file)
-
-            self.settings = self.settings_class(settings_dict)
+                self.settings = self.settings_class(json.load(file))
 
             # Process settings at the beginning of the application
             if self.settings.values.fullscreen:
                 dpg.toggle_viewport_fullscreen()
             if self.settings.values.maximized:
-                self._post_settings_call.append(dpg.maximize_viewport)
+                self._post_dpg_launchers.append(dpg.maximize_viewport)
 
             # process the custom defined settings
             #   This is done by defining a function to handle this
@@ -83,13 +92,14 @@ class Application: # made a singleton to make sure that there is only one applic
                 self.process_custom_settings()
 
             self._settings_defined = True
+        # return itself to make these functions chainable
+        return self
 
-    # ------------------------------------------------------------------------------------------------------------------
-    # - Properties -
-    # ------------------------------------------------------------------------------------------------------------------
-    @property
-    def model_id(self):
-        return f"{self.title}[{self.version.to_str(sep='.')}]"
+    def settings_store(self) -> Application:
+        with open(self.settings_path, "w") as settings_file:
+            settings_file.write(json.dumps(self.settings.to_dict()))
+        # return itself to make these functions chainable
+        return self
 
     # ------------------------------------------------------------------------------------------------------------------
     # - Viewport stuff -
@@ -98,8 +108,7 @@ class Application: # made a singleton to make sure that there is only one applic
         # if no viewport has been defined yet, you need to make one
         #   Else dpg will fail
         if not self.viewports:
-            viewport = Viewport()
-            self.viewports.add(viewport)
+            self.viewports.add(viewport := Viewport())
         else:
             # currently in dpg there is only one viewport available, but this will change in later versions
             viewport, = self.viewports
@@ -108,10 +117,7 @@ class Application: # made a singleton to make sure that there is only one applic
     # ------------------------------------------------------------------------------------------------------------------
     # - Fixes -
     # ------------------------------------------------------------------------------------------------------------------
-    def fix_icon_for_taskbar(self):
-        # retrieve the viewport object, if it hasn't been done before, it'll set up a new one
-        viewport:Viewport = self.get_viewport()
-
+    def fix_icon_for_taskbar(self) -> Application:
         # Define application ICON,
         #   makes sure the APPLICATION icon is shown in the taskbar
         if sys.platform == "win32":
@@ -125,7 +131,11 @@ class Application: # made a singleton to make sure that there is only one applic
 
         # actually set the icon
         if self.icon_enabled:
-            viewport.set_icon(icon_path=self.icon_path)
+            # retrieve the viewport object, if it hasn't been done before, it'll set up a new one
+            self.get_viewport().set_icon(icon_path=self.icon_path)
+
+        # return itself to make these functions chainable
+        return self
 
     # ------------------------------------------------------------------------------------------------------------------
     # - Startup and Close down -
@@ -141,7 +151,7 @@ class Application: # made a singleton to make sure that there is only one applic
             dpg.show_viewport()
             # after viewport has been show, do the post settings call
             #   as this is the only way the maximize function can be called correctly
-            for call in self._post_settings_call:
+            for call in self._post_dpg_launchers:
                 call()
             # launching of the actual application
             dpg.start_dearpygui() # blocking call
@@ -150,9 +160,16 @@ class Application: # made a singleton to make sure that there is only one applic
             raise
         else:
             self.graceful_minimum_shutdown() # always make sure there is some form of 'graceful' shutdown
-        # everything after is done after dpg has been shut down
+
+        # everything else is done after dpg has been shut down
         #   should handle things like dumping the settings to file
         #   etc...
+        self.settings_store() # dumps the settings to file
 
-        with open(self.settings_path, "w") as settings_file:
-            settings_file.write(json.dumps(self.settings.to_dict()))
+    # ------------------------------------------------------------------------------------------------------------------
+    # - Asyncio events -
+    # ------------------------------------------------------------------------------------------------------------------
+    def register_event(self, callback) -> asyncio.Event:
+        """A way to register asyncio events, which return the event"""
+        self.loop.create_task(callback(event:=asyncio.Event()))
+        return event
