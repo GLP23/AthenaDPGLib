@@ -1,4 +1,4 @@
 # ----------------------------------------------------------------------------------------------------------------------
 # - Package Imports -
 # ----------------------------------------------------------------------------------------------------------------------
-from AthenaGuiLib.applications.application import Application
+from AthenaGuiLib.models.settings.settings import Settings

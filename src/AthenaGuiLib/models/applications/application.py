@@ -16,8 +16,8 @@ from typing import Callable
 from AthenaLib.models import Version
 
 # Custom Packages
-from AthenaGuiLib.viewports import Viewport
-from AthenaGuiLib.settings import Settings
+from AthenaGuiLib.models.viewports import Viewport
+from AthenaGuiLib.models.settings import Settings
 
 # ----------------------------------------------------------------------------------------------------------------------
 # - Code -
@@ -143,8 +143,9 @@ class Application: # made a singleton to make sure that there is only one applic
             dpg.show_viewport()
             # after viewport has been show, do the post settings call
             #   as this is the only way the maximize function can be called correctly
-            for call in self.post_dpg_launchers:
-                call()
+            for callback in self.post_dpg_launchers:
+                callback()
+
             # launching of the actual application
             dpg.start_dearpygui() # blocking call
         except KeyboardInterrupt: # made sure to do a "graceful" shutdown:
@@ -158,6 +159,7 @@ class Application: # made a singleton to make sure that there is only one applic
         """the bare minimum that needs to happen to make sure the shutdown is handled correctly"""
         # destroy the context, else dpg will freak out
         dpg.destroy_context()
+
 
     def graceful_full_shutdown(self):
         """the full suite of how to handle the shutdown"""
