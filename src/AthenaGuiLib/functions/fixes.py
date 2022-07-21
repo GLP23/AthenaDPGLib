@@ -3,32 +3,22 @@
 # ----------------------------------------------------------------------------------------------------------------------
 # General Packages
 from __future__ import annotations
-import dearpygui.dearpygui as dpg
-from dataclasses import dataclass, field
+import sys
+import ctypes
 
 # Custom Library
 
 # Custom Packages
-from AthenaGuiLib.entities import Window
 
 # ----------------------------------------------------------------------------------------------------------------------
 # - Code -
 # ----------------------------------------------------------------------------------------------------------------------
-class WindowController:
-    _window:Window
-
-    def __init__(self, label:str="window"):
-        self._window = Window(
-            id = dpg.add_window(
-                label=label
-            )
-        )
-
-    @property
-    def id(self):
-        return self._window.id
-
-    def content(self):
-        pass
-
-    def assemble(self):
+def fix_icon_for_taskbar(app_model_id:str):
+    # Define application ICON,
+    #   makes sure the APPLICATION icon is shown in the taskbar
+    if sys.platform == "win32":
+        # WINDOWS NEEDS THIS to make this possible
+        ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(app_model_id)
+    else:
+        # TODO fix this! (aka, find out how to do this)
+        raise NotImplementedError
