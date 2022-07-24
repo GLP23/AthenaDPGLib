@@ -22,7 +22,7 @@ def version_handler() -> str:
     return version_str
 
 setuptools.setup(
-    name="AthenaGuiLib",
+    name="AthenaDearPyGuiLib",
     version=version_handler(),
     author="Andreas Sas",
     author_email="",
