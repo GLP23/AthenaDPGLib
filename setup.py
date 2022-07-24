@@ -27,9 +27,9 @@ setuptools.setup(
     author="Andreas Sas",
     author_email="",
     description="A Library of DearPyGui elements, to be used in Directive Athena projects",
-    url="https://github.com/DirectiveAthena/AthenaGuiLib",
+    url="https://github.com/DirectiveAthena/AthenaDearPyGuiLib",
     project_urls={
-        "Bug Tracker": "https://github.com/DirectiveAthena/AthenaGuiLib/issues",
+        "Bug Tracker": "https://github.com/DirectiveAthena/AthenaDearPyGuiLib/issues",
     },
     license="GPLv3",
     package_dir={"": "src"},
