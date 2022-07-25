@@ -28,10 +28,10 @@ class Application:
     def __post_init__(self):
         self.app_model_id = f"{self.name.lower()}_{self.version.to_str(sep='.')}"
 
-    def launch(self):
-
+        # create the context, else dpg will not work
         dpg.create_context()
 
+    def launch(self):
         dpg.create_viewport(
             title=self.app_model_id,
             small_icon=self.filepaths.icon,
