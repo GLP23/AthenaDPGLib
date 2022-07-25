@@ -21,4 +21,4 @@ class FilePaths:
     def from_file(cls, filepath:str):
         with open(filepath, "r") as file:
             kwargs_paths = json.load(file)
-        return cls(kwargs_paths)
+        return cls(**kwargs_paths)
