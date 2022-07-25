@@ -9,8 +9,10 @@ from dataclasses import dataclass, field
 from AthenaLib.models.version import Version
 
 # Custom Packages
-from AthenaDearPyGuiLib.models.filepaths import FilePaths
 from AthenaDearPyGuiLib.functions.fixes import fix_icon_for_taskbar
+from AthenaDearPyGuiLib.models.filepaths import FilePaths
+from AthenaDearPyGuiLib.models.dpg_component import DpgComponent
+from AthenaDearPyGuiLib.models.components.basic.window import Window
 
 # ----------------------------------------------------------------------------------------------------------------------
 # - Code -
@@ -24,6 +26,7 @@ class Application:
 
     # non init stuff
     app_model_id:str = field(init=False)
+    content:dict[str:DpgComponent] = field(init=False, default_factory=dict)
 
     def __post_init__(self):
         self.app_model_id = f"{self.name.lower()}_{self.version.to_str(sep='.')}"
@@ -35,12 +38,22 @@ class Application:
         dpg.create_viewport(
             title=self.app_model_id,
             small_icon=self.filepaths.icon,
-            large_icon=self.filepaths.icon
+            large_icon=self.filepaths.icon,
+            x_pos=1080+100 # todo remove in final version
         )
-
         fix_icon_for_taskbar(self.app_model_id)
+
+        for component_id,component in self.content.items(): #type: str, DpgComponent
+            dpg.unstage(component.stage)
 
         dpg.setup_dearpygui()
         dpg.show_viewport()
         dpg.start_dearpygui() # blocking call
         dpg.destroy_context()
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # - Code -
+    # ------------------------------------------------------------------------------------------------------------------
+    def register_component(self, component:DpgComponent):
+        self.content[component.id] = component
+
