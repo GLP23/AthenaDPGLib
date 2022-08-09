@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DPG mode="single">
+    <window name="test">
+        <gridlayout col="3">
+            <row>
+                <text>None</text>
+                <button callback="btn_1" label="1"/>
+                <text>None</text>
+            </row>
+            <row>
+                <button callback="btn_2" label="2"/>
+                <text>None</text>
+                <text>None</text>
+            </row>
+            <row>
+                <text>None</text>
+                <text>None</text>
+                <button callback="btn_3" label="3"/>
+            </row>
+        </gridlayout>
+    </window>
+</DPG>

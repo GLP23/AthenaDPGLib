@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DPG>
+    <primary_window label="test">
+        <text>This should be displayed</text>
+
+        <window label="test2">
+            <text>This should be displayed</text>
+        </window>
+
+        <window label="test3">
+            <text>This should be displayed also</text>
+            <button callback="btn_1" user_data="Some Data" label="press me"/>
+        </window>
+
+        <window label="test4"/>
+
+    </primary_window>
+</DPG>
