@@ -10,7 +10,6 @@ from dataclasses import dataclass
 # Custom Library
 
 # Custom Packages
-from AthenaDPGLib.data.parser import TAG_MAPPING
 
 # ----------------------------------------------------------------------------------------------------------------------
 # - Code -
