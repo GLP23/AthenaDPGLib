@@ -17,14 +17,14 @@ def version_handler() -> str:
     return ".".join(str(i) for i in version)
 
 setuptools.setup(
-    name="AthenaDearPyGuiLib",
+    name="AthenaDPGLib",
     version=version_handler(),
     author="Andreas Sas",
     author_email="",
-    description="A Library of DearPyGui elements, to be used in Directive Athena projects",
-    url="https://github.com/DirectiveAthena/AthenaDearPyGuiLib",
+    description="A Library of OOP DearPyGui elements, to be used in Directive Athena projects",
+    url="https://github.com/DirectiveAthena/AthenaDPGLib",
     project_urls={
-        "Bug Tracker": "https://github.com/DirectiveAthena/AthenaDearPyGuiLib/issues",
+        "Bug Tracker": "https://github.com/DirectiveAthena/AthenaDPGLib/issues",
     },
     license="GPLv3",
     package_dir={"": "src"},
