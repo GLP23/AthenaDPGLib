@@ -15,6 +15,18 @@ from AthenaDPGLib.data.runtimeparser_mapping import (
 )
 
 # ----------------------------------------------------------------------------------------------------------------------
+# - Support Code -
+# ----------------------------------------------------------------------------------------------------------------------
+class Callbacks:
+    pass
+
+    def __getitem__(self, item):
+        if item in self.__dir__():
+            return getattr(self,item)
+        else:
+            raise ValueError(item)
+
+# ----------------------------------------------------------------------------------------------------------------------
 # - Code -
 # ----------------------------------------------------------------------------------------------------------------------
 @dataclass(slots=True, init=False)
@@ -22,12 +34,12 @@ class RuntimeParser:
     filepath:str
     document:ET.ElementTree
     root:ET.Element
-    callbacks:dict
+    callbacks:Callbacks
 
-    def __init__(self, filepath_input:str, callbacks:dict=None):
+    def __init__(self, filepath_input:str, callbacks:Callbacks=None):
         # todo check if the file exists or not
         self.filepath = filepath_input
-        self.callbacks = callbacks if callbacks is not None else {}
+        self.callbacks = callbacks if callbacks is not None else Callbacks()
 
     def parse(self):
         """dpg.create_context() has to be run beforehand"""
@@ -51,7 +63,7 @@ class RuntimeParser:
             elif tag in RUNTIMEPARSER_MAPPING_ITEMS_STRIPPED:
                 if "check" in child.attrib:
                     child.attrib["check"] = True if child.attrib["check"] in ["1", "True", "true", "TRUE"] else False
-                if "callback"  in child.attrib:
+                if "callback" in child.attrib:
                     child.attrib["callback"] = self.callbacks[child.attrib["callback"]]
                 RUNTIMEPARSER_MAPPING_ITEMS_STRIPPED[tag](**child.attrib)
 
