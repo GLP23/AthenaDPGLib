@@ -1,0 +1,34 @@
+{
+  "dpg": {
+    "mode": 0,
+    "items": [
+      {"viewport": {"title": "this is a test for the menu bar test"}},
+      {"viewport_menu_bar": {
+        "items": [
+          {"menu": {
+            "label": "File",
+            "items": [
+              {"menu_item": {"label": "Save", "callback": "print_me"}},
+              {"menu_item": {"label": "Save As", "callback": "print_me"}}
+          ]}},
+          {"menu": {
+            "label": "Settings",
+            "items": [
+              {"menu_item": {"label": "Settings 1", "callback": "print_me", "check": true}},
+              {"menu_item": {"label": "Settings 2", "callback": "print_me"}}
+            ]
+          }},
+          {"menu_item": {"label": "Help", "callback": "print_me"}},
+          {"menu": {
+            "label": "Widget Items",
+            "items": [
+              {"checkbox": {"label": "Pick Me", "callback": "print_me"}},
+              {"button": {"label": "Press Me", "callback": "print_me"}},
+              {"color_picker": {"label": "Color Me", "callback": "print_me"}}
+            ]
+          }}
+        ]
+      }}
+    ]
+  }
+}
