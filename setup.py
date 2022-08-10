@@ -13,7 +13,7 @@ import setuptools
 # - Code -
 # ----------------------------------------------------------------------------------------------------------------------
 def version_handler() -> str:
-    version = 0,1,0
+    version = 0,1,1
     return ".".join(str(i) for i in version)
 
 setuptools.setup(

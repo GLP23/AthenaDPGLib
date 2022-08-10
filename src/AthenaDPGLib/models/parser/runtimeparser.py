@@ -11,7 +11,7 @@ import json
 
 # Custom Packages
 from AthenaDPGLib.data.runtimeparser_mapping import (
-    RUNTIMEPARSER_MAPPING_CONTEXTMANGERS, RUNTIMEPARSER_MAPPING_ITEMS_STRIPPED
+    RUNTIMEPARSER_MAPPING_CONTEXTMANGERS, RUNTIMEPARSER_MAPPING_ITEMS_FULL
 )
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -62,10 +62,10 @@ class RuntimeParser:
                 with RUNTIMEPARSER_MAPPING_CONTEXTMANGERS[tag](**attrib):
                     self._parse_recursive(parent=children)
 
-            elif tag in RUNTIMEPARSER_MAPPING_ITEMS_STRIPPED:
+            elif tag in RUNTIMEPARSER_MAPPING_ITEMS_FULL:
                 if "callback" in attrib:
                     attrib["callback"] = self.callbacks[attrib["callback"]]
-                RUNTIMEPARSER_MAPPING_ITEMS_STRIPPED[tag](**attrib)
+                RUNTIMEPARSER_MAPPING_ITEMS_FULL[tag](**attrib)
 
             # for special cases
             elif tag == "primary_window":
