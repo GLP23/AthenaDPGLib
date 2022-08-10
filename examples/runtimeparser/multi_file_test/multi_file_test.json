@@ -1,0 +1,17 @@
+{
+  "dpg": {
+    "mode": "full",
+    "_children": [
+      {"viewport": {"title": "this is a test for the multi file parsing on demand"}},
+      {"viewport_menu_bar": {
+        "_children": [
+          {"menu": {
+            "label": "File",
+            "_children": [
+              {"menu_item": {"label": "Parse Window", "callback": "create_window"}}
+          ]}}
+        ]
+      }}
+    ]
+  }
+}

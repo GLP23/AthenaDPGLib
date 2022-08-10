@@ -48,6 +48,8 @@ class RuntimeParser:
         match self.document["dpg"]:
             case {"mode":"full","_children":children,}:
                 self._parse_recursive(parent=children)
+            case {"mode":"partial","_children":children,}:
+                self._parse_recursive(parent=children)
             case _:
                 raise RuntimeError
 

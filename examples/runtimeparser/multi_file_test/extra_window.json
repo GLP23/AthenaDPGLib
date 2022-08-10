@@ -1,0 +1,13 @@
+{
+  "dpg": {
+    "mode": "partial",
+    "_children": [
+      {"window": {
+        "label": "Extra Window",
+        "_children": [
+          {"text": {"default_value": "This should be an extra window"}}
+        ]
+      }}
+    ]
+  }
+}
