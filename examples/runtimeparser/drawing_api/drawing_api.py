@@ -14,7 +14,6 @@ from AthenaDPGLib.models.parser.runtimeparser import RuntimeParser
 # - Code -
 # ----------------------------------------------------------------------------------------------------------------------
 def main():
-    # https://dearpygui.readthedocs.io/en/latest/documentation/drawing-api.html
     dpg.create_context()
     RuntimeParser("drawing_api.json").parse()
     dpg.setup_dearpygui()
