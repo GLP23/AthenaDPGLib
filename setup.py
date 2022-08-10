@@ -13,7 +13,7 @@ import setuptools
 # - Code -
 # ----------------------------------------------------------------------------------------------------------------------
 def version_handler() -> str:
-    version = 1,0,0
+    version = 0,1,0
     return ".".join(str(i) for i in version)
 
 setuptools.setup(
@@ -32,7 +32,7 @@ setuptools.setup(
     python_requires=">=3.10",
     install_requires=[
         "DearPyGui>=1.6.2",
-        "AthenaLib>=0.2.0",
-        "AthenaColor>=5.1.0"
+        "AthenaLib>=1.6.2",
+        "AthenaColor>=6.2.0"
     ]
 )
