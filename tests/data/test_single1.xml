@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dpg mode="full">
+    <viewport/>
+    <primary_window label="test">
+        <text>This should be displayed</text>
+
+        <window label="test2">
+            <text>This should be displayed in test2</text>
+        </window>
+
+        <window label="test3">
+            <text tag="text1"></text>
+            <button callback="btn_1" user_data="Some Data" label="press me"/>
+        </window>
+
+        <window label="test4">
+            <slider_3d/>
+        </window>
+
+    </primary_window>
+</dpg>
