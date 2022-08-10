@@ -8,6 +8,7 @@ import xml.etree.ElementTree as ET
 from dataclasses import dataclass
 
 # Custom Library
+from AthenaLib.data.text import TRUTHY
 
 # Custom Packages
 from AthenaDPGLib.data.runtimeparser_mapping import (
@@ -62,7 +63,7 @@ class RuntimeParser:
 
             elif tag in RUNTIMEPARSER_MAPPING_ITEMS_STRIPPED:
                 if "check" in child.attrib:
-                    child.attrib["check"] = True if child.attrib["check"] in ["1", "True", "true", "TRUE"] else False
+                    child.attrib["check"] = True if child.attrib["check"] in TRUTHY else False
                 if "callback" in child.attrib:
                     child.attrib["callback"] = self.callbacks[child.attrib["callback"]]
                 RUNTIMEPARSER_MAPPING_ITEMS_STRIPPED[tag](**child.attrib)
