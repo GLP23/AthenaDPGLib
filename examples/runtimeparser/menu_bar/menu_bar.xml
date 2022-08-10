@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- https://dearpygui.readthedocs.io/en/latest/documentation/menus.html -->
-<dpg mode="full">
+<dpg mode="0">
     <viewport title="this is a test for the menu bar test"/>
 
     <viewport_menu_bar>
@@ -19,7 +19,7 @@
         <menu label="Widget Items">
             <checkbox label="Pick Me" callback="print_me"/>
             <button label="Press Me" callback="print_me"/>
-            <colot_picker label="Color Me" callback="print_me"/>
+            <color_picker label="Color Me" callback="print_me"/>
         </menu>
 
     </viewport_menu_bar>

@@ -49,14 +49,17 @@ class RuntimeParser:
 
         self.root = self.document.getroot()
         match self.root:
-            case ET.Element(tag="dpg", attrib={"mode":"full",}):
+            case ET.Element(tag="dpg", attrib={"mode":"0",}):
                 self._parse_recursive(parent=self.root)
-            case ET.Element(tag="dpg", attrib={"mode":"single",}):
-                # todo something else here
-                self._parse_recursive(parent=self.root)
+            case _:
+                raise RuntimeError
+
 
     def _parse_recursive(self, parent:ET.Element):
         for child in parent: #type: ET.Element
+            # todo type casting
+            attrib = child.attrib
+
             if (tag:=child.tag) in RUNTIMEPARSER_MAPPING_CONTEXTMANGERS:
                 with RUNTIMEPARSER_MAPPING_CONTEXTMANGERS[tag](**child.attrib):
                     self._parse_recursive(parent=child)

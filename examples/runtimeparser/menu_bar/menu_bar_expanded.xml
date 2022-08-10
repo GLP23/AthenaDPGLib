@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- https://dearpygui.readthedocs.io/en/latest/documentation/menus.html -->
+<dpg mode="full">
+    <viewport>
+        <title>this is a test for the menu bar test</title>
+    </viewport>
+
+    <viewport_menu_bar>
+        <menu>
+            <label>File</label>
+            <items>
+                <menu_item>
+                    <label>Save</label>
+                    <callback>print_me</callback>
+                </menu_item>
+                <menu_item>
+                    <label>Save As</label>
+                    <callback>print_me</callback>
+                </menu_item>
+                <menu>
+                    <label>Settings</label>
+                    <items>
+                        <menu_item>
+                            <label>Setting 1</label>
+                            <callback>print_me</callback>
+                        </menu_item>
+                        <menu_item>
+                            <label>Setting 2</label>
+                            <callback>print_me</callback>
+                            <check>True</check>
+                        </menu_item>
+                    </items>
+                </menu>
+            </items>
+        </menu>
+
+        <menu_item>
+            <label>Help</label>
+            <callback>print_me</callback>
+        </menu_item>
+
+        <menu>
+            <label>Widget Items</label>
+            <items>
+                <checkbox>
+                    <label>Pick Me</label>
+                    <callback>print_me</callback>
+                </checkbox>
+                <button>
+                    <label>Press Me</label>
+                    <callback>print_me</callback>
+                </button>
+                <color_picker>
+                    <label>Color Me</label>
+                    <callback>print_me</callback>
+                </color_picker>
+            </items>
+        </menu>
+
+    </viewport_menu_bar>
+</dpg>
