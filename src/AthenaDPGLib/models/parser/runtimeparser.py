@@ -46,7 +46,7 @@ class RuntimeParser:
             self.document = json.load(file)
 
         match self.document["dpg"]:
-            case {"mode":0,"_children":children,}:
+            case {"mode":"full","_children":children,}:
                 self._parse_recursive(parent=children)
             case _:
                 raise RuntimeError

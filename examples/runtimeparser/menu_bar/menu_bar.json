@@ -1,6 +1,6 @@
 {
   "dpg": {
-    "mode": 0,
+    "mode": "full",
     "_children": [
       {"viewport": {"title": "this is a test for the menu bar test"}},
       {"viewport_menu_bar": {
