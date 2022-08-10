@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dpg mode="full">
+    <viewport/>
+    <primary_window label="test">
+        <text default_value="this should be in the primary window"/>
+    </primary_window>
+</dpg>

@@ -4,7 +4,6 @@
 # General Packages
 from __future__ import annotations
 import dearpygui.dearpygui as dpg
-import unittest
 
 # Custom Library
 from AthenaDPGLib.models.parser.runtimeparser import RuntimeParser
@@ -14,23 +13,19 @@ from AthenaDPGLib.models.parser.runtimeparser import RuntimeParser
 # ----------------------------------------------------------------------------------------------------------------------
 # - Code -
 # ----------------------------------------------------------------------------------------------------------------------
+def print_me(sender):
+    print(f"Menu Item: {sender}")
 
-def callback_test(sender, app_data, user_data):
-    dpg.set_value("text1",user_data)
+def main():
+    dpg.create_context()
+    RuntimeParser(
+        "menu_bar.xml",
+        callbacks={"print_me":print_me}
+    ).parse()
+    dpg.setup_dearpygui()
+    dpg.show_viewport()
+    dpg.start_dearpygui()
+    dpg.destroy_context()
 
-
-class TestParser(unittest.TestCase):
-    def test_general(self):
-        dpg.create_context()
-        dpg.create_viewport(title='test General', width=600, height=300)
-
-        filepath = "data/test_single1.xml"
-        RuntimeParser(
-            filepath,
-            callbacks={"btn_1":callback_test}
-        ).parse()
-
-        dpg.setup_dearpygui()
-        dpg.show_viewport()
-        dpg.start_dearpygui()
-        dpg.destroy_context()
+if __name__ == '__main__':
+    main()
