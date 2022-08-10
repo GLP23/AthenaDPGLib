@@ -21,7 +21,7 @@ class CustomCallbacks(Callbacks):
 def main():
     dpg.create_context()
     RuntimeParser(
-        "menu_bar.xml",
+        "menu_bar.json",
         callbacks=CustomCallbacks()
     ).parse()
     dpg.setup_dearpygui()

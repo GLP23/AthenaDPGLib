@@ -4,8 +4,8 @@
 # General Packages
 from __future__ import annotations
 import dearpygui.dearpygui as dpg
-import xml.etree.ElementTree as ET
 from dataclasses import dataclass
+import json
 
 # Custom Library
 
@@ -32,8 +32,7 @@ class Callbacks:
 @dataclass(slots=True, init=False)
 class RuntimeParser:
     filepath:str
-    document:ET.ElementTree
-    root:ET.Element
+    document:dict
     callbacks:Callbacks
 
     def __init__(self, filepath_input:str, callbacks:Callbacks=None):
@@ -44,36 +43,37 @@ class RuntimeParser:
     def parse(self):
         """dpg.create_context() has to be run beforehand"""
         with open(self.filepath, "r") as file:
-            self.document = ET.parse(file)
+            self.document = json.load(file)
 
-        self.root = self.document.getroot()
-        match self.root:
-            case ET.Element(tag="dpg", attrib={"mode":"full",}):
-                self._parse_recursive(parent=self.root)
-            case ET.Element(tag="dpg", attrib={"mode":"single",}):
-                # todo something else here
-                self._parse_recursive(parent=self.root)
+        match self.document["dpg"]:
+            case {"mode":"full","_children":children,}:
+                self._parse_recursive(parent=children)
+            case {"mode":"partial","_children":children,}:
+                self._parse_recursive(parent=children)
+            case _:
+                raise RuntimeError
 
-    def _parse_recursive(self, parent:ET.Element):
-        for child in parent: #type: ET.Element
-            if (tag:=child.tag) in RUNTIMEPARSER_MAPPING_CONTEXTMANGERS:
-                with RUNTIMEPARSER_MAPPING_CONTEXTMANGERS[tag](**child.attrib):
-                    self._parse_recursive(parent=child)
+
+    def _parse_recursive(self, parent:list):
+        for tag, attrib in ((k,v) for item in parent for k, v in item.items()): #type: str, dict
+            if tag in RUNTIMEPARSER_MAPPING_CONTEXTMANGERS:
+                children = attrib["_children"]
+                attrib.pop("_children")
+                with RUNTIMEPARSER_MAPPING_CONTEXTMANGERS[tag](**attrib):
+                    self._parse_recursive(parent=children)
 
             elif tag in RUNTIMEPARSER_MAPPING_ITEMS_STRIPPED:
-                if "check" in child.attrib:
-                    child.attrib["check"] = True if child.attrib["check"] in ["1", "True", "true", "TRUE"] else False
-                if "callback" in child.attrib:
-                    child.attrib["callback"] = self.callbacks[child.attrib["callback"]]
-                RUNTIMEPARSER_MAPPING_ITEMS_STRIPPED[tag](**child.attrib)
+                if "callback" in attrib:
+                    attrib["callback"] = self.callbacks[attrib["callback"]]
+                RUNTIMEPARSER_MAPPING_ITEMS_STRIPPED[tag](**attrib)
 
-            else:
-                # for special cases
-                match child:
-                    case ET.Element(tag="primary_window", attrib=attrib):
-                        with dpg.window(**attrib, tag="primary_window"):
-                            self._parse_recursive(parent=child)
-                        dpg.set_primary_window("primary_window", True)
+            # for special cases
+            elif tag == "primary_window":
+                children = attrib["_children"]
+                attrib.pop("_children")
+                with dpg.window(**attrib, tag="primary_window"):
+                    self._parse_recursive(parent=children)
+                dpg.set_primary_window("primary_window", True)
 
-                    case ET.Element(tag="viewport", attrib=attrib):
-                        dpg.create_viewport(**attrib)
+            elif tag == "viewport":
+                dpg.create_viewport(**attrib)

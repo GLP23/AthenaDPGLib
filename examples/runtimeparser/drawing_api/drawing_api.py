@@ -2,26 +2,24 @@
 # - Package Imports -
 # ----------------------------------------------------------------------------------------------------------------------
 # General Packages
-from dataclasses import dataclass
-import json
+from __future__ import annotations
+import dearpygui.dearpygui as dpg
 
 # Custom Library
-from AthenaLib.data.text import NOTHING
+from AthenaDPGLib.models.parser.runtimeparser import RuntimeParser
 
 # Custom Packages
 
 # ----------------------------------------------------------------------------------------------------------------------
 # - Code -
 # ----------------------------------------------------------------------------------------------------------------------
-@dataclass(kw_only=True)
-class FilePaths:
-    icon:str=NOTHING
+def main():
+    dpg.create_context()
+    RuntimeParser("drawing_api.json").parse()
+    dpg.setup_dearpygui()
+    dpg.show_viewport()
+    dpg.start_dearpygui()
+    dpg.destroy_context()
 
-    @classmethod
-    def from_json(cls, filepath:str):
-        if not filepath.endswith(".json"):
-            raise ValueError
-
-        with open(filepath, "r") as file:
-            kwargs_paths = json.load(file)
-        return cls(**kwargs_paths)
+if __name__ == '__main__':
+    main()
