@@ -6,7 +6,7 @@ from __future__ import annotations
 import dearpygui.dearpygui as dpg
 
 # Custom Library
-from AthenaDPGLib.models.parser.runtimeparser import RuntimeParser, Callbacks
+from AthenaDPGLib.models.runtimeparser.parser_runtime import ParserRuntime, Callbacks
 
 # Custom Packages
 
@@ -20,10 +20,9 @@ class CustomCallbacks(Callbacks):
 
 def main():
     dpg.create_context()
-    RuntimeParser(
-        "menu_bar.json",
+    ParserRuntime(
         callbacks=CustomCallbacks()
-    ).parse()
+    ).parse("menu_bar.json")
     dpg.setup_dearpygui()
     dpg.show_viewport()
     dpg.start_dearpygui()

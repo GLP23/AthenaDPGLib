@@ -6,7 +6,7 @@ from __future__ import annotations
 import dearpygui.dearpygui as dpg
 
 # Custom Library
-from AthenaDPGLib.models.parser.runtimeparser import RuntimeParser
+from AthenaDPGLib.models.runtimeparser.parser_runtime import ParserRuntime
 
 # Custom Packages
 
@@ -15,7 +15,7 @@ from AthenaDPGLib.models.parser.runtimeparser import RuntimeParser
 # ----------------------------------------------------------------------------------------------------------------------
 def main():
     dpg.create_context()
-    RuntimeParser("drawing_api.json").parse()
+    ParserRuntime().parse("drawing_api.json")
     dpg.setup_dearpygui()
     dpg.show_viewport()
     dpg.start_dearpygui()
