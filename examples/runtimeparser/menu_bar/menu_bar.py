@@ -14,8 +14,8 @@ from AthenaDPGLib.models.runtimeparser.parser_runtime import ParserRuntime, Call
 # - Code -
 # ----------------------------------------------------------------------------------------------------------------------
 class CustomCallbacks(Callbacks):
-    @staticmethod
-    def print_me(sender):
+    @Callbacks.callback
+    def print_me(self,sender):
         print(f"Menu Item: {sender}")
 
 def main():
