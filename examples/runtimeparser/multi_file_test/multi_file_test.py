@@ -6,29 +6,29 @@ from __future__ import annotations
 import dearpygui.dearpygui as dpg
 
 # Custom Library
-from AthenaDPGLib.models.parser.runtimeparser import RuntimeParser, Callbacks
+from AthenaDPGLib.models.runtimeparser.parser_runtime import ParserRuntime, Callbacks
 
 # Custom Packages
 
 # ----------------------------------------------------------------------------------------------------------------------
 # - Code -
 # ----------------------------------------------------------------------------------------------------------------------
+parser: ParserRuntime
+
 class CustomCallbacks(Callbacks):
-    @staticmethod
-    def print_me(sender):
+    @Callbacks.callback
+    def print_me(self, sender):
         print(f"Menu Item: {sender}")
-    @staticmethod
-    def create_window():
-        RuntimeParser(
-            "extra_window.json",
-        ).parse()
+    @Callbacks.callback
+    def create_window(self):
+        global parser
+        parser.parse("extra_window.json")
 
 def main():
     dpg.create_context()
-    RuntimeParser(
-        "multi_file_test.json",
-        callbacks=CustomCallbacks()
-    ).parse()
+    global parser
+    parser = ParserRuntime(callbacks=CustomCallbacks())
+    parser.parse("multi_file_test.json")
     dpg.setup_dearpygui()
     dpg.show_viewport()
     dpg.start_dearpygui()

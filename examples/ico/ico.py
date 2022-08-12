@@ -6,7 +6,7 @@ from __future__ import annotations
 import dearpygui.dearpygui as dpg
 
 # Custom Library
-from AthenaDPGLib.models.runtimeparser.parser_runtime import ParserRuntime
+from AthenaDPGLib.functions.fixes import fix_icon_for_taskbar
 
 # Custom Packages
 
@@ -14,8 +14,16 @@ from AthenaDPGLib.models.runtimeparser.parser_runtime import ParserRuntime
 # - Code -
 # ----------------------------------------------------------------------------------------------------------------------
 def main():
+    ICON = "ATHENA.ico"
+    TITLE = "IconExample"
+
     dpg.create_context()
-    ParserRuntime().parse("drawing_api.json")
+    dpg.create_viewport(title=TITLE, width=600, height=300, large_icon=ICON, small_icon=ICON)
+    fix_icon_for_taskbar(TITLE)
+
+    with dpg.window(label="Example of the Icon"):
+        dpg.add_text("You should see an icon in your taskbar.\nOnly works for windows currently")
+
     dpg.setup_dearpygui()
     dpg.show_viewport()
     dpg.start_dearpygui()
