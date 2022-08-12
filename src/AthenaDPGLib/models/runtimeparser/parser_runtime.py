@@ -7,6 +7,7 @@ import dearpygui.dearpygui as dpg
 from dataclasses import dataclass, field
 import json
 from typing import Callable
+import copy
 
 # Custom Library
 
@@ -25,6 +26,16 @@ def custom_dpg_item(fnc):
     custom_dpg[fnc.__name__] = fnc
     return fnc
 
+PRIMARY_WINDOW = "primary_window"
+SKIP_ATTRIB = {"_children"}
+SKIP_ATTRIB_GRID_LAYOUT = {"_columns", "_rows","_children","_row_all"}
+def skip_attrib(attrib:dict, skipables:set) -> dict:
+    return {k:v for k, v in attrib.items() if k not in skipables}
+
+def map_attrib_policy(attrib:dict) -> dict:
+    if "policy" in attrib:
+        attrib["policy"] = getattr(dpg, attrib["policy"])
+    return attrib
 # ----------------------------------------------------------------------------------------------------------------------
 # - Code -
 # ----------------------------------------------------------------------------------------------------------------------
@@ -38,7 +49,7 @@ class ParserRuntime:
         global custom_dpg
         self.custom_dpg: dict[str:Callable] = custom_dpg
 
-    def parse(self, filepath_input:str):
+    def parse(self, filepath_input:str) -> ParserRuntime:
         """dpg.create_context() has to be run beforehand"""
         with open(filepath_input, "r") as file:
             document = json.load(file)
@@ -50,6 +61,7 @@ class ParserRuntime:
                 self._parse_recursive(parent=children)
             case _:
                 raise RuntimeError
+        return self
 
     def _parse_recursive(self, parent:list):
         for item, attrib in ((k,v) for i in parent for k, v in i.items()): #type: str, dict
@@ -88,22 +100,38 @@ class ParserRuntime:
             self.tags.add(tag)
 
     def dpg_context_manager(self, fnc:Callable , attrib:dict):
-            children = attrib["_children"]
-            attrib.pop("_children")
-            with fnc(**self.assign_callbacks(attrib)):
-                self._parse_recursive(parent=children)
+            with fnc(**self.assign_callbacks(skip_attrib(attrib, SKIP_ATTRIB))):
+                self._parse_recursive(parent=attrib["_children"])
 
     # ------------------------------------------------------------------------------------------------------------------
     # - Special DPG items -
     # ------------------------------------------------------------------------------------------------------------------
     @custom_dpg_item
     def primary_window(self, _: str, attrib: dict):
-        children = attrib["_children"]
-        attrib.pop("_children")
-        with dpg.window(**attrib, tag="primary_window"):
-            self._parse_recursive(parent=children)
-        dpg.set_primary_window("primary_window", True)
+        attrib["tag"] = PRIMARY_WINDOW
+        self.dpg_context_manager(
+            fnc=dpg.window,
+            attrib=attrib
+        )
+        dpg.set_primary_window(PRIMARY_WINDOW, True)
 
     @custom_dpg_item
     def viewport(self, _:str, attrib:dict):
         dpg.create_viewport(**attrib)
+
+    @custom_dpg_item
+    def grid_layout(self, _:str, attrib:dict):
+        with dpg.table(**map_attrib_policy(skip_attrib(attrib, SKIP_ATTRIB_GRID_LAYOUT)), header_row=False):
+            # columns
+            for column in attrib["_columns"]:
+                dpg.add_table_column(**column)
+
+            # rows with the items
+            if "_rows" in attrib:
+                for row_attrib, child in zip(attrib["_rows"], attrib["_children"]):
+                    with dpg.table_row(**row_attrib):
+                       self._parse_recursive(child)
+            elif "_row_all" in attrib:
+                for child in attrib["_children"]:
+                    with dpg.table_row(**attrib["_row_all"]):
+                       self._parse_recursive(child)
