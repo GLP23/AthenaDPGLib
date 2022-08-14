@@ -5,6 +5,7 @@
 from __future__ import annotations
 import sys
 import ctypes
+import dearpygui.dearpygui as dpg
 
 # Custom Library
 
@@ -23,3 +24,10 @@ def fix_icon_for_taskbar(app_model_id:str):
     else:
         # TODO fix this! (aka, find out how to do this)
         raise NotImplementedError(f"the 'fix_icon_for_taskbar' function doe not work for the os: {sys_platform}")
+
+def fix_grid_layout_equal_row_spacing(table_name:str):
+    if dpg.does_item_exist(table_name):
+        child = dpg.get_item_children(table_name)
+        vp_height = dpg.get_item_height(table_name)
+        for x in child[1]:
+            dpg.configure_item(x, height=vp_height / len(child[1]))

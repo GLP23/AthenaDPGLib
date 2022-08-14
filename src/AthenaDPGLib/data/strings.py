@@ -6,20 +6,13 @@ from __future__ import annotations
 import dearpygui.dearpygui as dpg
 
 # Custom Library
-from AthenaDPGLib.models.runtimeparser.parser_runtime import ParserRuntime
 
 # Custom Packages
 
 # ----------------------------------------------------------------------------------------------------------------------
 # - Code -
 # ----------------------------------------------------------------------------------------------------------------------
-def main():
-    dpg.create_context()
-    ParserRuntime().parse_single_file("drawing_api.json")
-    dpg.setup_dearpygui()
-    dpg.show_viewport()
-    dpg.start_dearpygui()
-    dpg.destroy_context()
-
-if __name__ == '__main__':
-    main()
+TAG:str = "tag"
+CALLBACK:str = "callback"
+DRAG_CALLBACK:str = "drag_callback"
+DROP_CALLBACK:str = "drop_callback"

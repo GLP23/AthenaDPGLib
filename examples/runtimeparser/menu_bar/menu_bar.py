@@ -22,7 +22,7 @@ def main():
     dpg.create_context()
     ParserRuntime(
         callbacks=CustomCallbacks()
-    ).parse("menu_bar.json")
+    ).parse_single_file("menu_bar.json")
     dpg.setup_dearpygui()
     dpg.show_viewport()
     dpg.start_dearpygui()

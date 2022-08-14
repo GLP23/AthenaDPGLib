@@ -3,23 +3,21 @@
 # ----------------------------------------------------------------------------------------------------------------------
 # General Packages
 from __future__ import annotations
-import dearpygui.dearpygui as dpg
+from typing import Callable, ClassVar
+from dataclasses import dataclass
 
 # Custom Library
-from AthenaDPGLib.models.runtimeparser.parser_runtime import ParserRuntime
 
 # Custom Packages
 
 # ----------------------------------------------------------------------------------------------------------------------
 # - Code -
 # ----------------------------------------------------------------------------------------------------------------------
-def main():
-    dpg.create_context()
-    ParserRuntime().parse_single_file("drawing_api.json")
-    dpg.setup_dearpygui()
-    dpg.show_viewport()
-    dpg.start_dearpygui()
-    dpg.destroy_context()
+@dataclass(slots=True, kw_only=True)
+class _Parser:
+    custom_dpg:ClassVar[dict[str:Callable]]={}
 
-if __name__ == '__main__':
-    main()
+    @classmethod
+    def custom_dpg_item(cls,fnc):
+        cls.custom_dpg[fnc.__name__] = fnc
+        return fnc
