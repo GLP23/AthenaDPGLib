@@ -12,6 +12,9 @@ import dearpygui.dearpygui as dpg
 # ----------------------------------------------------------------------------------------------------------------------
 # - Code -
 # ----------------------------------------------------------------------------------------------------------------------
+
+# Strings that are often reused within the library
+#   Stored here to be created once, and then just referenced afterwards
 TAG:str = "tag"
 CALLBACK:str = "callback"
 DRAG_CALLBACK:str = "drag_callback"

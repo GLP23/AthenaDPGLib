@@ -13,6 +13,8 @@ import dearpygui.dearpygui as dpg
 # - Code -
 # ----------------------------------------------------------------------------------------------------------------------
 RUNTIMEPARSER_MAPPING_CONTEXTMANGERS = {
+    # A full dictionary of all DPG items that can be used in context managers
+    #   Ergo, the ones that can be used in with ... statements
     "child": dpg.child,
     "clipper": dpg.clipper,
     "collapsing_header": dpg.collapsing_header,
@@ -51,6 +53,8 @@ RUNTIMEPARSER_MAPPING_CONTEXTMANGERS = {
 }
 
 RUNTIMEPARSER_MAPPING_ITEMS_FULL = {
+    # A full dictionary of all DPG items
+    #   Most often than not, these will be used within context managed items
     "2d_histogram_series": dpg.add_2d_histogram_series,
     "3d_slider": dpg.add_3d_slider,
     "alias": dpg.add_alias,
