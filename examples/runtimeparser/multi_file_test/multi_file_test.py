@@ -22,13 +22,13 @@ class CustomCallbacks(Callbacks):
     @Callbacks.callback
     def create_window(self):
         global parser
-        parser.parse("extra_window.json")
+        parser.parse_single_file("extra_window.json")
 
 def main():
     dpg.create_context()
     global parser
     parser = ParserRuntime(callbacks=CustomCallbacks())
-    parser.parse("multi_file_test.json")
+    parser.parse_single_file("multi_file_test.json")
     dpg.setup_dearpygui()
     dpg.show_viewport()
     dpg.start_dearpygui()
