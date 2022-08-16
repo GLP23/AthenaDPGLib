@@ -16,6 +16,7 @@ from AthenaDPGLib.data.strings import (TAG, CALLBACK, DRAG_CALLBACK, DROP_CALLBA
 from AthenaDPGLib.data.runtimeparser_mapping import (
     RUNTIMEPARSER_MAPPING_CONTEXTMANGERS, RUNTIMEPARSER_MAPPING_ITEMS_FULL
 )
+from AthenaDPGLib.data.dpg_policies import DPG_TABLE_POLICIES
 
 # ----------------------------------------------------------------------------------------------------------------------
 # - Support Code -
@@ -28,7 +29,7 @@ def skip_attrib(attrib:dict, skipables:set) -> dict:
 
 def map_attrib_policy(attrib:dict) -> dict:
     if "policy" in attrib:
-        attrib["policy"] = getattr(dpg, attrib["policy"])
+        attrib["policy"] = DPG_TABLE_POLICIES[attrib["policy"]]
     return attrib
 
 # ----------------------------------------------------------------------------------------------------------------------
