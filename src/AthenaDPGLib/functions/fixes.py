@@ -31,7 +31,7 @@ def fix_grid_layout_equal_row_spacing(table_name:str):
     #   This is a fix that solves this 'issue'
     #   By example of the code Illu showed me
     if dpg.does_item_exist(table_name) and dpg.get_item_type(table_name) == DpgItemNames.table.value:
-        # ALWAYS MAKE SURE THE TABLE EXSISTS and is actually a table
+        # Always make sure the table exists and is actually a table
         tbl_height = dpg.get_item_height(table_name)
         for r in (rows := dpg.get_item_children(table_name)[1]):
             dpg.configure_item(r, height=tbl_height / len(rows))

@@ -87,7 +87,7 @@ class ParserRuntime(_Parser):
     # ------------------------------------------------------------------------------------------------------------------
     # - Special DPG items -
     # ------------------------------------------------------------------------------------------------------------------
-    @_Parser.custom_dpg_item
+    @_Parser.custom_dpg_item(name="primary_window")
     def primary_window(self, _: str, attrib: dict):
         attrib[TAG] = PRIMARY_WINDOW
         self.dpg_context_manager(
@@ -96,11 +96,11 @@ class ParserRuntime(_Parser):
         )
         dpg.set_primary_window(PRIMARY_WINDOW, True)
 
-    @_Parser.custom_dpg_item
+    @_Parser.custom_dpg_item(name="viewport")
     def viewport(self, _:str, attrib:dict):
         dpg.create_viewport(**attrib)
 
-    @_Parser.custom_dpg_item
+    @_Parser.custom_dpg_item(name="grid_layout")
     def grid_layout(self, _:str, attrib:dict):
         with dpg.table(**map_attrib_policy(skip_attrib(attrib, SKIP_ATTRIB_GRID_LAYOUT)), header_row=False):
             # columns
