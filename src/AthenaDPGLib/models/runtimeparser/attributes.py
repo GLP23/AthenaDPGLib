@@ -23,14 +23,16 @@ class Attributes(collections.abc.Mapping):
     """
     attrib:dict[str:Any]
 
-    def __init__(self, attrib:dict, *,skipables:set=None):
-        self.attrib = skip_keys_in_mapping(attrib, skipables) if skipables is not None else attrib
+    def __init__(self, attrib:dict):
+        # skip all attributes that start with `_`
+        #   This is because these are used within the parser to define special args, child items, etc...
+        self.attrib = {k:v for k,v in  attrib.items() if not k.startswith("_")}
 
         # fix any attributes that have to be mapped to another non-JSON-Storable data type
         self.map_attrib_policy()
 
     # ------------------------------------------------------------------------------------------------------------------
-    # - Mapping abstract methods -
+    # - Mapping abstract methods - (this way we can 'unpack' the Attributes Class)
     # ------------------------------------------------------------------------------------------------------------------
     def __iter__(self):
         return iter(self.attrib.keys()) # thanks for eivl in showing me collections.abc.Mapping

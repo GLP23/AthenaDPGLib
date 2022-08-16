@@ -39,7 +39,7 @@ class Application:
     def parse_gui_files(self):
         if self.gui_folder is not None:
             for filepath in gather_all_filepaths(self.gui_folder):
-                self.parser.parse_single_file(filepath)
+                self.parser.parse_file(filepath)
 
     def parse_translation(self, language:Languages):
         self.translations.connect()

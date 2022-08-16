@@ -3,23 +3,20 @@
 # ----------------------------------------------------------------------------------------------------------------------
 # General Packages
 from __future__ import annotations
-import dearpygui.dearpygui as dpg
 
 # Custom Library
-from AthenaDPGLib.models.runtimeparser.parser_runtime import ParserRuntime
 
 # Custom Packages
+from AthenaDPGLib.data.globals import global_custom_dpg_items
 
 # ----------------------------------------------------------------------------------------------------------------------
 # - Code -
 # ----------------------------------------------------------------------------------------------------------------------
-def main():
-    dpg.create_context()
-    ParserRuntime().parse_file("drawing_api.json")
-    dpg.setup_dearpygui()
-    dpg.show_viewport()
-    dpg.start_dearpygui()
-    dpg.destroy_context()
-
-if __name__ == '__main__':
-    main()
+def custom_dpg_item(name):
+    """
+    Decorator which assigns the method as a custom dpg item which can be used within the json ui files.
+    Meant to be used within an inherited class of RunTimeParser
+    """
+    def decorator(fnc):
+        global_custom_dpg_items[name] = fnc
+    return decorator
