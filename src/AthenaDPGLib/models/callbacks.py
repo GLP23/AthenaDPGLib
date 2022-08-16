@@ -7,7 +7,7 @@ from typing import Callable
 import functools
 
 # Custom Library
-from AthenaLib.functions.mappings import append_or_new_list_to_mapping
+from AthenaLib.functions.mappings import append_or_extend_list_to_mapping
 
 # Custom Packages
 
@@ -45,7 +45,7 @@ class Callbacks:
         @functools.wraps(cls)
         def decoration(fnc:Callable):
             for item_name in items: #type: str
-                append_or_new_list_to_mapping(mapping=cls.mapping_callback, key=item_name, value=fnc)
+                append_or_extend_list_to_mapping(mapping=cls.mapping_callback, key=item_name, value=fnc)
         return decoration
 
     @classmethod

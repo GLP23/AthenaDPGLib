@@ -12,25 +12,11 @@ from typing import Callable
 
 # Custom Packages
 from AthenaDPGLib.models.runtimeparser._parser import _Parser
-from AthenaDPGLib.data.strings import (TAG, CALLBACK, DRAG_CALLBACK, DROP_CALLBACK)
+from AthenaDPGLib.models.runtimeparser.attributes import Attributes
+from AthenaDPGLib.data.text import (TAG, PRIMARY_WINDOW,SKIP_ATTRIB, SKIP_ATTRIB_GRID_LAYOUT)
 from AthenaDPGLib.data.runtimeparser_mapping import (
     RUNTIMEPARSER_MAPPING_CONTEXTMANGERS, RUNTIMEPARSER_MAPPING_ITEMS_FULL
 )
-from AthenaDPGLib.data.dpg_policies import DPG_TABLE_POLICIES
-
-# ----------------------------------------------------------------------------------------------------------------------
-# - Support Code -
-# ----------------------------------------------------------------------------------------------------------------------
-PRIMARY_WINDOW = "primary_window"
-SKIP_ATTRIB = {"_children", CALLBACK, DRAG_CALLBACK, DROP_CALLBACK}
-SKIP_ATTRIB_GRID_LAYOUT = {"_columns", "_rows","_children","_row_all"}
-def skip_attrib(attrib:dict, skipables:set) -> dict:
-    return {k:v for k, v in attrib.items() if k not in skipables}
-
-def map_attrib_policy(attrib:dict) -> dict:
-    if "policy" in attrib:
-        attrib["policy"] = DPG_TABLE_POLICIES[attrib["policy"]]
-    return attrib
 
 # ----------------------------------------------------------------------------------------------------------------------
 # - Code -
@@ -82,7 +68,7 @@ class ParserRuntime(_Parser):
             self.tags.add(tag)
 
     def dpg_context_manager(self, fnc:Callable , attrib:dict):
-            with fnc(**skip_attrib(attrib, SKIP_ATTRIB)):
+            with fnc(**Attributes(attrib, skipables=SKIP_ATTRIB)):
                 self._parse_recursive(parent=attrib["_children"])
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -103,7 +89,7 @@ class ParserRuntime(_Parser):
 
     @_Parser.custom_dpg_item(name="grid_layout")
     def grid_layout(self, _:str, attrib:dict):
-        with dpg.table(**map_attrib_policy(skip_attrib(attrib, SKIP_ATTRIB_GRID_LAYOUT)), header_row=False):
+        with dpg.table(**Attributes(attrib, skipables=SKIP_ATTRIB_GRID_LAYOUT), header_row=False):
             # columns
             for column in attrib["_columns"]:
                 dpg.add_table_column(**column)
