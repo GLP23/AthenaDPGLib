@@ -68,8 +68,8 @@ class ParserRuntime(_Parser):
             self.tags.add(tag)
 
     def dpg_context_manager(self, fnc:Callable , attrib:dict):
-            with fnc(**Attributes(attrib, skipables=SKIP_ATTRIB)):
-                self._parse_recursive(parent=attrib["_children"])
+        with fnc(**Attributes(attrib, skipables=SKIP_ATTRIB)):
+            self._parse_recursive(parent=attrib["_children"])
 
     # ------------------------------------------------------------------------------------------------------------------
     # - Special DPG items -
