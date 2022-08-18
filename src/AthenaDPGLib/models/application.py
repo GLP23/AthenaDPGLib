@@ -6,11 +6,9 @@ from __future__ import annotations
 import dearpygui.dearpygui as dpg
 from typing import Callable
 from dataclasses import dataclass,field
-import functools
 
 # Custom Library
 from AthenaLib.functions.files import gather_all_filepaths
-
 
 # Custom Packages
 from AthenaDPGLib.functions.fixes import fix_icon_for_taskbar
