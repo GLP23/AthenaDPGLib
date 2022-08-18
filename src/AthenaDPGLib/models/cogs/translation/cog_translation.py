@@ -19,6 +19,12 @@ import AthenaDPGLib.data.sql as sql_fnc
 # ----------------------------------------------------------------------------------------------------------------------
 class CogTranslation(Cog):
     translator:Translator
+    _translation_mapping= [
+        # Gather and apply all label texts
+        {"sql":lambda language: sql_fnc.TRANSLATION_LABELS(language.value),"set_value":dpg.set_item_label},
+        # Gather and apply  all value texts
+        {"sql":lambda language: sql_fnc.TRANSLATION_VALUES(language.value),"set_value":dpg.set_value},
+    ]
 
     def __init__(self, sqlite_filepath:str):
         self.translator = Translator(sqlite_filepath)
@@ -38,17 +44,16 @@ class CogTranslation(Cog):
             with dpg.theme_component(dpg.mvAll):
                 dpg.add_theme_color(dpg.mvThemeCol_Text, (255,0,0,255))
 
-        for kwargs in [
-            # Gather and apply all label texts
-            {"sql":sql_fnc.TRANSLATION_LABELS(language.value),"set_value":dpg.set_item_label},
-            # Gather and apply  all value texts
-            {"sql":sql_fnc.TRANSLATION_VALUES(language.value),"set_value":dpg.set_value},
-        ]:
-            self._translate_from_translator_component(**kwargs,not_found_theme=item_theme)
+        for kwargs in self._translation_mapping:
+            self._translate_from_translator_component(
+                **kwargs,
+                language=language,
+                not_found_theme=item_theme
+            )
 
-    def _translate_from_translator_component(self, sql:str, set_value: Callable, not_found_theme:str|int):
+    def _translate_from_translator_component(self, sql:Callable, language:Languages, set_value: Callable, not_found_theme:str|int):
         with self.translator.cursor() as cursor:
-            for k, v in cursor.execute(sql).fetchall():  # type: str, str|None
+            for k, v in cursor.execute(sql(language)).fetchall():  # type: str, str|None
                 if v is None:
                     set_value(k, k)
                     dpg.bind_item_theme(k, not_found_theme)
