@@ -10,7 +10,7 @@ import json
 # Custom Library
 
 # Custom Packages
-from AthenaDPGLib.models.runtimeparser.attributes import Attributes
+from AthenaDPGLib.models.application.cogs.gui_parsing.attributes import Attributes
 from AthenaDPGLib.data.text import (TAG, PRIMARY_WINDOW,DPG)
 from AthenaDPGLib.data.runtimeparser_mapping import (
     RUNTIMEPARSER_MAPPING_CONTEXTMANGERS, RUNTIMEPARSER_MAPPING_ITEMS_FULL
@@ -23,7 +23,7 @@ from AthenaDPGLib.data.exceptions import DPGJSONStructureError
 # - Code -
 # ----------------------------------------------------------------------------------------------------------------------
 @dataclass(slots=True, kw_only=True)
-class ParserRuntime:
+class UIParser:
     # ------------------------------------------------------------------------------------------------------------------
     # - Actual Parsing -
     # ------------------------------------------------------------------------------------------------------------------
@@ -75,13 +75,13 @@ class ParserRuntime:
             if item in RUNTIMEPARSER_MAPPING_CONTEXTMANGERS:
                 # run the item with a context.
                 #   Else the child items will not be correctly placed within the parent item
-                with RUNTIMEPARSER_MAPPING_CONTEXTMANGERS[item](**Attributes(attrib)):
+                with RUNTIMEPARSER_MAPPING_CONTEXTMANGERS[item](**Attributes(item, attrib)):
                     self._parse_recursive(parent=attrib["_children"])
 
             elif item in RUNTIMEPARSER_MAPPING_ITEMS_FULL:
                 # run the item creation normally
                 #   aka: dpg.add_...
-                RUNTIMEPARSER_MAPPING_ITEMS_FULL[item](**Attributes(attrib))
+                RUNTIMEPARSER_MAPPING_ITEMS_FULL[item](**Attributes(item, attrib))
 
             # for special cases
             elif item in global_custom_dpg_items:
@@ -106,7 +106,7 @@ class ParserRuntime:
         attrib[TAG] = PRIMARY_WINDOW
         global_tags.add(PRIMARY_WINDOW)
 
-        with dpg.window(**Attributes(attrib)):
+        with dpg.window(**Attributes("window", attrib)):
             self._parse_recursive(parent=attrib["_children"])
 
         dpg.set_primary_window(PRIMARY_WINDOW, True)
@@ -126,7 +126,7 @@ class ParserRuntime:
         This item is the quicker solution to this as it automatically defines columns and has an easier way of
             assigning the rows.
         """
-        with dpg.table(**Attributes(attrib), header_row=False):
+        with dpg.table(**Attributes("table",attrib), header_row=False):
             # columns
             for column in attrib["_columns"]:
                 dpg.add_table_column(**column)

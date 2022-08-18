@@ -15,7 +15,7 @@ from AthenaLib.data.text import NOTHING
 # ----------------------------------------------------------------------------------------------------------------------
 # - Code -
 # ----------------------------------------------------------------------------------------------------------------------
-class Translation:
+class Translator:
     sqlite_filepath:str=NOTHING
     conn: sqlite3.Connection|None = None
 
@@ -44,7 +44,7 @@ class Translation:
     def gather_cursor(self) -> sqlite3.Cursor:
         """
         Context Managed function to yield the cursor to any function that needs it.
-        Calls the Translation.gather_connection() first to have the connection managed through there.
+        Calls the Translator.gather_connection() first to have the connection managed through there.
         Closes the cursor automatically
         """
 

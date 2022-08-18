@@ -11,10 +11,10 @@ from dataclasses import dataclass,field
 from AthenaLib.functions.files import gather_all_filepaths
 
 # Custom Packages
-from AthenaDPGLib.models.runtimeparser.parser_runtime import ParserRuntime
-from AthenaDPGLib.models.callbacks import Callbacks
-from AthenaDPGLib.models.translation.translation import Translation
-from AthenaDPGLib.models.translation.languages import Languages
+from AthenaDPGLib.models.application.cogs.gui_parsing.ui_parser import UIParser
+from AthenaDPGLib.models.application.cogs.callbacks import Callbacks
+from AthenaDPGLib.models.application.cogs.translation.translator import Translator
+from AthenaDPGLib.models.application.cogs.translation.languages import Languages
 from AthenaDPGLib.functions.fixes import fix_icon_for_taskbar
 import AthenaDPGLib.data.sql as sql_fnc
 
@@ -26,12 +26,12 @@ class Application:
     name:str
     gui_folder:str|None = None
     callbacks:Callbacks = field(default_factory=Callbacks)
-    translations:Translation = field(default_factory=Translation)
+    translations:Translator = field(default_factory=Translator)
     translations_enabled:bool = False
 
     # non init
     viewport_resize_callbacks:list[Callable] = field(init=False,default_factory=list)
-    parser:ParserRuntime = field(init=False,default_factory=ParserRuntime)
+    parser:UIParser = field(init=False, default_factory=UIParser)
     viewport_id:str|int|None = field(init=False)
 
     def __post_init__(self):
