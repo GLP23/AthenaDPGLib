@@ -4,7 +4,7 @@
 # General Packages
 from __future__ import annotations
 import collections.abc
-from typing import Any, Callable, ClassVar
+from typing import Any, Callable
 from dataclasses import dataclass, InitVar, field
 
 # Custom Library
