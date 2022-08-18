@@ -16,7 +16,6 @@ from AthenaDPGLib.models.callbacks import Callbacks
 from AthenaDPGLib.models.translation.translation import Translation
 from AthenaDPGLib.models.translation.languages import Languages
 from AthenaDPGLib.functions.fixes import fix_icon_for_taskbar
-from AthenaDPGLib.data.dpg_item_names import DpgItemNames
 import AthenaDPGLib.data.sql as sql_fnc
 
 # ----------------------------------------------------------------------------------------------------------------------
