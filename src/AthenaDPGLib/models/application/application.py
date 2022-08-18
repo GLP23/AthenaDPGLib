@@ -58,7 +58,7 @@ class Application:
                     dpg.add_theme_color(dpg.mvThemeCol_Text, (255,0,0,255))
 
             # Gather all label texts
-            with self.translations.gather_cursor() as cursor:
+            with self.translations.cursor() as cursor:
                 for k, v in cursor.execute(sql_fnc.TRANSLATION_LABELS(language.value)).fetchall(): # type: str, str|None
                     if v is None:
                         dpg.set_item_label(k, k)
@@ -67,7 +67,7 @@ class Application:
                         dpg.set_item_label(k, v)
 
             # Gather all value texts
-            with self.translations.gather_cursor() as cursor:
+            with self.translations.cursor() as cursor:
                 for k,v in cursor.execute(sql_fnc.TRANSLATION_VALUES(language.value)).fetchall(): # type: str, str|None
                     if v is None:
                         dpg.set_value(k, k)

@@ -41,3 +41,5 @@ TRANSLATION_CREATE_EMPTY_TABLES = {
     )
     """
 }
+
+SHOW_TABLES = "SELECT `name` from `sqlite_master` WHERE `type`='table';"
