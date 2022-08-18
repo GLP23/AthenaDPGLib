@@ -15,3 +15,4 @@ import dearpygui.dearpygui as dpg
 # ----------------------------------------------------------------------------------------------------------------------
 class DpgItemNames(enum.Enum):
     table = "mvAppItemType::mvTable"
+    text = "mvAppItemType::mvText"

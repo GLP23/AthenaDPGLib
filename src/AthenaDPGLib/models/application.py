@@ -11,11 +11,13 @@ from dataclasses import dataclass,field
 from AthenaLib.functions.files import gather_all_filepaths
 
 # Custom Packages
-from AthenaDPGLib.functions.fixes import fix_icon_for_taskbar
 from AthenaDPGLib.models.runtimeparser.parser_runtime import ParserRuntime
 from AthenaDPGLib.models.callbacks import Callbacks
 from AthenaDPGLib.models.translation.translation import Translation
 from AthenaDPGLib.models.translation.languages import Languages
+from AthenaDPGLib.functions.fixes import fix_icon_for_taskbar
+from AthenaDPGLib.data.dpg_item_names import DpgItemNames
+import AthenaDPGLib.data.sql as sql_fnc
 
 # ----------------------------------------------------------------------------------------------------------------------
 # - Code -
@@ -46,8 +48,33 @@ class Application:
                 self.parser.parse_file(filepath)
 
     def parse_translation(self, language:Languages):
-        self.translations.connect()
-        self.translations.apply_translation(language=language)
+        """
+        Basic function to gather all records that have the corresponding language column filled in.
+        If the Value of the language column is none, the text will be displayed in red
+        """
+        if self.translations_enabled:
+            with dpg.theme() as item_theme:
+                with dpg.theme_component(dpg.mvAll):
+                    dpg.add_theme_color(dpg.mvThemeCol_Text, (255,0,0,255))
+
+            # Gather all label texts
+            with self.translations.gather_cursor() as cursor:
+                for k, v in cursor.execute(sql_fnc.TRANSLATION_LABELS(language.value)).fetchall(): # type: str, str|None
+                    if v is None:
+                        dpg.set_item_label(k, k)
+                        dpg.bind_item_theme(k, item_theme)
+                    else:
+                        dpg.set_item_label(k, v)
+
+            # Gather all value texts
+            with self.translations.gather_cursor() as cursor:
+                for k,v in cursor.execute(sql_fnc.TRANSLATION_VALUES(language.value)).fetchall(): # type: str, str|None
+                    if v is None:
+                        dpg.set_value(k, k)
+                        dpg.bind_item_theme(k, item_theme)
+                    else:
+                        dpg.set_value(k, v)
+
 
     def parse_callbacks(self):
         for tag in self.callbacks.mapping_callback:
@@ -65,8 +92,7 @@ class Application:
 
         self.parse_gui_files()
         self.parse_callbacks()
-        if self.translations_enabled:
-            self.parse_translation(language=Languages.english)
+        self.parse_translation(language=Languages.nederlands)
 
         fix_icon_for_taskbar(app_model_id=self.name)
 
