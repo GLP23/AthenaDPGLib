@@ -28,18 +28,23 @@ class Application:
     gui_folder:str|None = None
     callbacks:Callbacks = field(default_factory=Callbacks)
     translations:Translation = field(default_factory=Translation)
-    translations_enabled:bool = True
+    translations_enabled:bool = False
 
     # non init
     viewport_resize_callbacks:list[Callable] = field(init=False,default_factory=list)
     parser:ParserRuntime = field(init=False,default_factory=ParserRuntime)
+    viewport_id:str|int|None = field(init=False)
+
+    def __post_init__(self):
+        dpg.create_context()
 
     def create_viewport(self):
-        dpg.create_viewport(title=self.name)
+        # noinspection PyNoneFunctionAssignment
+        self.viewport_id = dpg.create_viewport(title=self.name)
 
     def parse_gui_files(self):
         if self.gui_folder is not None:
-            for filepath in gather_all_filepaths(self.gui_folder):
+            for filepath in gather_all_filepaths(self.gui_folder, extensions={"json"}):
                 self.parser.parse_file(filepath)
 
     def parse_translation(self, language:Languages):
@@ -58,7 +63,6 @@ class Application:
 
 
     def main(self):
-        dpg.create_context()
         self.create_viewport()
 
         self.parse_gui_files()

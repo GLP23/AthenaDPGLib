@@ -9,6 +9,7 @@ import pathlib
 import dearpygui.dearpygui as dpg
 
 # Custom Library
+from AthenaLib.data.text import NOTHING
 
 # Custom Packages
 import AthenaDPGLib.data.sql as sql_fnc
@@ -31,10 +32,10 @@ def connected_to_db_file(fnc):
 # - Code -
 # ----------------------------------------------------------------------------------------------------------------------
 class Translation:
-    sqlite_filepath:str
+    sqlite_filepath:str=NOTHING
     conn: sqlite3.Connection = None
 
-    def __init__(self, sqlite_filepath:str):
+    def __init__(self, sqlite_filepath:str=NOTHING):
             self.sqlite_filepath = sqlite_filepath
 
     def connect(self):
