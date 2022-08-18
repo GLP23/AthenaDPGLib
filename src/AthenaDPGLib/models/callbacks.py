@@ -19,7 +19,7 @@ class Callbacks:
     mapping_callback:dict[str:list[Callable]] = {}
     mapping_drag_callback:dict[str:list[Callable]] = {}
     mapping_drop_callback:dict[str:list[Callable]] = {}
-    mapping_viewport_resize:dict[str:list[Callable]] = {}
+    mapping_viewport_resize:list[Callable] = []
 
     def _chain(self, sender, app_data, user_data:None=None, *,mapping:dict):
         for fnc in mapping[sender]:
@@ -37,7 +37,7 @@ class Callbacks:
     def chain_viewport_resize(self):
         # execute all viewport resize callbacks in order
         #   Fixes a lot of issues most of the time
-        for _, fnc in self.mapping_viewport_resize.items():
+        for fnc in self.mapping_viewport_resize:
             fnc(self=self)
 
     @classmethod
@@ -49,16 +49,22 @@ class Callbacks:
         return decoration
 
     @classmethod
-    def drag_callback(cls, fnc:Callable ):
-        cls.mapping_drag_callback[fnc.__name__] = fnc
-        return fnc
+    def drag_callback(cls,items:list[str]):
+        @functools.wraps(cls)
+        def decoration(fnc:Callable):
+            for item_name in items: #type: str
+                append_or_extend_list_to_mapping(mapping=cls.mapping_drag_callback, key=item_name, value=fnc)
+        return decoration
 
     @classmethod
-    def drop_callback(cls, fnc:Callable):
-        cls.mapping_drop_callback[fnc.__name__] = fnc
-        return fnc
+    def drop_callback(cls,items:list[str]):
+        @functools.wraps(cls)
+        def decoration(fnc:Callable):
+            for item_name in items: #type: str
+                append_or_extend_list_to_mapping(mapping=cls.mapping_drop_callback, key=item_name, value=fnc)
+        return decoration
 
     @classmethod
-    def viewport_resize(cls, fnc:Callable):
-        cls.mapping_viewport_resize[fnc.__name__] = fnc
+    def viewport_resize(cls, fnc):
+        cls.mapping_viewport_resize.append(fnc)
         return fnc
