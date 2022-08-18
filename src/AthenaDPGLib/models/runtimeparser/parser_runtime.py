@@ -60,6 +60,10 @@ class ParserRuntime:
                 raise DPGJSONStructureError(f"The file `{filepath_input}` had no usable structure")
 
     def _parse_recursive(self, parent:list):
+        """
+        Recursive part of the parser.
+        It will recursively parse all child items of DPG items that are run with a context manager (with statement).
+        """
         for item, attrib in ((k,v) for i in parent for k, v in i.items()): #type: str, dict
             if TAG in attrib:
                 if (tag := attrib[TAG]) in global_tags:
@@ -69,19 +73,25 @@ class ParserRuntime:
                 global_tags.add(tag)
 
             if item in RUNTIMEPARSER_MAPPING_CONTEXTMANGERS:
+                # run the item with a context.
+                #   Else the child items will not be correctly placed within the parent item
                 with RUNTIMEPARSER_MAPPING_CONTEXTMANGERS[item](**Attributes(attrib)):
                     self._parse_recursive(parent=attrib["_children"])
 
             elif item in RUNTIMEPARSER_MAPPING_ITEMS_FULL:
+                # run the item creation normally
+                #   aka: dpg.add_...
                 RUNTIMEPARSER_MAPPING_ITEMS_FULL[item](**Attributes(attrib))
 
             # for special cases
             elif item in global_custom_dpg_items:
+                # Custom implemented items that either don't have a "normal" dpg function
+                #   or are a collection of predefined items
                 global_custom_dpg_items[item](self, item, attrib)
 
             else:
                 raise DPGJSONStructureError(
-                    f"'{item}' dpg item name could not be parsed as a default iterm or a custom item"
+                    f"'{item}' dpg item name could not be parsed as a default dpg item or a custom item"
                 )
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -89,6 +99,10 @@ class ParserRuntime:
     # ------------------------------------------------------------------------------------------------------------------
     @custom_dpg_item(name="primary_window")
     def primary_window(self, _: str, attrib: dict):
+        """
+        Not a "true" custom item as it is just a DPG window with the tag set to 'primary_window'.
+        After the window and it's children have been created, the `dpg.set_primary_window` function is ran.
+        """
         attrib[TAG] = PRIMARY_WINDOW
         global_tags.add(PRIMARY_WINDOW)
 
@@ -99,16 +113,27 @@ class ParserRuntime:
 
     @custom_dpg_item(name="viewport")
     def viewport(self, _:str, attrib:dict):
+        """
+        Alias for dpg.create_viewport
+        """
         dpg.create_viewport(**attrib)
 
     @custom_dpg_item(name="grid_layout")
     def grid_layout(self, _:str, attrib:dict):
+        """
+        A custom item, which at it's core is an alias for `dpg.table` and its columns and rows.
+        Technically DPG doesn't have a layout system, but the documentation proposes to use tables for this feature.
+        This item is the quicker solution to this as it automatically defines columns and has an easier way of
+            assigning the rows.
+        """
         with dpg.table(**Attributes(attrib), header_row=False):
             # columns
             for column in attrib["_columns"]:
                 dpg.add_table_column(**column)
 
-            # rows with the items
+            # rows attribution definition
+            #   TODO: fix this ugly system
+
             if "_rows" in attrib and len(attrib["_rows"]) == 1:
                 attrib_rows = (attrib["_rows"],)*len(attrib["_children"])
             elif "_rows" in attrib and len(attrib["_rows"]) > 1:
@@ -118,6 +143,7 @@ class ParserRuntime:
             else:
                 attrib_rows = ({},)*len(attrib["_children"])
 
+            # create all the items within the rows
             for attrib_row, child in zip(attrib_rows, attrib["_children"]):
                 with dpg.table_row(**attrib_row):
                    self._parse_recursive(child)
