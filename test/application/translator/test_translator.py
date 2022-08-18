@@ -21,5 +21,4 @@ class TestTranslator(unittest.TestCase):
 
     def test_connection(self):
         translator = self.get_translator()
-        translator.test_valid_structure()
 
