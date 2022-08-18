@@ -11,10 +11,10 @@ from dataclasses import dataclass,field
 from AthenaLib.functions.files import gather_all_filepaths
 
 # Custom Packages
-from AthenaDPGLib.models.application.cogs.gui_parsing.ui_parser import UIParser
-from AthenaDPGLib.models.application.cogs.callbacks import Callbacks
-from AthenaDPGLib.models.application.cogs.translation.translator import Translator
-from AthenaDPGLib.models.application.cogs.translation.languages import Languages
+from AthenaDPGLib.models.cogs.gui_parsing.ui_parser import UIParser
+from AthenaDPGLib.models.cogs.callbacks import Callbacks
+from AthenaDPGLib.models.cogs.translation.translator import Translator
+from AthenaDPGLib.models.cogs.translation.languages import Languages
 from AthenaDPGLib.functions.fixes import fix_icon_for_taskbar
 import AthenaDPGLib.data.sql as sql_fnc
 
@@ -26,7 +26,7 @@ class Application:
     name:str
     gui_folder:str|None = None
     callbacks:Callbacks = field(default_factory=Callbacks)
-    translations:Translator = field(default_factory=Translator)
+    translator:Translator = field(default_factory=Translator)
     translations_enabled:bool = False
 
     # non init
@@ -46,34 +46,6 @@ class Application:
         if self.gui_folder is not None:
             for filepath in gather_all_filepaths(self.gui_folder, extensions={"json"}):
                 self.parser.parse_file(filepath)
-
-    def parse_translation(self, language:Languages):
-        """
-        Basic function to gather all records that have the corresponding language column filled in.
-        If the Value of the language column is none, the text will be displayed in red
-        """
-        if self.translations_enabled:
-            with dpg.theme() as item_theme:
-                with dpg.theme_component(dpg.mvAll):
-                    dpg.add_theme_color(dpg.mvThemeCol_Text, (255,0,0,255))
-
-            # Gather all label texts
-            with self.translations.cursor() as cursor:
-                for k, v in cursor.execute(sql_fnc.TRANSLATION_LABELS(language.value)).fetchall(): # type: str, str|None
-                    if v is None:
-                        dpg.set_item_label(k, k)
-                        dpg.bind_item_theme(k, item_theme)
-                    else:
-                        dpg.set_item_label(k, v)
-
-            # Gather all value texts
-            with self.translations.cursor() as cursor:
-                for k,v in cursor.execute(sql_fnc.TRANSLATION_VALUES(language.value)).fetchall(): # type: str, str|None
-                    if v is None:
-                        dpg.set_value(k, k)
-                        dpg.bind_item_theme(k, item_theme)
-                    else:
-                        dpg.set_value(k, v)
 
 
     def parse_callbacks(self):

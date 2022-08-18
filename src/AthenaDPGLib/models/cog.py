@@ -3,7 +3,6 @@
 # ----------------------------------------------------------------------------------------------------------------------
 # General Packages
 from __future__ import annotations
-import enum
 
 # Custom Library
 
@@ -12,9 +11,11 @@ import enum
 # ----------------------------------------------------------------------------------------------------------------------
 # - Code -
 # ----------------------------------------------------------------------------------------------------------------------
-class Languages(enum.Enum):
-    """
-    Support Enum for the `Translator` class as the sqllite table is divided into columns with the languages below.
-    """
-    english="english"
-    nederlands="nederlands"
+class Cog:
+    def startup(self, *args, **kwargs):
+        """Ran at Application startup"""
+        pass
+
+    def closedown(self, *args, **kwargs):
+        """Ran at Application closedown"""
+        pass

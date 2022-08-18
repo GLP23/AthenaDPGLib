@@ -10,7 +10,7 @@ import json
 # Custom Library
 
 # Custom Packages
-from AthenaDPGLib.models.application.cogs.gui_parsing.attributes import Attributes
+from AthenaDPGLib.models.cogs.gui_parsing.attributes import Attributes
 from AthenaDPGLib.data.text import (TAG, PRIMARY_WINDOW,DPG)
 from AthenaDPGLib.data.runtimeparser_mapping import (
     RUNTIMEPARSER_MAPPING_CONTEXTMANGERS, RUNTIMEPARSER_MAPPING_ITEMS_FULL
