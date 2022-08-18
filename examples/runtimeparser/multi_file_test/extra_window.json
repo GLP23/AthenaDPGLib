@@ -1,6 +1,6 @@
 {
   "dpg": {
-    "mode": "partial",
+    "_parser": {"version": 0},
     "_children": [
       {"window": {
         "label": "Extra Window",

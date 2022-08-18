@@ -11,5 +11,33 @@ from __future__ import annotations
 # ----------------------------------------------------------------------------------------------------------------------
 # - Code -
 # ----------------------------------------------------------------------------------------------------------------------
-TRANSLATION_CREATE_TABLE="CREATE TABLE `translation` (`tag` VARCHAR(255),`english` LONGTEXT,PRIMARY KEY (`tag`));"
-TRANSLATION_SELECT_LANGUAGE= lambda language: f"SELECT `tag`,`{language}` FROM `translation`;"
+
+# ----------------------------------------------------------------------------------------------------------------------
+# SQL statements that have been predefined already
+# ----------------------------------------------------------------------------------------------------------------------
+TRANSLATION_VALUES = (
+    lambda language: f"SELECT `tag`, `{language}` FROM `translation_value`;"
+)
+TRANSLATION_LABELS = (
+    lambda language: f"SELECT `tag`, `{language}` FROM `translation_label`;"
+)
+
+# ----------------------------------------------------------------------------------------------------------------------
+# EXTRA SQL STATEMENTS
+# ----------------------------------------------------------------------------------------------------------------------
+TRANSLATION_CREATE_EMPTY_TABLES = {
+    "translation_label": """
+    CREATE TABLE "translation_label" (
+        `tag` VARCHAR(255),
+        `english` LONGTEXT,
+        PRIMARY KEY (`tag`)
+    )
+    """,
+    "translation_value": """
+    CREATE TABLE "translation_value" (
+        `tag` VARCHAR(255),
+        `english` LONGTEXT,
+        PRIMARY KEY (`tag`)
+    )
+    """
+}

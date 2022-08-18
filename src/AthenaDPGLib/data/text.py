@@ -3,7 +3,6 @@
 # ----------------------------------------------------------------------------------------------------------------------
 # General Packages
 from __future__ import annotations
-import enum
 
 # Custom Library
 
@@ -12,9 +11,13 @@ import enum
 # ----------------------------------------------------------------------------------------------------------------------
 # - Code -
 # ----------------------------------------------------------------------------------------------------------------------
-class Languages(enum.Enum):
-    """
-    Support Enum for the `Translation` class as the sqllite table is divided into columns with the languages below.
-    """
-    english="english"
-    nederlands="nederlands"
+
+# Strings that are often reused within the library
+#   Stored here to be created once, and then just referenced afterwards
+TAG:str = "tag"
+CALLBACK:str = "callback"
+DRAG_CALLBACK:str = "drag_callback"
+DROP_CALLBACK:str = "drop_callback"
+PRIMARY_WINDOW:str = "primary_window"
+POLICY:str = "policy"
+DPG:str = "dpg"

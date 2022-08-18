@@ -1,6 +1,6 @@
 {
   "dpg": {
-    "mode": "full",
+    "_parser": {"version": 0},
     "_children": [
       {"viewport": {"title": "Custom Title","width":800, "height":600}},
       {"window": {

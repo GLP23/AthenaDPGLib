@@ -3,10 +3,10 @@
 # ----------------------------------------------------------------------------------------------------------------------
 # General Packages
 from __future__ import annotations
-import dearpygui.dearpygui as dpg
 
 # Custom Library
-from AthenaDPGLib.models.runtimeparser.parser_runtime import ParserRuntime, Callbacks
+from AthenaDPGLib.models.application import Application
+from AthenaDPGLib.models.callbacks import Callbacks
 
 # Custom Packages
 
@@ -14,19 +14,19 @@ from AthenaDPGLib.models.runtimeparser.parser_runtime import ParserRuntime, Call
 # - Code -
 # ----------------------------------------------------------------------------------------------------------------------
 class CustomCallbacks(Callbacks):
-    @Callbacks.callback
-    def print_me(self,sender):
+    @Callbacks.callback(
+        items=["FileSave","FileSaveAs","Settings1","Settings2","Help","WidgetCheckbox","WidgetButton","WidgetColor"]
+    )
+    def print_me(self,sender, **_):
         print(f"Menu Item: {sender}")
 
 def main():
-    dpg.create_context()
-    ParserRuntime(
+    app = Application(
+        name="Menubar Example",
+        gui_folder="../menu_bar",
         callbacks=CustomCallbacks()
-    ).parse_single_file("menu_bar.json")
-    dpg.setup_dearpygui()
-    dpg.show_viewport()
-    dpg.start_dearpygui()
-    dpg.destroy_context()
+    )
+    app.main()
 
 if __name__ == '__main__':
     main()

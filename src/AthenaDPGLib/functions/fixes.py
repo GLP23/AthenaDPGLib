@@ -10,6 +10,7 @@ import dearpygui.dearpygui as dpg
 # Custom Library
 
 # Custom Packages
+from AthenaDPGLib.data.dpg_item_names import DpgItemNames
 
 # ----------------------------------------------------------------------------------------------------------------------
 # - Code -
@@ -26,8 +27,11 @@ def fix_icon_for_taskbar(app_model_id:str):
         raise NotImplementedError(f"the 'fix_icon_for_taskbar' function doe not work for the os: {sys_platform}")
 
 def fix_grid_layout_equal_row_spacing(table_name:str):
-    if dpg.does_item_exist(table_name):
-        child = dpg.get_item_children(table_name)
-        vp_height = dpg.get_item_height(table_name)
-        for x in child[1]:
-            dpg.configure_item(x, height=vp_height / len(child[1]))
+    # Current dpg 1.6.2 doesn't support equal row spacing
+    #   This is a fix that solves this 'issue'
+    #   By example of the code Illu showed me
+    if dpg.does_item_exist(table_name) and dpg.get_item_type(table_name) == DpgItemNames.table.value:
+        # Always make sure the table exists and is actually a table
+        tbl_height = dpg.get_item_height(table_name)
+        for r in (rows := dpg.get_item_children(table_name)[1]):
+            dpg.configure_item(r, height=tbl_height / len(rows))

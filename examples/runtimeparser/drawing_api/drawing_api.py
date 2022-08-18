@@ -3,10 +3,9 @@
 # ----------------------------------------------------------------------------------------------------------------------
 # General Packages
 from __future__ import annotations
-import dearpygui.dearpygui as dpg
 
 # Custom Library
-from AthenaDPGLib.models.runtimeparser.parser_runtime import ParserRuntime
+from AthenaDPGLib.models.application import Application
 
 # Custom Packages
 
@@ -14,12 +13,11 @@ from AthenaDPGLib.models.runtimeparser.parser_runtime import ParserRuntime
 # - Code -
 # ----------------------------------------------------------------------------------------------------------------------
 def main():
-    dpg.create_context()
-    ParserRuntime().parse_single_file("drawing_api.json")
-    dpg.setup_dearpygui()
-    dpg.show_viewport()
-    dpg.start_dearpygui()
-    dpg.destroy_context()
+    app = Application(
+        name="Drawing API Example",
+        gui_folder="../drawing_api"
+    )
+    app.main()
 
 if __name__ == '__main__':
     main()

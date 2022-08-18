@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------------------------------------------------------
 # General Packages
 from __future__ import annotations
-import enum
+from typing import Callable
 
 # Custom Library
 
@@ -12,9 +12,5 @@ import enum
 # ----------------------------------------------------------------------------------------------------------------------
 # - Code -
 # ----------------------------------------------------------------------------------------------------------------------
-class Languages(enum.Enum):
-    """
-    Support Enum for the `Translation` class as the sqllite table is divided into columns with the languages below.
-    """
-    english="english"
-    nederlands="nederlands"
+global_custom_dpg_items: dict[str:Callable] = {}
+global_tags: set[str] = set()
