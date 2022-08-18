@@ -1,6 +1,5 @@
 {
   "dpg": {
-    "mode": "partial",
     "_children": [
       {"window": {
         "label": "Extra Window",

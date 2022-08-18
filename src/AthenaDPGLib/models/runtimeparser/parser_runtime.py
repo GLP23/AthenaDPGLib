@@ -77,7 +77,7 @@ class ParserRuntime:
 
             # for special cases
             elif item in global_custom_dpg_items:
-                global_custom_dpg_items[item](item, attrib)
+                global_custom_dpg_items[item](self, item, attrib)
 
             else:
                 raise DPGJSONStructureError(

@@ -28,6 +28,7 @@ class Application:
     gui_folder:str|None = None
     callbacks:Callbacks = field(default_factory=Callbacks)
     translations:Translation = field(default_factory=Translation)
+    translations_enabled:bool = True
 
     # non init
     viewport_resize_callbacks:list[Callable] = field(init=False,default_factory=list)
@@ -62,7 +63,8 @@ class Application:
 
         self.parse_gui_files()
         self.parse_callbacks()
-        self.parse_translation(language=Languages.english)
+        if self.translations_enabled:
+            self.parse_translation(language=Languages.english)
 
         fix_icon_for_taskbar(app_model_id=self.name)
 

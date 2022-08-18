@@ -6,7 +6,9 @@ from __future__ import annotations
 import dearpygui.dearpygui as dpg
 
 # Custom Library
-from AthenaDPGLib.models.runtimeparser.parser_runtime import ParserRuntime, Callbacks
+from AthenaDPGLib.models.application import Application
+from AthenaDPGLib.models.runtimeparser.parser_runtime import ParserRuntime
+from AthenaDPGLib.models.callbacks import Callbacks
 
 # Custom Packages
 
@@ -16,18 +18,22 @@ from AthenaDPGLib.models.runtimeparser.parser_runtime import ParserRuntime, Call
 parser: ParserRuntime
 
 class CustomCallbacks(Callbacks):
-    @Callbacks.callback
-    def print_me(self, sender):
-        print(f"Menu Item: {sender}")
-    @Callbacks.callback
+    @Callbacks.callback(items=["create_window"])
     def create_window(self):
         global parser
         parser.parse_file("extra_window.json")
 
 def main():
+    app = Application(
+        name="Multi File Test",
+        callbacks=CustomCallbacks(),
+        gui_folder="../multi_file_test",
+        translations_enabled=False
+    )
+
     dpg.create_context()
     global parser
-    parser = ParserRuntime(callbacks=CustomCallbacks())
+    parser = ParserRuntime()
     parser.parse_file("multi_file_test.json")
     dpg.setup_dearpygui()
     dpg.show_viewport()

@@ -34,13 +34,11 @@ class Translation:
     sqlite_filepath:str
     conn: sqlite3.Connection = None
 
-    def __init__(self, sqlite_filepath:str):
+    def connect(self, sqlite_filepath:str):
         if pathlib.Path(sqlite_filepath).exists():
             self.sqlite_filepath = sqlite_filepath
         else:
             raise ValueError(f"'{sqlite_filepath}' does not exist")
-
-    def connect(self):
         try:
             self.conn = sqlite3.connect(self.sqlite_filepath)
         except sqlite3.Error as e:
