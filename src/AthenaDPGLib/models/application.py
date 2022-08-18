@@ -36,6 +36,7 @@ class Application:
     viewport_id:str|int|None = field(init=False)
 
     def __post_init__(self):
+        # always makes sure the context exists
         dpg.create_context()
 
     def create_viewport(self):
@@ -77,6 +78,10 @@ class Application:
 
 
     def parse_callbacks(self):
+        """
+        Goes over all registered callbacks and sets the items' callbacks accordingly
+        Will raise errors if the tag doesn't exist yet
+        """
         for tag in self.callbacks.mapping_callback:
             dpg.set_item_callback(item=tag, callback=self.callbacks.chain_callback)
         for tag in self.callbacks.mapping_drag_callback:
