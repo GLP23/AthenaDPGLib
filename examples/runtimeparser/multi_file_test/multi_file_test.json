@@ -1,5 +1,6 @@
 {
   "dpg": {
+    "_parser": {"version": 0},
     "_children": [
       {"viewport": {"title": "this is a test for the multi file parsing on demand"}},
       {"viewport_menu_bar": {

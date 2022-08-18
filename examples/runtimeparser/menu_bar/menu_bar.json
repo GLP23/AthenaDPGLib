@@ -1,6 +1,6 @@
 {
   "dpg": {
-    "mode": "full",
+    "_parser": {"version": 0},
     "_children": [
       {"viewport": {"title": "this is a test for the menu bar test"}},
       {"viewport_menu_bar": {
@@ -8,23 +8,23 @@
           {"menu": {
             "label": "File",
             "_children": [
-              {"menu_item": {"label": "Save", "callback": "print_me"}},
-              {"menu_item": {"label": "Save As", "callback": "print_me"}}
+              {"menu_item": {"tag":"FileSave","label": "Save", "callback": "print_me"}},
+              {"menu_item": {"tag":"FileSaveAs","label": "Save As", "callback": "print_me"}}
           ]}},
           {"menu": {
             "label": "Settings",
             "_children": [
-              {"menu_item": {"label": "Settings 1", "callback": "print_me", "check": true}},
-              {"menu_item": {"label": "Settings 2", "callback": "print_me"}}
+              {"menu_item": {"tag":"Settings1", "label": "Settings 1", "callback": "print_me", "check": true}},
+              {"menu_item": {"tag":"Settings2", "label": "Settings 2", "callback": "print_me"}}
             ]
           }},
-          {"menu_item": {"label": "Help", "callback": "print_me"}},
+          {"menu_item": {"tag": "Help","label": "Help", "callback": "print_me"}},
           {"menu": {
             "label": "Widget Items",
             "_children": [
-              {"checkbox": {"label": "Pick Me", "callback": "print_me"}},
-              {"button": {"label": "Press Me", "callback": "print_me"}},
-              {"color_picker": {"label": "Color Me", "callback": "print_me"}}
+              {"checkbox": {"tag": "WidgetCheckbox","label": "Pick Me", "callback": "print_me"}},
+              {"button": {"tag": "WidgetButton","label": "Press Me", "callback": "print_me"}},
+              {"color_picker": {"tag": "WidgetColor","label": "Color Me", "callback": "print_me"}}
             ]
           }}
         ]

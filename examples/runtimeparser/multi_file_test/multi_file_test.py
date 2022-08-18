@@ -15,30 +15,22 @@ from AthenaDPGLib.models.callbacks import Callbacks
 # ----------------------------------------------------------------------------------------------------------------------
 # - Code -
 # ----------------------------------------------------------------------------------------------------------------------
-parser: ParserRuntime
+app: Application
 
 class CustomCallbacks(Callbacks):
     @Callbacks.callback(items=["create_window"])
-    def create_window(self):
-        global parser
-        parser.parse_file("extra_window.json")
+    def create_window(self,**_):
+        global app
+        app.parser.parse_file("extra_window.json")
 
 def main():
+    global app
     app = Application(
         name="Multi File Test",
         callbacks=CustomCallbacks(),
-        gui_folder="../multi_file_test",
-        translations_enabled=False
     )
-
-    dpg.create_context()
-    global parser
-    parser = ParserRuntime()
-    parser.parse_file("multi_file_test.json")
-    dpg.setup_dearpygui()
-    dpg.show_viewport()
-    dpg.start_dearpygui()
-    dpg.destroy_context()
+    app.parser.parse_file("multi_file_test.json")
+    app.main()
 
 if __name__ == '__main__':
     main()
