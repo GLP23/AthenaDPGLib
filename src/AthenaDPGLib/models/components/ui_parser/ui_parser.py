@@ -6,24 +6,54 @@ from __future__ import annotations
 import dearpygui.dearpygui as dpg
 from dataclasses import dataclass
 import json
+from typing import Callable, ClassVar
 
 # Custom Library
 
 # Custom Packages
-from AthenaDPGLib.models.cogs.gui_parsing.attributes import Attributes
+from AthenaDPGLib.models.components.ui_parser.attributes import Attributes
 from AthenaDPGLib.data.text import (TAG, PRIMARY_WINDOW,DPG)
 from AthenaDPGLib.data.runtimeparser_mapping import (
     RUNTIMEPARSER_MAPPING_CONTEXTMANGERS, RUNTIMEPARSER_MAPPING_ITEMS_FULL
 )
-from AthenaDPGLib.data.globals import global_custom_dpg_items, global_tags
-from AthenaDPGLib.functions.decorators import custom_dpg_item
 from AthenaDPGLib.data.exceptions import DPGJSONStructureError
+
+# ----------------------------------------------------------------------------------------------------------------------
+# - Code -
+# ----------------------------------------------------------------------------------------------------------------------
+_internal_custom_dpg_items = {}
+def _custom_dpg_item(name: str) -> Callable:
+    def decorator(fnc: Callable):
+        _internal_custom_dpg_items[name] = fnc
+    return decorator
 
 # ----------------------------------------------------------------------------------------------------------------------
 # - Code -
 # ----------------------------------------------------------------------------------------------------------------------
 @dataclass(slots=True, kw_only=True)
 class UIParser:
+    # non init
+    tags:ClassVar[set] = set()
+    custom_dpg_items:ClassVar[dict] = _internal_custom_dpg_items
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # - Support methods for the component -
+    # ------------------------------------------------------------------------------------------------------------------
+    def recursive(self) -> Callable:
+        return self._parse_recursive
+
+    @classmethod
+    def custom_dpg_item(cls, name: str) -> Callable:
+        """
+        Decorator which assigns the method as a custom dpg item which can be used within the json ui files.
+        Meant to be used within an inherited class of RunTimeParser
+        """
+        def decorator(fnc: Callable):
+            if name in cls.custom_dpg_items:
+                raise ValueError(f"the custom item of `{name}` was already stored")
+            cls.custom_dpg_items[name] = fnc
+        return decorator
+
     # ------------------------------------------------------------------------------------------------------------------
     # - Actual Parsing -
     # ------------------------------------------------------------------------------------------------------------------
@@ -66,11 +96,11 @@ class UIParser:
         """
         for item, attrib in ((k,v) for i in parent for k, v in i.items()): #type: str, dict
             if TAG in attrib:
-                if (tag := attrib[TAG]) in global_tags:
+                if (tag := attrib[TAG]) in self.tags:
                     raise DPGJSONStructureError(
                         f"'{tag}' was already present in the tags dictionary.\nRaised in the '{item}' item"
                     )
-                global_tags.add(tag)
+                self.tags.add(tag)
 
             if item in RUNTIMEPARSER_MAPPING_CONTEXTMANGERS:
                 # run the item with a context.
@@ -84,10 +114,10 @@ class UIParser:
                 RUNTIMEPARSER_MAPPING_ITEMS_FULL[item](**Attributes(item, attrib))
 
             # for special cases
-            elif item in global_custom_dpg_items:
+            elif item in self.custom_dpg_items:
                 # Custom implemented items that either don't have a "normal" dpg function
                 #   or are a collection of predefined items
-                global_custom_dpg_items[item](self, item, attrib)
+                self.custom_dpg_items[item](self, item, attrib)
 
             else:
                 raise DPGJSONStructureError(
@@ -97,36 +127,36 @@ class UIParser:
     # ------------------------------------------------------------------------------------------------------------------
     # - Special DPG items -
     # ------------------------------------------------------------------------------------------------------------------
-    @custom_dpg_item(name="primary_window")
+    @_custom_dpg_item(name="primary_window")
     def primary_window(self, _: str, attrib: dict):
         """
         Not a "true" custom item as it is just a DPG window with the tag set to 'primary_window'.
         After the window and it's children have been created, the `dpg.set_primary_window` function is ran.
         """
         attrib[TAG] = PRIMARY_WINDOW
-        global_tags.add(PRIMARY_WINDOW)
+        self.tags.add(PRIMARY_WINDOW)
 
         with dpg.window(**Attributes("window", attrib)):
             self._parse_recursive(parent=attrib["_children"])
 
         dpg.set_primary_window(PRIMARY_WINDOW, True)
 
-    @custom_dpg_item(name="viewport")
-    def viewport(self, _:str, attrib:dict):
+    @_custom_dpg_item(name="viewport")
+    def viewport(self, _: str, attrib: dict):
         """
         Alias for dpg.create_viewport
         """
         dpg.create_viewport(**attrib)
 
-    @custom_dpg_item(name="grid_layout")
-    def grid_layout(self, _:str, attrib:dict):
+    @_custom_dpg_item(name="grid_layout")
+    def grid_layout(self, _: str, attrib: dict):
         """
         A custom item, which at it's core is an alias for `dpg.table` and its columns and rows.
         Technically DPG doesn't have a layout system, but the documentation proposes to use tables for this feature.
         This item is the quicker solution to this as it automatically defines columns and has an easier way of
             assigning the rows.
         """
-        with dpg.table(**Attributes("table",attrib), header_row=False):
+        with dpg.table(**Attributes("table", attrib), header_row=False):
             # columns
             for column in attrib["_columns"]:
                 dpg.add_table_column(**column)
@@ -135,15 +165,15 @@ class UIParser:
             #   TODO: fix this ugly system
 
             if "_rows" in attrib and len(attrib["_rows"]) == 1:
-                attrib_rows = (attrib["_rows"],)*len(attrib["_children"])
+                attrib_rows = (attrib["_rows"],) * len(attrib["_children"])
             elif "_rows" in attrib and len(attrib["_rows"]) > 1:
                 attrib_rows = attrib["_rows"]
             elif "_row_all" in attrib:
-                attrib_rows = (attrib["_row_all"],)*len(attrib["_children"])
+                attrib_rows = (attrib["_row_all"],) * len(attrib["_children"])
             else:
-                attrib_rows = ({},)*len(attrib["_children"])
+                attrib_rows = ({},) * len(attrib["_children"])
 
             # create all the items within the rows
             for attrib_row, child in zip(attrib_rows, attrib["_children"]):
                 with dpg.table_row(**attrib_row):
-                   self._parse_recursive(child)
+                    self._parse_recursive(child)

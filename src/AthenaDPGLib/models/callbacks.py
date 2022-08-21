@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------------------------------------------------------
 # General Packages
 from __future__ import annotations
-from typing import Callable
+from typing import Callable, ClassVar, Any, Optional
 import functools
 
 # Custom Library
@@ -16,30 +16,30 @@ from AthenaLib.functions.mappings import append_or_extend_list_to_mapping
 # ----------------------------------------------------------------------------------------------------------------------
 class Callbacks:
     # part of the actual class
-    mapping_callback:dict[str:list[Callable]] = {}
-    mapping_drag_callback:dict[str:list[Callable]] = {}
-    mapping_drop_callback:dict[str:list[Callable]] = {}
-    mapping_viewport_resize:list[Callable] = []
+    mapping_callback:ClassVar[dict[str:list[Callable]]] = {}
+    mapping_drag_callback:ClassVar[dict[str:list[Callable]]] = {}
+    mapping_drop_callback:ClassVar[dict[str:list[Callable]]] = {}
+    mapping_viewport_resize:ClassVar[list[Callable]] = []
 
-    def _chain(self, sender, app_data, user_data:None=None, *,mapping:dict):
+    def _chain(self, sender, app_data, user_data:Optional[Any]=None, *,mapping:dict):
         for fnc in mapping[sender]:
             fnc(self=self,sender=sender, app_data=app_data, user_data=user_data)
 
-    def chain_callback(self, sender, app_data, user_data:None=None):
+    def chain_callback(self, sender, app_data, user_data:Optional[Any]=None):
         """
         Function which executes the bound functions to the sender's `callback` function.
         The order is defined by at which moment the functions were registered.
         """
         self._chain(sender, app_data, user_data, mapping=self.mapping_callback)
 
-    def chain_drag_callback(self, sender, app_data, user_data:None=None):
+    def chain_drag_callback(self, sender, app_data, user_data:Optional[Any]=None):
         """
         Function which executes the bound functions to the sender's `drag_callback` function.
         The order is defined by at which moment the functions were registered.
         """
         self._chain(sender, app_data, user_data, mapping=self.mapping_drag_callback)
 
-    def chain_drop_callback(self, sender, app_data, user_data:None=None):
+    def chain_drop_callback(self, sender, app_data, user_data:Optional[Any]=None):
         """
         Function which executes the bound functions to the sender's `drop_callback` function.
         The order is defined by at which moment the functions were registered.

@@ -7,15 +7,9 @@ from __future__ import annotations
 # Custom Library
 
 # Custom Packages
+from AthenaDPGLib.data.text import JSON
 
 # ----------------------------------------------------------------------------------------------------------------------
 # - Code -
 # ----------------------------------------------------------------------------------------------------------------------
-class Cog:
-    def startup(self, *args, **kwargs):
-        """Ran at Application startup"""
-        pass
-
-    def closedown(self, *args, **kwargs):
-        """Ran at Application closedown"""
-        pass
+UI_EXTENSIONS:set[str] = {JSON}
