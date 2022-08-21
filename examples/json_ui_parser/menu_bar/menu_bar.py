@@ -11,8 +11,11 @@ from AthenaDPGLib.functions.json_ui_parser import json_ui_parser
 # Custom Packages
 
 # ----------------------------------------------------------------------------------------------------------------------
-# - Code -
+# - Support Code -
 # ----------------------------------------------------------------------------------------------------------------------
+def print_me(sender, **_):
+    print(f"Menu Item: {sender}")
+
 def main():
     # example made after the following example:
     #   https://dearpygui.readthedocs.io/en/latest/documentation/menus.html
@@ -25,7 +28,9 @@ def main():
         filepath="menu_bar.json"
     )
 
-    # TODO Register callbacks
+    # TODO Automatically Register callbacks (see old system)
+    for item in ["FileSave","FileSaveAs","Settings1","Settings2","Help","WidgetCheckbox","WidgetButton","WidgetColor"]:
+        dpg.set_item_callback(item=item, callback=print_me)
 
     # execute dpg as normally
     dpg.setup_dearpygui()

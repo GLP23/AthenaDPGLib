@@ -40,7 +40,7 @@ def main():
         tags = tags
     )
 
-    # TODO Automatically register callbacks
+    # TODO Automatically Register callbacks (see old system)
     dpg.set_item_callback(
         item="create_window",
         callback=create_window_callback
