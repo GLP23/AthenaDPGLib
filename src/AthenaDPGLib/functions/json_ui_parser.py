@@ -28,6 +28,10 @@ def _item_and_attrib_generator(children:list) ->  tuple[str, dict] :
     for item, attrib in ((k, v) for i in children for k, v in i.items()):
         yield item, attrib
 
+
+def _attrib_generator(attrib:dict)->dict:
+    return {k:v for k,v in attrib.items() if not k.startswith("_")}
+
 def _recursive_parser(item: str, attrib: dict, *, custom_dpg_items: dict, tags: set):
     """
     Recursive part of the parser.
@@ -41,7 +45,7 @@ def _recursive_parser(item: str, attrib: dict, *, custom_dpg_items: dict, tags: 
     if item in JSONUIPARSER_CONTEXTMANGERS:
         # run the item with a context.
         #   Else the child items will not be correctly placed within the parent item
-        with JSONUIPARSER_CONTEXTMANGERS[item](**attrib):
+        with JSONUIPARSER_CONTEXTMANGERS[item](**_attrib_generator(attrib)):
             # Go over all items and it's descendants if needed
             for item, attrib in _item_and_attrib_generator(attrib["_children"]):
                 _recursive_parser(item=item, attrib=attrib, custom_dpg_items=custom_dpg_items, tags=tags)
@@ -49,7 +53,7 @@ def _recursive_parser(item: str, attrib: dict, *, custom_dpg_items: dict, tags: 
     elif item in JSONUIPARSER_ITEMS:
         # run the item creation normally
         #   aka: dpg.add_...
-        JSONUIPARSER_ITEMS[item](**attrib)
+        JSONUIPARSER_ITEMS[item](**_attrib_generator(attrib))
 
     # for special cases
     #   see if the item can be found in the `custom_dpg_items` keys
@@ -64,13 +68,17 @@ def _recursive_parser(item: str, attrib: dict, *, custom_dpg_items: dict, tags: 
 # ----------------------------------------------------------------------------------------------------------------------
 # - Code -
 # ----------------------------------------------------------------------------------------------------------------------
-def json_ui_parser(filepath:PATHLIKE, custom_dpg_items:dict, tags:set):
+def json_ui_parser(filepath:PATHLIKE, *, custom_dpg_items:dict=None, tags:set=None):
     """
     Parses the given json file at the `filepath_input` argument.
     Make sure that the dpg.create_context() has been run before this method is run
 
     Made as a standalone function to be used outside an AthenaApplication manner
     """
+    if custom_dpg_items is None:
+        custom_dpg_items = {}
+    if tags is None:
+        tags = set()
 
     # Error catching block specifically placed here
     #   Else all `KeyError` exceptions within the parser will be caught

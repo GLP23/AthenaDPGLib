@@ -217,6 +217,7 @@ JSONUIPARSER_ITEMS = {
     "tooltip": dpg.add_tooltip,
     "tree_node": dpg.add_tree_node,
     "value_registry": dpg.add_value_registry,
+    "viewport":dpg.create_viewport,
     "viewport_drawlist": dpg.add_viewport_drawlist,
     "viewport_menu_bar": dpg.add_viewport_menu_bar,
     "vline_series": dpg.add_vline_series,
