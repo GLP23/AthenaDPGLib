@@ -6,7 +6,7 @@ from __future__ import annotations
 import unittest
 
 # Custom Library
-from AthenaDPGLib.models.application.cogs.translation.translator import Translator
+from AthenaDPGLib.models.athena_application.cogs.translation.translator import Translator
 from AthenaDPGLib.data.sql import TRANSLATION_CREATE_EMPTY_TABLES, SHOW_TABLES
 
 # Custom Packages
@@ -15,7 +15,7 @@ from AthenaDPGLib.data.sql import TRANSLATION_CREATE_EMPTY_TABLES, SHOW_TABLES
 # - Code -
 # ----------------------------------------------------------------------------------------------------------------------
 class TestTranslator(unittest.TestCase):
-    sqlite_filepath = "application/translator/test_translation.sqlite"
+    sqlite_filepath = "app/translator/test_translation.sqlite"
 
     def get_translator(self) -> Translator:
         """Will create the sqlite file if it doesn't exist with the proper tables installed"""
