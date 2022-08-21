@@ -30,6 +30,7 @@ def _item_and_attrib_generator(children:list) ->  tuple[str, dict] :
 
 
 def _attrib_generator(attrib:dict)->dict:
+    # TODO quick fix, eventually this has to be changed to a better system but works as intended
     return {k:v for k,v in attrib.items() if not k.startswith("_")}
 
 def _recursive_parser(item: str, attrib: dict, *, custom_dpg_items: dict, tags: set):
@@ -75,6 +76,8 @@ def json_ui_parser(filepath:PATHLIKE, *, custom_dpg_items:dict=None, tags:set=No
 
     Made as a standalone function to be used outside an AthenaApplication manner
     """
+    # Created here to make sure they are present and usable by the recursive parser
+    #   Here they are created once, instead of on every `_recursive_parser` call
     if custom_dpg_items is None:
         custom_dpg_items = {}
     if tags is None:
