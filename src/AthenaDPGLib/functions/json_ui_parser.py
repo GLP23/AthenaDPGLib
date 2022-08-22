@@ -11,7 +11,7 @@ from AthenaLib.data.types import PATHLIKE
 # Custom Packages
 from AthenaDPGLib.models.json_ui_parser.custom_dpg_items import CustomDPGItems
 from AthenaDPGLib.data.json_ui_parser_mappings import JSONUIPARSER_ITEMS, JSONUIPARSER_CONTEXT_MANAGERS
-from AthenaDPGLib.data.exceptions import error_tag, error_item, error_file
+from AthenaDPGLib.data.exceptions import error_item, error_file
 
 # ----------------------------------------------------------------------------------------------------------------------
 # - Support Code -
@@ -24,17 +24,11 @@ def _attrib_generator(attrib:dict)->dict:
     # TODO quick fix, eventually this has to be changed to a better system but works as intended
     return {k:v for k,v in attrib.items() if not k.startswith("_")}
 
-def _recursive_parser(item: str, attrib: dict, *, custom_dpg_items: type[CustomDPGItems]|CustomDPGItems, tags: set):
+def _recursive_parser(item: str, attrib: dict, *, custom_dpg_items: type[CustomDPGItems]|CustomDPGItems):
     """
     Recursive part of the parser.
     It will recursively parse all child items of DPG items that are run with a context manager (with statement).
     """
-    # Check for tag
-    #   Else DPG will crash
-    if "tag" in attrib:
-        if (tag := attrib["tag"]) in tags:
-            raise error_tag(tag, item)
-        tags.add(tag)
 
     # for special cases
     #   run first because maybe a custom item name replaces a "normally named dpg item"
@@ -46,7 +40,7 @@ def _recursive_parser(item: str, attrib: dict, *, custom_dpg_items: type[CustomD
         # item needs to be context managed because it has child items.
         with custom_dpg_items.items_context_managed[item](attrib=_attrib_generator(attrib)):
             for i, a in _item_and_attrib_generator(attrib["_children"]):
-                _recursive_parser(item=i, attrib=a, custom_dpg_items=custom_dpg_items, tags=tags)
+                _recursive_parser(item=i, attrib=a, custom_dpg_items=custom_dpg_items)
 
     elif item in JSONUIPARSER_CONTEXT_MANAGERS:
         # run the item with a context.
@@ -54,7 +48,7 @@ def _recursive_parser(item: str, attrib: dict, *, custom_dpg_items: type[CustomD
         with JSONUIPARSER_CONTEXT_MANAGERS[item](**_attrib_generator(attrib)):
             # Go over all items and it's descendants if needed
             for item, attrib in _item_and_attrib_generator(attrib["_children"]):
-                _recursive_parser(item=item, attrib=attrib, custom_dpg_items=custom_dpg_items, tags=tags)
+                _recursive_parser(item=item, attrib=attrib, custom_dpg_items=custom_dpg_items)
 
     elif item in JSONUIPARSER_ITEMS:
         # run the item creation normally
@@ -67,7 +61,7 @@ def _recursive_parser(item: str, attrib: dict, *, custom_dpg_items: type[CustomD
 # ----------------------------------------------------------------------------------------------------------------------
 # - Code -
 # ----------------------------------------------------------------------------------------------------------------------
-def json_ui_parser(filepath:PATHLIKE, *, custom_dpg_items:CustomDPGItems=None, tags:set=None):
+def json_ui_parser(filepath:PATHLIKE, *, custom_dpg_items:CustomDPGItems=None):
     """
     Parses the given json file at the `filepath_input` argument.
     Make sure that the dpg.create_context() has been run before this method is run
@@ -78,8 +72,6 @@ def json_ui_parser(filepath:PATHLIKE, *, custom_dpg_items:CustomDPGItems=None, t
     #   Here they are created once, instead of on every `_recursive_parser` call
     if custom_dpg_items is None:
         custom_dpg_items = CustomDPGItems # this is an empty object and should work as is
-    if tags is None:
-        tags = set()
 
     # Error catching block specifically placed here
     #   Else all `KeyError` exceptions within the parser will be caught
@@ -101,7 +93,7 @@ def json_ui_parser(filepath:PATHLIKE, *, custom_dpg_items:CustomDPGItems=None, t
         #       And this will ensure that the "old" ui files don't break
         case {"_parser": {"version": 0}, "_children": children, }:
             for item, attrib in _item_and_attrib_generator(children):
-                _recursive_parser(item=item, attrib=attrib, custom_dpg_items=custom_dpg_items, tags=tags)
+                _recursive_parser(item=item, attrib=attrib, custom_dpg_items=custom_dpg_items)
 
         # No usable format could be found
         case _:

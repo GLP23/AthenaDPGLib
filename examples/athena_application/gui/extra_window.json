@@ -3,9 +3,11 @@
     "_parser": {"version": 0},
     "_children": [
       {"window": {
+        "tag": "special_window",
         "label": "Extra Window",
+        "pos": [200,0],
         "_children": [
-          {"button": {"label": "Create new window", "tag": "wnd_extra"}}
+          {"button": {"label": "close me", "tag": "close_me"}}
         ]
       }}
     ]

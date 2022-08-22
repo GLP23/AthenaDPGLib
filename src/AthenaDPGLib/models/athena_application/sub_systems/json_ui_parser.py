@@ -4,6 +4,7 @@
 # General Packages
 from __future__ import annotations
 from dataclasses import dataclass, field
+import dearpygui.dearpygui as dpg
 
 # Custom Library
 from AthenaLib.functions.files import gather_all_filepaths
@@ -25,13 +26,17 @@ class SubSystem_JsonUiParser(SubSystem):
     gui_folder:str
     excluded_files:set[str] = field(default_factory=set)
     custom_dpg_items:CustomDPGItems_PreMade = field(default_factory=CustomDPGItems_PreMade)
-    tags:set = field(default_factory=set)
 
-    def __post_init__(self):
+    def run(self):
         for filepath in gather_all_filepaths(directory=self.gui_folder, extensions={"json"}):
             if filepath not in self.excluded_files:
                 json_ui_parser(
                     filepath,
                     custom_dpg_items=self.custom_dpg_items,
-                    tags=self.tags
                 )
+
+    def parse_file(self, filepath):
+        json_ui_parser(
+            filepath,
+            custom_dpg_items=self.custom_dpg_items,
+        )
