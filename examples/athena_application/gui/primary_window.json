@@ -1,0 +1,12 @@
+{
+  "dpg": {
+    "_parser": {"version": 0},
+    "_children": [
+      {"primary_window": {
+        "label": "Primary Window",
+        "_children": [
+          {"text": {"default_value": "YAHOO"}}
+        ]}}
+    ]
+  }
+}

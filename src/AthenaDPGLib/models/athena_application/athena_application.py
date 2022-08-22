@@ -20,7 +20,7 @@ class AthenaApplication:
     #   because their execution order might be of importance
     # `sub_systems` is not part of init as it shouldn't house any objects at the start of the application
     #   Is only populated during startup procedure
-    sub_systems:set[SubSystem] = field(init=False, default_factory=set)
+    sub_systems:list[SubSystem] = field(init=False, default_factory=list)
     sub_system_constructors:list[Callable] = field(default_factory=list)
     sub_system_constructors_pre_dpg:list[Callable] = field(default_factory=list)
 
@@ -39,7 +39,7 @@ class AthenaApplication:
         AFTER the DPG context has been created
         """
         for constructor in self.sub_system_constructors: #type: Callable
-            self.sub_systems.add(constructor(application=self))
+            self.sub_systems.append(constructor(app=self))
 
     def sub_systems_startup_pre_dpg(self):
         """
@@ -47,7 +47,7 @@ class AthenaApplication:
         BEFORE the DPG context has been created
         """
         for constructor in self.sub_system_constructors_pre_dpg: #type: Callable
-            self.sub_systems.add(constructor(application=self))
+            self.sub_systems.append(constructor(app=self))
 
     def sub_systems_close_down_controlled(self):
         """

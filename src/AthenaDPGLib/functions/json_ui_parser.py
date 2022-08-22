@@ -9,31 +9,22 @@ import json
 from AthenaLib.data.types import PATHLIKE
 
 # Custom Packages
+from AthenaDPGLib.models.json_ui_parser.custom_dpg_items import CustomDPGItems
 from AthenaDPGLib.data.json_ui_parser_mappings import JSONUIPARSER_ITEMS, JSONUIPARSER_CONTEXTMANGERS
+from AthenaDPGLib.data.exceptions import error_tag, error_item, error_file
 
 # ----------------------------------------------------------------------------------------------------------------------
 # - Support Code -
 # ----------------------------------------------------------------------------------------------------------------------
-error_tag = lambda tag, item : ValueError(
-    f"'{tag}' was already present in the tags dictionary.\nRaised in '{item}' item"
-)
-error_item = lambda item : ValueError(
-    f"'{item}' dpg item name could not be parsed as a default dpg item or a custom item"
-)
-error_file = lambda filepath : ValueError(
-    f"The file `{filepath}` had no usable structure"
-)
-
 def _item_and_attrib_generator(children:list) ->  tuple[str, dict] :
     for item, attrib in ((k, v) for i in children for k, v in i.items()):
         yield item, attrib
-
 
 def _attrib_generator(attrib:dict)->dict:
     # TODO quick fix, eventually this has to be changed to a better system but works as intended
     return {k:v for k,v in attrib.items() if not k.startswith("_")}
 
-def _recursive_parser(item: str, attrib: dict, *, custom_dpg_items: dict, tags: set):
+def _recursive_parser(item: str, attrib: dict, *, custom_dpg_items: CustomDPGItems, tags: set):
     """
     Recursive part of the parser.
     It will recursively parse all child items of DPG items that are run with a context manager (with statement).
@@ -43,7 +34,20 @@ def _recursive_parser(item: str, attrib: dict, *, custom_dpg_items: dict, tags: 
             raise error_tag(tag, item)
         tags.add(tag)
 
-    if item in JSONUIPARSER_CONTEXTMANGERS:
+    # for special cases
+    #   see if the item can be found in the `custom_dpg_items` keys
+    #   run first because maybe a custom item name replaces a "normally named dpg item"
+    # Custom implemented items that either don't have a "normal" dpg function
+    #   or are a collection of predefined items and procedures
+    if item in custom_dpg_items.items:
+        custom_dpg_items.items[item](item=item, attrib=_attrib_generator(attrib), tags=tags)
+
+    elif item in custom_dpg_items.context_managed:
+        with custom_dpg_items.context_managed[item](item=item, attrib=_attrib_generator(attrib), tags=tags):
+            for i, a in _item_and_attrib_generator(attrib["_children"]):
+                _recursive_parser(item=i, attrib=a, custom_dpg_items=custom_dpg_items, tags=tags)
+
+    elif item in JSONUIPARSER_CONTEXTMANGERS:
         # run the item with a context.
         #   Else the child items will not be correctly placed within the parent item
         with JSONUIPARSER_CONTEXTMANGERS[item](**_attrib_generator(attrib)):
@@ -56,20 +60,13 @@ def _recursive_parser(item: str, attrib: dict, *, custom_dpg_items: dict, tags: 
         #   aka: dpg.add_...
         JSONUIPARSER_ITEMS[item](**_attrib_generator(attrib))
 
-    # for special cases
-    #   see if the item can be found in the `custom_dpg_items` keys
-    elif item in custom_dpg_items:
-        # Custom implemented items that either don't have a "normal" dpg function
-        #   or are a collection of predefined items and procedures
-        custom_dpg_items[item](item, attrib)
-
     else:
         raise error_item(item)
 
 # ----------------------------------------------------------------------------------------------------------------------
 # - Code -
 # ----------------------------------------------------------------------------------------------------------------------
-def json_ui_parser(filepath:PATHLIKE, *, custom_dpg_items:dict=None, tags:set=None):
+def json_ui_parser(filepath:PATHLIKE, *, custom_dpg_items:CustomDPGItems=None, tags:set=None):
     """
     Parses the given json file at the `filepath_input` argument.
     Make sure that the dpg.create_context() has been run before this method is run
@@ -79,7 +76,7 @@ def json_ui_parser(filepath:PATHLIKE, *, custom_dpg_items:dict=None, tags:set=No
     # Created here to make sure they are present and usable by the recursive parser
     #   Here they are created once, instead of on every `_recursive_parser` call
     if custom_dpg_items is None:
-        custom_dpg_items = {}
+        custom_dpg_items = CustomDPGItems() # this is an empty object and should work as is
     if tags is None:
         tags = set()
 
