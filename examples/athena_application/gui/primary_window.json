@@ -4,6 +4,7 @@
     "_children": [
       {"primary_window": {
         "label": "Primary Window",
+        "tag": "primary_window",
         "_children": [
           {"text": {"default_value": "YAHOO"}}
         ]}}

@@ -12,7 +12,7 @@ import dearpygui.dearpygui as dpg
 # ----------------------------------------------------------------------------------------------------------------------
 # - Code -
 # ----------------------------------------------------------------------------------------------------------------------
-JSONUIPARSER_CONTEXTMANGERS = {
+JSONUIPARSER_CONTEXT_MANAGERS = {
     # A full dictionary of all DPG items that can be used in context managers
     #   Ergo, the ones that can be used in with ... statements
     "child": dpg.child,
