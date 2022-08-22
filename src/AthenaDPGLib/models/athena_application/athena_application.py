@@ -66,9 +66,9 @@ class AthenaApplication:
         self.sub_systems_startup_pre_dpg()
         # Create the context
         #   done here so `self.sub_systems_startup()` sub systems can use dpg functions
-        #   if the context was created later dpg would refuse to work
+        #   if the context was created later functions that depend on dpg, would refuse to work
         dpg.create_context()
-        self.sub_systems_startup()
+        self.sub_systems_startup() # runs all constructors for the sub systems
         self.main()
         # Shows dpg window to the user
         dpg.setup_dearpygui()

@@ -1,0 +1,13 @@
+{
+  "dpg": {
+    "_parser": {"version": 0},
+    "_children": [
+      {"window": {
+        "label": "Extra Window",
+        "_children": [
+          {"button": {"label": "Create new window", "tag": "wnd_extra"}}
+        ]
+      }}
+    ]
+  }
+}
