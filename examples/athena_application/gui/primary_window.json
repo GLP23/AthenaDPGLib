@@ -6,7 +6,7 @@
         "label": "Primary Window",
         "tag": "primary_window",
         "_children": [
-          {"button": {"label": "Create new window", "tag": "wnd_extra"}}
+          {"button": {"label": "Create new window", "tag": "wnd_extra", "user_data": "gui/extra_window_1.json"}}
         ]}}
     ]
   }

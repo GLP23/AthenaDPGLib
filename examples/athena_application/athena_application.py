@@ -22,22 +22,23 @@ from AthenaDPGLib.functions.cleanups import cleanup_aliases
 class AppExample_CustomCallbacks(SubSystem_CustomCallbacks):
     app:App
 
-    @staticmethod
-    @CustomCallbacks.callback(items=["wnd_extra", "close_me"])
-    def print_me(sender,**_):
-        print(f"Menu Item: {sender}")
+    @CustomCallbacks.callback(items=["wnd_extra", "open_me"])
+    def create_window(self, user_data, **_):
+        self.app.parser.parse_file(filepath=user_data)
+        # force all callbacks to be set again
+        #   (Maybe this isn't the best course of action)
+        self.app.callbacks.apply_callbacks()
 
-    @CustomCallbacks.callback(items=["wnd_extra"])
-    def create_window(self, **_):
-        dpg.hide_item("wnd_extra")
-        self.app.parser.parse_file(filepath="gui/extra_window.json")
-        self.app.callbacks.apply_callbacks_specific(items={"wnd_extra","special_window","close_me"})
-
-    @CustomCallbacks.on_close(items=["special_window"])
-    def create_window_close(self, **_):
-        dpg.show_item("wnd_extra")
-
-        cleanup_aliases(("special_window", "close_me"))
+    @CustomCallbacks.on_close(items=["special_window_1","special_window_2"])
+    def on_window_close(self, sender, **_):
+        # aliases have to be cleaned up, else DPG gets mad
+        cleanup_aliases((
+            sender,
+            *(  # Get all child aliases
+                dpg.get_item_alias(child)
+                for child in dpg.get_item_children(sender)[1]
+            )
+        ))
 
 @dataclass(slots=True, kw_only=True)
 class App(AthenaApplication):
@@ -49,7 +50,7 @@ class App(AthenaApplication):
             constructor=lambda app : SubSystem_JsonUiParser(
                 app=app,
                 gui_folder="gui/",
-                excluded_files={"gui/extra_window.json"}
+                excluded_files={"gui/extra_window_1.json","gui/extra_window_2.json"}
             )
         )
         self.callbacks = self.sub_systems_register(

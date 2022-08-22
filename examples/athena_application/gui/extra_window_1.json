@@ -1,0 +1,15 @@
+{
+  "dpg": {
+    "_parser": {"version": 0},
+    "_children": [
+      {"window": {
+        "tag": "special_window_1",
+        "label": "Extra Window",
+        "pos": [200,0],
+        "_children": [
+          {"button": {"label": "open me", "tag": "open_me", "user_data": "gui/extra_window_2.json"}}
+        ]
+      }}
+    ]
+  }
+}
