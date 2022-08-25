@@ -6,7 +6,7 @@ from __future__ import annotations
 import dearpygui.dearpygui as dpg
 
 # Custom Library
-from AthenaDPGLib.functions.landplot_designer import wnd_landplot_designer
+from AthenaDPGLib.functions.landplot_designer import WndLandplotDesigner
 
 # Custom Packages
 
@@ -17,9 +17,10 @@ def main():
     dpg.create_context()
     dpg.create_viewport(title='LandPlot Designer Example')
 
-    wnd_landplot_designer(background_path="img.png")
+    WndLandplotDesigner(background_path="img.png", window_tag="primary_window").define_dpg()
+    dpg.set_primary_window("primary_window", True)
 
-    dpg.show_metrics()
+    # dpg.show_metrics()
 
     dpg.setup_dearpygui()
     dpg.show_viewport()
