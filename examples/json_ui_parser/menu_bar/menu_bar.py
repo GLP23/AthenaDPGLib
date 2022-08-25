@@ -6,34 +6,35 @@ from __future__ import annotations
 import dearpygui.dearpygui as dpg
 
 # Custom Library
+from AthenaDPGLib.functions.json_ui_parser import json_ui_parser
 
 # Custom Packages
 
 # ----------------------------------------------------------------------------------------------------------------------
-# - Code -
+# - Support Code -
 # ----------------------------------------------------------------------------------------------------------------------
+def print_me(sender, **_):
+    print(f"Menu Item: {sender}")
+
 def main():
-    # Created a second version of the test, according to the original solution Hoffstadt posted
-    # https://github.com/hoffstadt/DearPyGui/issues/1024#issuecomment-875163747
-    ICON = "ATHENA.ico"
-    TITLE = "IconExample"
+    # example made after the following example:
+    #   https://dearpygui.readthedocs.io/en/latest/documentation/menus.html
 
+    # ALWAYS make sure this function is ran beforehand
     dpg.create_context()
-    vp = dpg.create_viewport(title=TITLE, width=600, height=300)
-    dpg.setup_dearpygui(viewport=vp)
 
-    dpg.set_viewport_small_icon(ICON)
-    dpg.set_viewport_large_icon(ICON)
+    # run the ui parser
+    json_ui_parser(
+        filepath="menu_bar.json"
+    )
 
-    # indeed excluding the following line works to actually show the icon in the taskbar
-    #   But by all accords, we are seemingly doing the same, except for a very strange order
-    # fix_icon_for_taskbar(TITLE)
+    # TODO Automatically Register callbacks (see old system)
+    for item in ["FileSave","FileSaveAs","Settings1","Settings2","Help","WidgetCheckbox","WidgetButton","WidgetColor"]:
+        dpg.set_item_callback(item=item, callback=print_me)
 
+    # execute dpg as normally
+    dpg.setup_dearpygui()
     dpg.show_viewport()
-
-    with dpg.window(label="Example of the Icon"):
-        dpg.add_text("You should see an icon in your taskbar.\nOnly works for windows currently")
-
     dpg.start_dearpygui()
     dpg.destroy_context()
 

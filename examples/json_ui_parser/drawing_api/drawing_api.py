@@ -6,31 +6,30 @@ from __future__ import annotations
 import dearpygui.dearpygui as dpg
 
 # Custom Library
-from AthenaDPGLib.models.application import Application
-from AthenaDPGLib.models.runtimeparser.parser_runtime import ParserRuntime
-from AthenaDPGLib.models.callbacks import Callbacks
+from AthenaDPGLib.functions.json_ui_parser import json_ui_parser
 
 # Custom Packages
 
 # ----------------------------------------------------------------------------------------------------------------------
 # - Code -
 # ----------------------------------------------------------------------------------------------------------------------
-app: Application
-
-class CustomCallbacks(Callbacks):
-    @Callbacks.callback(items=["create_window"])
-    def create_window(self,**_):
-        global app
-        app.parser.parse_file("extra_window.json")
-
 def main():
-    global app
-    app = Application(
-        name="Multi File Test",
-        callbacks=CustomCallbacks(),
+    # example made after the following example:
+    #   https://dearpygui.readthedocs.io/en/latest/documentation/drawing-api.html
+
+    # ALWAYS make sure this function is ran beforehand
+    dpg.create_context()
+
+    # run the ui parser
+    json_ui_parser(
+        filepath="drawing_api.json"
     )
-    app.parser.parse_file("multi_file_test.json")
-    app.main()
+
+    # execute dpg as normally
+    dpg.setup_dearpygui()
+    dpg.show_viewport()
+    dpg.start_dearpygui()
+    dpg.destroy_context()
 
 if __name__ == '__main__':
     main()

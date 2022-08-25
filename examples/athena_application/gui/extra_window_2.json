@@ -1,0 +1,15 @@
+{
+  "dpg": {
+    "_parser": {"version": 0},
+    "_children": [
+      {"window": {
+        "tag": "special_window_2",
+        "label": "Extra Window",
+        "pos": [200,200],
+        "_children": [
+          {"text": {"default_value": "GOTCHA", "tag": "gotcha"}}
+        ]
+      }}
+    ]
+  }
+}

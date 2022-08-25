@@ -3,8 +3,6 @@
 # ----------------------------------------------------------------------------------------------------------------------
 # General Packages
 from __future__ import annotations
-import enum
-import dearpygui.dearpygui as dpg
 
 # Custom Library
 
@@ -13,6 +11,3 @@ import dearpygui.dearpygui as dpg
 # ----------------------------------------------------------------------------------------------------------------------
 # - Code -
 # ----------------------------------------------------------------------------------------------------------------------
-class DpgItemNames(enum.Enum):
-    table = "mvAppItemType::mvTable"
-    text = "mvAppItemType::mvText"
