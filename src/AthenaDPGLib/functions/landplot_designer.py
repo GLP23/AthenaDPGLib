@@ -59,7 +59,7 @@ class WndLandplotDesigner:
                 dpg.add_text("selected polygon:")
                 dpg.add_text(tag="poly_selected")
 
-            dpg.add_button(label="make polygons",callback=self.update_series_polygons)
+            dpg.add_button(label="make polygons", callback=self.update_polygon_all)
 
         with dpg.item_handler_registry(tag="ireg_0"):
             dpg.add_item_clicked_handler(
@@ -67,6 +67,7 @@ class WndLandplotDesigner:
             )
 
         dpg.bind_item_handler_registry(self.plot_name, "ireg_0")
+
 
     def btn_define_polygon(self):
         polyname = dpg.get_value("polygon_name")
@@ -90,8 +91,28 @@ class WndLandplotDesigner:
             dpg.set_value(f"cbox_{polyname}", True)
             dpg.set_value("poly_selected", polyname)
 
+    def gather_polygon_points(self, point_tags: list[{str}]):
+        x_data = []
+        y_data = []
+        for p in point_tags:
+            x, y, *_ = dpg.get_value(int(p))
+            x_data.append(x)
+            y_data.append(y)
+        return x_data, y_data
 
-    def update_series_polygons(self):
+    def update_polygon(self,_,__, user_data:str):
+        polyname = user_data
+        if not (points_str := dpg.get_value(f'points_{polyname}')):
+            return
+        if len(point_tags := points_str.split(";")) <= 2:
+            return
+        x_data, y_data = self.gather_polygon_points(point_tags)
+        if len(x_data) != len(dpg.get_value(f'series_{polyname}')[0]):
+            return
+        dpg.set_value(f'series_{polyname}', [x_data, y_data])
+
+
+    def update_polygon_all(self):
         for row in dpg.get_item_children("tbl_polygons")[1]:
             polyname = dpg.get_item_user_data(row)
 
@@ -101,20 +122,29 @@ class WndLandplotDesigner:
             if len(point_tags := points_str.split(";")) <= 2:
                 return
 
-            x_data = []
-            y_data= []
-            for p in point_tags:
-                x,y , *_ = dpg.get_value(int(p))
-                x_data.append(x)
-                y_data.append(y)
+            x_data, y_data = self.gather_polygon_points(point_tags)
 
-            dpg.add_custom_series(
-                x_data, y_data,
-                2,
-                parent="x_axis",
-                callback=self.series_polygon_callback,
-                tag=f'series_{polyname}',
-            )
+            if dpg.does_item_exist(f'series_{polyname}'):
+                if len(x_data) == len(dpg.get_value(f'series_{polyname}')[0]):
+                    dpg.set_value(f'series_{polyname}', [x_data, y_data])
+                else:
+                    dpg.delete_item(f'series_{polyname}')
+                    dpg.add_custom_series(
+                        x_data, y_data,
+                        2,
+                        parent="x_axis",
+                        callback=self.series_polygon_callback,
+                        tag=f'series_{polyname}',
+                    )
+
+            else:
+                dpg.add_custom_series(
+                    x_data, y_data,
+                    2,
+                    parent="x_axis",
+                    callback=self.series_polygon_callback,
+                    tag=f'series_{polyname}',
+                )
 
     def series_polygon_callback(self, sender, app_data):
         _helper_data = app_data[0]
@@ -144,7 +174,9 @@ class WndLandplotDesigner:
         point = dpg.add_drag_point(
             parent=self.plot_name,
             default_value=pos,
-            color=dpg.get_value(f"color_{polyname}")
+            color=dpg.get_value(f"color_{polyname}"),
+            callback=self.update_polygon,
+            user_data=polyname
         )
         val = dpg.get_value(f'points_{polyname}')
         dpg.set_value(
