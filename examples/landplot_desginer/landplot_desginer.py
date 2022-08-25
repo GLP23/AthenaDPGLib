@@ -17,11 +17,8 @@ def main():
     dpg.create_context()
     dpg.create_viewport(title='LandPlot Designer Example')
 
-    WndLandplotDesigner(background_path="img.png", window_tag="primary_window").define_dpg()
+    WndLandplotDesigner(background_path="img.png", window_tag="primary_window").run()
     dpg.set_primary_window("primary_window", True)
-
-    dpg.show_metrics()
-    dpg.show_debug()
 
     dpg.setup_dearpygui()
     dpg.show_viewport()
