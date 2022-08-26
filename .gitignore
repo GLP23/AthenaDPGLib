@@ -131,3 +131,4 @@ dmypy.json
 # Pyre type checker
 .pyre/
 res/architectureOnion.psd
+examples/landplot_desginer/img.png
