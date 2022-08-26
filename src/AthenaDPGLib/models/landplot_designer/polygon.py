@@ -3,27 +3,18 @@
 # ----------------------------------------------------------------------------------------------------------------------
 # General Packages
 from __future__ import annotations
-import dearpygui.dearpygui as dpg
+from dataclasses import dataclass, field
 
 # Custom Library
-from AthenaDPGLib.functions.landplot_designer import WndLandplotDesigner
+from AthenaLib.data.types import NUMBER
 
 # Custom Packages
 
 # ----------------------------------------------------------------------------------------------------------------------
 # - Code -
 # ----------------------------------------------------------------------------------------------------------------------
-def main():
-    dpg.create_context()
-    dpg.create_viewport(title='LandPlot Designer Example')
-
-    WndLandplotDesigner(background_path="img.png", window_tag="primary_window").run()
-    dpg.set_primary_window("primary_window", True)
-
-    dpg.setup_dearpygui()
-    dpg.show_viewport()
-    dpg.start_dearpygui()
-    dpg.destroy_context()
-
-if __name__ == '__main__':
-    main()
+@dataclass(slots=True, kw_only=True)
+class Polygon:
+    name:str
+    points:list[int] = field(default_factory=list)
+    color:list[NUMBER] = field(default_factory=lambda : [0,0,0,255])
