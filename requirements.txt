@@ -1,3 +1,5 @@
 DearPyGui>=1.6.2
 AthenaLib>=1.6.2
 AthenaColor>=6.2.0
+numpy~=1.23.2
+setuptools~=65.0.0
