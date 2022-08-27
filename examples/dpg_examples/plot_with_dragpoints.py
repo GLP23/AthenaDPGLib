@@ -13,6 +13,10 @@ import numpy as np
 # ----------------------------------------------------------------------------------------------------------------------
 # - Code -
 # ----------------------------------------------------------------------------------------------------------------------
+# a global storage of the individual points on the plot.
+#   This list holds the dpg tags of the dragpoints, and not the individual positions
+#   If you want to have a list of all points' postions at a specific moment, you'll need to do the following:
+#       [dpg.get_value(p)[:2] for p in points]
 points:list[int] = []
 
 def plot_mouseclick_left_callback():
@@ -24,7 +28,7 @@ def plot_mouseclick_left_callback():
     point = dpg.add_drag_point(
         parent="plot",
         default_value=pos,
-        callback=lambda : print("Point Clicked"),
+        callback=lambda : print("Point dragged"), # this callback is executed on dragging dragpoint
     )
     # After the point has been created
     #   Store the point tag somewhere (in this case auto generated)
