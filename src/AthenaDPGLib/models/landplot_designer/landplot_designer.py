@@ -28,9 +28,9 @@ class WndLandplotDesigner:
 
     def __init__(self, background_path: PATHLIKE, window_tag:str):
         # Define the background texture and assign it to the window
-        width, height, channels, data = dpg.load_image(background_path)
-        with dpg.texture_registry():
-            dpg.add_static_texture(width, height, data, tag="background_id")
+        # width, height, channels, data = dpg.load_image(background_path)
+        # with dpg.texture_registry():
+        #     dpg.add_static_texture(width, height, data, tag="background_id")
 
         self.window_tag = window_tag
         self.polygons = {}
