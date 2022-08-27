@@ -37,6 +37,7 @@ def plot_mouseclick_left_callback():
 
 def plot_mouseclick_right_callback():
     global points
+
     # Use numpy to find the nearest point through a simple algorithm
     pos = dpg.get_plot_mouse_pos()
     index_nearest = np.argmin(np.sum((np.asarray([dpg.get_value(p)[:2] for p in points]) - pos)**2, axis=1))
@@ -47,6 +48,12 @@ def plot_mouseclick_right_callback():
     points.pop(index_nearest)
 
 def main():
+    """
+    A simple example of how to set up a drag point handler for a plot
+    The handler makes it so that:
+    - on a left click on the plot, it will create a drag point
+    - on a right click on the plot, it will delete the nearest drag point
+    """
     dpg.create_context()
     dpg.create_viewport(title='Dragpoint Example')
 
@@ -56,7 +63,7 @@ def main():
     with dpg.window(label="Plot with dragpoints"):
         with dpg.plot(tag="plot", width=500, height=500, no_menus=True, ):
             dpg.add_plot_axis(dpg.mvXAxis, label="x", tag="x_axis")
-            dpg.add_plot_axis(dpg.mvYAxis, label="y", tag="y_axis")
+            # dpg.add_plot_axis(dpg.mvYAxis, label="y", tag="y_axis")
 
     # Create a registry for the different callbacks on different mouse button clicks
     with dpg.item_handler_registry(tag="registry"):
