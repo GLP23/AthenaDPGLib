@@ -61,9 +61,7 @@ def main():
     #   Make sure to store the plot tag somwhere
     #       or use a custom tag as with this example
     with dpg.window(label="Plot with dragpoints"):
-        with dpg.plot(tag="plot", width=500, height=500, no_menus=True, ):
-            dpg.add_plot_axis(dpg.mvXAxis, label="x", tag="x_axis")
-            # dpg.add_plot_axis(dpg.mvYAxis, label="y", tag="y_axis")
+        dpg.add_plot(tag="plot", width=500, height=500, no_menus=True)
 
     # Create a registry for the different callbacks on different mouse button clicks
     with dpg.item_handler_registry(tag="registry"):
