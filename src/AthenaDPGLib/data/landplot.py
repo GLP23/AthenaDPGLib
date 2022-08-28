@@ -7,10 +7,9 @@ from __future__ import annotations
 # Custom Library
 
 # Custom Packages
-from AthenaDPGLib.models.custom_dpg_item import CustomDPGItem
+from AthenaDPGLib.models.landplot_designer.landplot_memory import _landplotMemory
 
 # ----------------------------------------------------------------------------------------------------------------------
 # - Code -
 # ----------------------------------------------------------------------------------------------------------------------
-class LandplotDesigner(CustomDPGItem):
-    pass
+landplotMemory = _landplotMemory()
