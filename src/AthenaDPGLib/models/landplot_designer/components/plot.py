@@ -39,9 +39,18 @@ class Plot(CustomDPGItem, LandplotDesigner_Component):
     # ------------------------------------------------------------------------------------------------------------------
     @contextmanager
     def constructor(self):
-        with dpg.plot(tag=self.tag, no_menus=True, width=750, height=750) as plot:
-            dpg.add_plot_axis(axis=dpg.mvXAxis,tag=self.axis_x)
-            dpg.add_plot_axis(axis=dpg.mvYAxis,tag=self.axis_y)
+        with dpg.plot(tag=self.tag, no_menus=True, width=750, height=750, no_title=True) as plot:
+            dpg.add_plot_axis(axis=dpg.mvXAxis,tag=self.axis_x, no_tick_marks=True, no_tick_labels=True)
+            with dpg.plot_axis(axis=dpg.mvYAxis,tag=self.axis_y, no_tick_marks=True, no_tick_labels=True):
+                # one global series which controls the polygon painting
+                #   No real polygon is stored withing it,
+                #       as the drag points are parented to the plot and nit the series
+                dpg.add_custom_series(
+                    x=[0,1],
+                    y=[0,1],
+                    channel_count=2,
+                    callback=custom_series_polygon.painter,
+                )
 
             yield plot
 
@@ -57,7 +66,6 @@ class Plot(CustomDPGItem, LandplotDesigner_Component):
                 button=dpg.mvMouseButton_Left,
                 callback=self.mousebutton_left
             )
-
         dpg.bind_item_handler_registry(item=self.tag,handler_registry=f"{self.tag}_registry")
 
     def mousebutton_left(self):
@@ -68,33 +76,22 @@ class Plot(CustomDPGItem, LandplotDesigner_Component):
 
     def add_drag_point(self,polygon:Polygon):
         # assign the drag point to the list of points to the polygon
+        pos = dpg.get_plot_mouse_pos()
         polygon.points.append(
-            dpg.add_drag_point(
-                parent=self.tag,
-                default_value=dpg.get_plot_mouse_pos(),
-                label=polygon.name,
-                color=[255,255,255,255],
-                user_data=polygon,
-                callback=self.drag_point_callback
-            )
+            [
+                dpg.add_drag_point(
+                    parent=self.tag,
+                    default_value=pos,
+                    label=polygon.name,
+                    color=[255,255,255,255],
+                    callback=self.drag_point_callbck,
+                    user_data=polygon
+                ),
+                pos
+            ]
         )
 
-        # if a series already exists, delete it and clean it up
-        if polygon.series is not None:
-            dpg.delete_item(polygon.series)
-
-        # Create a new series with the updated points
-        custom_series_polygon.new(
-            polygon=polygon,
-            x=[dpg.get_value(p)[0] for p in polygon.points],
-            y=[dpg.get_value(p)[1] for p in polygon.points]
-        )
-
-    def drag_point_callback(self, _, __, polygon:Polygon):
-        """
-        Function called to update the series with new points on the given polygon
-        """
-        dpg.set_value(
-            item=polygon.series,
-            value=[[dpg.get_value(p)[0] for p in polygon.points],[dpg.get_value(p)[1] for p in polygon.points]]
-        )
+    def drag_point_callbck(self, sender, __, polygon:Polygon):
+        for i, (point, _) in enumerate(polygon.points):
+            if point == sender:
+                polygon.points[i][1] = dpg.get_value(sender)

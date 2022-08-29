@@ -18,7 +18,6 @@ def main():
     dpg.create_viewport(title='LandPlot Designer Example')
 
     LandplotDesigner(window_tag="primary_window").constructor()
-    dpg.show_metrics()
 
     dpg.set_primary_window("primary_window", True)
 

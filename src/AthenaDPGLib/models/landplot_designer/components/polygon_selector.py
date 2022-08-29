@@ -7,6 +7,7 @@ import dearpygui.dearpygui as dpg
 from dataclasses import dataclass
 from contextlib import contextmanager
 import random
+import threading
 
 # Custom Library
 from AthenaLib.data.text import NOTHING
@@ -34,7 +35,7 @@ class PolygonSelector(CustomDPGItem, LandplotDesigner_Component):
     def constructor(self):
         with dpg.group(tag=self.tag) as group:
             dpg.add_text("Create a new polygon with a unique name:")
-            dpg.add_button(label="pregenerate", callback=self.pre_gen)
+            dpg.add_button(label="pregenerate", callback=lambda :threading.Thread(target=self.pre_gen).start())
             with dpg.group(horizontal=True):
                 dpg.add_input_text(
                     tag=self.inputtxt_polygon_name,
@@ -100,7 +101,7 @@ class PolygonSelector(CustomDPGItem, LandplotDesigner_Component):
 
         polygon.nodes_enabled = app_data
 
-        for point in polygon.points:
+        for point, _ in polygon.points:
             dpg.show_item(point) if app_data else dpg.hide_item(point)
 
         if app_data:
@@ -112,7 +113,7 @@ class PolygonSelector(CustomDPGItem, LandplotDesigner_Component):
                 polygon_checkbox = dpg.get_item_user_data(checkbox)  # type: Polygon
                 dpg.set_value(checkbox, False)
                 polygon_checkbox.nodes_enabled = False
-                for point in polygon_checkbox.points:
+                for point, _ in polygon_checkbox.points:
                     dpg.hide_item(point)
         else:
             self.memory.polygon_selected_name = NOTHING
@@ -130,23 +131,24 @@ class PolygonSelector(CustomDPGItem, LandplotDesigner_Component):
             [1,1],
             [1,0],
         ]
-        for i in range(1_000_000):
+        for i in range(1_000):
             polygon: Polygon = Polygon(
                 name=f"{i}",
                 color=(random.randint(0,255),random.randint(0,255),random.randint(0,255),255)
             )
             for x,y in rectangle:
-                polygon.points.append(dpg.add_drag_point(
+                polygon.points.append([dpg.add_drag_point(
                     parent=self.memory.plot_tag,
                     default_value=[x+i, y+i],
                     label=polygon.name,
-                    user_data=polygon,
-                ))
-            self.table_row_add(polygon)
-            self.memory.polygon_add(polygon=polygon)
+                    callback = self.drag_point_callbck,
+                    user_data = polygon
+                ),[x+i, y+i]])
 
-            custom_series_polygon.new(
-                polygon=polygon,
-                x=[dpg.get_value(p)[0] for p in polygon.points],
-                y=[dpg.get_value(p)[1] for p in polygon.points]
-            )
+            self.table_row_add(polygon)
+            self.memory.polygons[polygon.name] = polygon
+
+    def drag_point_callbck(self, sender, __, polygon: Polygon):
+        for i, (point, _) in enumerate(polygon.points):
+            if point == sender:
+                polygon.points[i][1] = dpg.get_value(sender)

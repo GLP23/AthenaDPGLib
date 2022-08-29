@@ -18,7 +18,7 @@ from AthenaLib.data.types import NUMBER
 class Polygon:
     name:str
 
-    points:list[int|str] = field(default_factory=list)
+    points:list[list[int|str, list]] = field(default_factory=list)
     color: tuple[NUMBER,...] = field(default_factory=lambda: (0, 0, 0, 255))
     series:Optional[str|int] = None
 
