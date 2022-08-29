@@ -73,17 +73,18 @@ class Plot(CustomDPGItem, LandplotDesigner_Component):
                 parent=self.tag,
                 default_value=(pos:=dpg.get_plot_mouse_pos()),
                 label=polygon.name,
-                color=polygon.color,
+                color=[255,255,255,255],
                 user_data=(polygon, ),
                 callback=self.drag_point_callback
             )
         )
         if polygon.series is None:
             custom_series_polygon.new(polygon=polygon, x=[pos[0]], y=[pos[1]])
-        self.polygon_series_update(polygon=polygon)
+        else:
+            self.polygon_series_update(polygon=polygon)
 
     def drag_point_callback(self, sender, app_data, user_data:tuple[Polygon]):
-        polygon, = user_data
+        polygon:Polygon = user_data[0]
         self.polygon_series_update(polygon=polygon)
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -108,7 +109,5 @@ class Plot(CustomDPGItem, LandplotDesigner_Component):
             return
 
         # this assumes that the node count in the polygon has changed
-        #   And allows us to delete the old one and create a new polygon
-        #   Else the custom series will make DPG crash
-        dpg.delete_item(polygon.series)
+
         custom_series_polygon.new(polygon=polygon, x=x_data, y=y_data)

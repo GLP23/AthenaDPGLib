@@ -22,26 +22,35 @@ def new(*,  polygon:Polygon, x:list[float|int], y:list[float|int]):
     # define the tag to be used for the series
     #   this way it can be used anywhere throughout the landplot designer
     #   as the polygon is stored in the memory class
-    polygon.series = dpg.add_custom_series(
+
+    series = lambda :dpg.add_custom_series(
         x=x,
         y=y,
         channel_count=2,
         parent=landplot_designer_memory.plot_axis_x_tag,
-        callback=painter,
         user_data=(polygon,),
-        tag=f"{polygon.name}_series"
+        callback=painter,
     )
 
-def painter(sender:int|str, app_data:tuple[dict,list,list,Any,Any,Any], user_data:tuple[Polygon]):
+    if polygon.series is not None:
+        old_series = polygon.series
+        polygon.series = series()
+        dpg.delete_item(old_series)
+
+    else:
+        polygon.series = series()
+
+
+def painter(sender:int|str, app_data:tuple[dict,list,list,Any,Any,Any], user_data:tuple):
     """
     A dpg.custom_series painter function to create the proper polygon shape inside the plot.
     The actual shape of the plot doesn't add any functionality other than any visual benefits.
     """
-    polygon, = user_data #type: Polygon
+    polygon:Polygon = user_data[0]
 
     # fixes an issue that relates to quickly redrawing the series
-    if not dpg.does_item_exist(sender):
-        return
+    # if not dpg.does_item_exist(sender):
+    #     return
 
     # gather all vars we need for the callback
     transformed_x = app_data[1]
@@ -66,8 +75,9 @@ def painter(sender:int|str, app_data:tuple[dict,list,list,Any,Any,Any], user_dat
 
     # draw the points afterwards
     #   If this is done first, these will come behind the polygon, which is a desired placement
-    for point in zip(transformed_x, transformed_y):
-        dpg.draw_circle(point, radius=5, fill=polygon.color)
+    if polygon.nodes_enabled:
+        for point in zip(transformed_x, transformed_y):
+            dpg.draw_circle(point, radius=5, fill=[255,255,255,255], color=[0,0,0,255], thickness=5)
 
     # Always make sure to pop the container stack
     dpg.pop_container_stack()

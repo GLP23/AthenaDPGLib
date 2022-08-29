@@ -15,8 +15,6 @@ from AthenaDPGLib.models.custom_dpg_item import CustomDPGItem
 from AthenaDPGLib.models.landplot_designer.components._component import LandplotDesigner_Component
 from AthenaDPGLib.models.landplot_designer.polygon import Polygon
 
-import AthenaDPGLib.functions.landplot_designer.custom_series_polygon as custom_series_polygon
-
 # ----------------------------------------------------------------------------------------------------------------------
 # - Code -
 # ----------------------------------------------------------------------------------------------------------------------
@@ -70,15 +68,16 @@ class PolygonSelector(CustomDPGItem, LandplotDesigner_Component):
             name=polygon_name
         )
 
-        self.memory.polygon_add(polygon=polygon)
         dpg.set_value(self.inputtxt_polygon_name, NOTHING)
+
         self.table_row_add(polygon)
+        self.memory.polygon_add(polygon=polygon)
 
     def table_row_add(self, polygon:Polygon):
         with dpg.table_row(parent=self.tbl_polygons):
             # column 1
             dpg.add_checkbox(
-                user_data=polygon.name,
+                user_data=(polygon,),
                 callback=self.checkbox_callback,
             )
             # column 2
@@ -98,9 +97,23 @@ class PolygonSelector(CustomDPGItem, LandplotDesigner_Component):
                     no_inputs=True,
                 )
 
-    def checkbox_callback(self, sender, app_data, user_data):
+    def checkbox_callback(self, sender, app_data:bool, user_data:tuple[Polygon]):
+        polygon = user_data[0]
+
         if app_data:
-            self.memory.polygon_selected_name = user_data
+            self.memory.polygon_selected_name = polygon.name
+            for row in dpg.get_item_children(self.tbl_polygons)[1]:
+                if (checkbox := dpg.get_item_children(row)[1][0]) != sender:
+                    dpg.set_value(checkbox, False)
+                    polygon_checkbox, = dpg.get_item_user_data(checkbox)  # type: Polygon
+                    polygon_checkbox.nodes_enabled = False
+                    for point in polygon_checkbox.points:
+                        dpg.hide_item(point)
+
 
         else:
             self.memory.polygon_selected_name = NOTHING
+
+        polygon.nodes_enabled = app_data
+        for point in polygon.points:
+            dpg.show_item(point) if app_data else dpg.hide_item(point)
