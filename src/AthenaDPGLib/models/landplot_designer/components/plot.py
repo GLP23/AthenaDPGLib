@@ -32,14 +32,14 @@ class Plot(CustomDPGItem, LandplotDesigner_Component):
         self.axis_y = f"{self.tag}_y"
 
         self.memory.plot_tag =  self.tag
-        self.memory.plot_axis_x_tag = self.axis_x
+        self.memory.plot_axis_y_tag = self.axis_y
 
     # ------------------------------------------------------------------------------------------------------------------
     # - DPG Constructor -
     # ------------------------------------------------------------------------------------------------------------------
     @contextmanager
     def constructor(self):
-        with dpg.plot(tag=self.tag, no_menus=True) as plot:
+        with dpg.plot(tag=self.tag, no_menus=True, width=750, height=750) as plot:
             dpg.add_plot_axis(axis=dpg.mvXAxis,tag=self.axis_x)
             dpg.add_plot_axis(axis=dpg.mvYAxis,tag=self.axis_y)
 
@@ -71,43 +71,30 @@ class Plot(CustomDPGItem, LandplotDesigner_Component):
         polygon.points.append(
             dpg.add_drag_point(
                 parent=self.tag,
-                default_value=(pos:=dpg.get_plot_mouse_pos()),
+                default_value=dpg.get_plot_mouse_pos(),
                 label=polygon.name,
                 color=[255,255,255,255],
-                user_data=(polygon, ),
+                user_data=polygon,
                 callback=self.drag_point_callback
             )
         )
-        if polygon.series is None:
-            custom_series_polygon.new(polygon=polygon, x=[pos[0]], y=[pos[1]])
-        else:
-            self.polygon_series_update(polygon=polygon)
 
-    def drag_point_callback(self, sender, app_data, user_data:tuple[Polygon]):
-        polygon:Polygon = user_data[0]
-        self.polygon_series_update(polygon=polygon)
+        # if a series already exists, delete it and clean it up
+        if polygon.series is not None:
+            dpg.delete_item(polygon.series)
 
-    # ------------------------------------------------------------------------------------------------------------------
-    # - Custom Series -
-    # ------------------------------------------------------------------------------------------------------------------
-    def polygon_series_update(self, polygon:Polygon):
+        # Create a new series with the updated points
+        custom_series_polygon.new(
+            polygon=polygon,
+            x=[dpg.get_value(p)[0] for p in polygon.points],
+            y=[dpg.get_value(p)[1] for p in polygon.points]
+        )
+
+    def drag_point_callback(self, _, __, polygon:Polygon):
         """
         Function called to update the series with new points on the given polygon
         """
-        # check as soon as possible if the polygon is actually creatable
-        if (polygon.name not in self.memory.polygons) or (len((points := polygon.points)) <= 2):
-            return
-
-        # assemble all the points
-        #   todo offload this unpacking to the stored values in the column
-        x_data = [dpg.get_value(p)[0] for p in points]
-        y_data = [dpg.get_value(p)[1] for p in points]
-
-        # create a new polygon if it doesn't exist yet
-        if len(x_data) == len(dpg.get_value(polygon.series)[0]):
-            dpg.set_value(polygon.series, [x_data, y_data])
-            return
-
-        # this assumes that the node count in the polygon has changed
-
-        custom_series_polygon.new(polygon=polygon, x=x_data, y=y_data)
+        dpg.set_value(
+            item=polygon.series,
+            value=[[dpg.get_value(p)[0] for p in polygon.points],[dpg.get_value(p)[1] for p in polygon.points]]
+        )

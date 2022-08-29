@@ -6,6 +6,7 @@ from __future__ import annotations
 import dearpygui.dearpygui as dpg
 from dataclasses import dataclass
 from contextlib import contextmanager
+import random
 
 # Custom Library
 from AthenaLib.data.text import NOTHING
@@ -14,6 +15,7 @@ from AthenaLib.data.text import NOTHING
 from AthenaDPGLib.models.custom_dpg_item import CustomDPGItem
 from AthenaDPGLib.models.landplot_designer.components._component import LandplotDesigner_Component
 from AthenaDPGLib.models.landplot_designer.polygon import Polygon
+import AthenaDPGLib.functions.landplot_designer.custom_series_polygon as custom_series_polygon
 
 # ----------------------------------------------------------------------------------------------------------------------
 # - Code -
@@ -32,6 +34,7 @@ class PolygonSelector(CustomDPGItem, LandplotDesigner_Component):
     def constructor(self):
         with dpg.group(tag=self.tag) as group:
             dpg.add_text("Create a new polygon with a unique name:")
+            dpg.add_button(label="pregenerate", callback=self.pre_gen)
             with dpg.group(horizontal=True):
                 dpg.add_input_text(
                     tag=self.inputtxt_polygon_name,
@@ -77,7 +80,7 @@ class PolygonSelector(CustomDPGItem, LandplotDesigner_Component):
         with dpg.table_row(parent=self.tbl_polygons):
             # column 1
             dpg.add_checkbox(
-                user_data=(polygon,),
+                user_data=polygon,
                 callback=self.checkbox_callback,
             )
             # column 2
@@ -88,32 +91,62 @@ class PolygonSelector(CustomDPGItem, LandplotDesigner_Component):
                 dpg.add_color_edit(
                     tag=f"{polygon.name}_color_edit",
                     default_value=polygon.color,
-                    callback=lambda _,__,user_data: setattr(
-                        user_data,
-                        "color",
-                        dpg.get_value(f"{user_data.name}_color_edit")
-                    ),
+                    callback=self.color_edit_callback,
                     user_data = polygon,
                     no_inputs=True,
                 )
 
-    def checkbox_callback(self, sender, app_data:bool, user_data:tuple[Polygon]):
-        polygon = user_data[0]
+    def checkbox_callback(self, sender, app_data:bool, polygon:Polygon):
+
+        polygon.nodes_enabled = app_data
+
+        for point in polygon.points:
+            dpg.show_item(point) if app_data else dpg.hide_item(point)
 
         if app_data:
             self.memory.polygon_selected_name = polygon.name
             for row in dpg.get_item_children(self.tbl_polygons)[1]:
-                if (checkbox := dpg.get_item_children(row)[1][0]) != sender:
-                    dpg.set_value(checkbox, False)
-                    polygon_checkbox, = dpg.get_item_user_data(checkbox)  # type: Polygon
-                    polygon_checkbox.nodes_enabled = False
-                    for point in polygon_checkbox.points:
-                        dpg.hide_item(point)
+                if (checkbox := dpg.get_item_children(row)[1][0]) == sender:
+                    continue
 
-
+                polygon_checkbox = dpg.get_item_user_data(checkbox)  # type: Polygon
+                dpg.set_value(checkbox, False)
+                polygon_checkbox.nodes_enabled = False
+                for point in polygon_checkbox.points:
+                    dpg.hide_item(point)
         else:
             self.memory.polygon_selected_name = NOTHING
 
-        polygon.nodes_enabled = app_data
-        for point in polygon.points:
-            dpg.show_item(point) if app_data else dpg.hide_item(point)
+    def color_edit_callback(self, sender,_, polygon):
+        polygon.color = dpg.get_value(sender)
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # - pregen -
+    # ------------------------------------------------------------------------------------------------------------------
+    def pre_gen(self):
+        rectangle = [
+            [0,0],
+            [0,1],
+            [1,1],
+            [1,0],
+        ]
+        for i in range(1_000_000):
+            polygon: Polygon = Polygon(
+                name=f"{i}",
+                color=(random.randint(0,255),random.randint(0,255),random.randint(0,255),255)
+            )
+            for x,y in rectangle:
+                polygon.points.append(dpg.add_drag_point(
+                    parent=self.memory.plot_tag,
+                    default_value=[x+i, y+i],
+                    label=polygon.name,
+                    user_data=polygon,
+                ))
+            self.table_row_add(polygon)
+            self.memory.polygon_add(polygon=polygon)
+
+            custom_series_polygon.new(
+                polygon=polygon,
+                x=[dpg.get_value(p)[0] for p in polygon.points],
+                y=[dpg.get_value(p)[1] for p in polygon.points]
+            )

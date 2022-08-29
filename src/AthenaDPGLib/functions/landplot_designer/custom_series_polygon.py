@@ -22,39 +22,31 @@ def new(*,  polygon:Polygon, x:list[float|int], y:list[float|int]):
     # define the tag to be used for the series
     #   this way it can be used anywhere throughout the landplot designer
     #   as the polygon is stored in the memory class
-
-    series = lambda :dpg.add_custom_series(
+    polygon.series = dpg.add_custom_series(
         x=x,
         y=y,
         channel_count=2,
-        parent=landplot_designer_memory.plot_axis_x_tag,
-        user_data=(polygon,),
+        parent=landplot_designer_memory.plot_axis_y_tag,
+        user_data=polygon,
         callback=painter,
     )
 
-    if polygon.series is not None:
-        old_series = polygon.series
-        polygon.series = series()
-        dpg.delete_item(old_series)
 
-    else:
-        polygon.series = series()
-
-
-def painter(sender:int|str, app_data:tuple[dict,list,list,Any,Any,Any], user_data:tuple):
+def painter(sender:int|str, app_data:tuple[dict,list,list,Any,Any,Any], polygon:Polygon):
     """
     A dpg.custom_series painter function to create the proper polygon shape inside the plot.
     The actual shape of the plot doesn't add any functionality other than any visual benefits.
     """
-    polygon:Polygon = user_data[0]
-
     # fixes an issue that relates to quickly redrawing the series
-    # if not dpg.does_item_exist(sender):
-    #     return
+    if not dpg.does_item_exist(sender):
+        return
 
     # gather all vars we need for the callback
     transformed_x = app_data[1]
     transformed_y = app_data[2]
+    if not transformed_y or not transformed_x:
+        return
+
 
     # Delete old polygon's already drawn shapes
     #   And create new shape
@@ -63,21 +55,26 @@ def painter(sender:int|str, app_data:tuple[dict,list,list,Any,Any,Any], user_dat
 
     # draw the main shape
     #   and append the first point to the end to "complete" the polygon
-    if points := [list(point) for point in zip(transformed_x, transformed_y)]:
-        points.append(points[0])
-
     dpg.draw_polygon(
-        points=points,
+        parent=sender,
+        points=(points := [[x,y] for x,y in zip(transformed_x, transformed_y)]),
         fill=polygon.color,
         color=polygon.color,
-        thickness=1
+        thickness=0,
     )
 
     # draw the points afterwards
     #   If this is done first, these will come behind the polygon, which is a desired placement
     if polygon.nodes_enabled:
-        for point in zip(transformed_x, transformed_y):
-            dpg.draw_circle(point, radius=5, fill=[255,255,255,255], color=[0,0,0,255], thickness=5)
+        for point in points:
+            dpg.draw_circle(
+                point,
+                parent=sender,
+                radius=5,
+                fill=[255,255,255,255],
+                color=[0,0,0,255],
+                thickness=5
+            )
 
     # Always make sure to pop the container stack
     dpg.pop_container_stack()

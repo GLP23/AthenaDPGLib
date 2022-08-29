@@ -19,7 +19,7 @@ class Polygon:
     name:str
 
     points:list[int|str] = field(default_factory=list)
-    color: list[NUMBER] = field(default_factory=lambda: [0, 0, 0, 255])
+    color: tuple[NUMBER,...] = field(default_factory=lambda: (0, 0, 0, 255))
     series:Optional[str|int] = None
 
     nodes_enabled:bool = False
