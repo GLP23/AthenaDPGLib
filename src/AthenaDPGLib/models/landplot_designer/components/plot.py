@@ -31,6 +31,9 @@ class Plot(CustomDPGItem, LandplotDesigner_Component):
         self.axis_x = f"{self.tag}_x"
         self.axis_y = f"{self.tag}_y"
 
+        self.memory.plot_tag =  self.tag
+        self.memory.plot_axis_x_tag = self.axis_x
+
     # ------------------------------------------------------------------------------------------------------------------
     # - DPG Constructor -
     # ------------------------------------------------------------------------------------------------------------------
@@ -58,22 +61,25 @@ class Plot(CustomDPGItem, LandplotDesigner_Component):
         dpg.bind_item_handler_registry(item=self.tag,handler_registry=f"{self.tag}_registry")
 
     def mousebutton_left(self):
-        self.add_drag_point(
-            polygon=self.memory.polygon_selected
-        )
+        if self.memory.polygon_selected:
+            self.add_drag_point(
+                polygon=self.memory.polygon_selected
+            )
 
     def add_drag_point(self,polygon:Polygon):
         # assign the drag point to the list of points to the polygon
         polygon.points.append(
             dpg.add_drag_point(
                 parent=self.tag,
-                default_value=dpg.get_plot_mouse_pos(),
+                default_value=(pos:=dpg.get_plot_mouse_pos()),
                 label=polygon.name,
-                color=polygon.color_node,
+                color=polygon.color,
                 user_data=(polygon, ),
                 callback=self.drag_point_callback
             )
         )
+        if polygon.series is None:
+            custom_series_polygon.new(polygon=polygon, x=[pos[0]], y=[pos[1]])
         self.polygon_series_update(polygon=polygon)
 
     def drag_point_callback(self, sender, app_data, user_data:tuple[Polygon]):
@@ -83,23 +89,6 @@ class Plot(CustomDPGItem, LandplotDesigner_Component):
     # ------------------------------------------------------------------------------------------------------------------
     # - Custom Series -
     # ------------------------------------------------------------------------------------------------------------------
-    def polygon_series_add(self, *,  polygon:Polygon, x:list[float|int], y:list[float|int]):
-        """
-        Adds a polygon to the plot.
-        """
-        # define the tag to be used for the series
-        #   this way it can be used anywhere throughout the landplot designer
-        #   as the polygon is stored in the memory class
-        polygon.series = dpg.add_custom_series(
-            x=x,
-            y=y,
-            channel_count=2,
-            parent=self.axis_x,
-            callback=custom_series_polygon.painter,
-            user_data=(polygon,),
-            tag=f"{polygon.name}_series"
-        )
-
     def polygon_series_update(self, polygon:Polygon):
         """
         Function called to update the series with new points on the given polygon
@@ -122,4 +111,4 @@ class Plot(CustomDPGItem, LandplotDesigner_Component):
         #   And allows us to delete the old one and create a new polygon
         #   Else the custom series will make DPG crash
         dpg.delete_item(polygon.series)
-        self.polygon_series_add(polygon=polygon, x=x_data, y=y_data)
+        custom_series_polygon.new(polygon=polygon, x=x_data, y=y_data)

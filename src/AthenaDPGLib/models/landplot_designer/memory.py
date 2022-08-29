@@ -17,6 +17,12 @@ from AthenaDPGLib.models.landplot_designer.polygon import Polygon
 @dataclass(slots=True, kw_only=True)
 class LandplotDesignerMemory:
     # ------------------------------------------------------------------------------------------------------------------
+    # - designer tags -
+    # ------------------------------------------------------------------------------------------------------------------
+    plot_tag:str = NOTHING
+    plot_axis_x_tag:str = NOTHING
+
+    # ------------------------------------------------------------------------------------------------------------------
     # - POLYGONS -
     # ------------------------------------------------------------------------------------------------------------------
     polygons: dict[str:Polygon] = field(default_factory=dict)
@@ -35,5 +41,7 @@ class LandplotDesignerMemory:
         self.polygons.pop(polygon.name)
 
     @property
-    def polygon_selected(self) -> Polygon:
-        return self.polygons[self.polygon_selected_name]
+    def polygon_selected(self) -> Polygon|False:
+        if self.polygon_selected_name:
+            return self.polygons[self.polygon_selected_name]
+        return False

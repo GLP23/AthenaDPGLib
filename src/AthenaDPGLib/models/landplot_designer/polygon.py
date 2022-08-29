@@ -18,19 +18,6 @@ from AthenaLib.data.types import NUMBER
 class Polygon:
     name:str
 
-    colors:InitVar[list[NUMBER]] = None
-
     points:list[int|str] = field(default_factory=list)
-    color_fill:list[NUMBER] = field(default_factory=lambda : [0,0,0,255])
-    color_border:list[NUMBER] = field(default_factory=lambda : [0,0,0,255])
-    color_node:list[NUMBER] = field(default_factory=lambda : [0,0,0,255])
+    color: list[NUMBER] = field(default_factory=lambda: [0, 0, 0, 255])
     series:Optional[str|int] = None
-
-    def __post_init__(self, colors: list[NUMBER]):
-        if colors is not None:
-            self.all_colors(colors)
-
-    def all_colors(self, value):
-        self.color_fill = value
-        self.color_border = value
-        self.color_node = value

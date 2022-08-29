@@ -10,10 +10,28 @@ from typing import Any
 
 # Custom Packages
 from AthenaDPGLib.models.landplot_designer.polygon import Polygon
+from AthenaDPGLib.data.landplot import landplot_designer_memory
 
 # ----------------------------------------------------------------------------------------------------------------------
 # - Code -
 # ----------------------------------------------------------------------------------------------------------------------
+def new(*,  polygon:Polygon, x:list[float|int], y:list[float|int]):
+    """
+    Adds a polygon to the plot.
+    """
+    # define the tag to be used for the series
+    #   this way it can be used anywhere throughout the landplot designer
+    #   as the polygon is stored in the memory class
+    polygon.series = dpg.add_custom_series(
+        x=x,
+        y=y,
+        channel_count=2,
+        parent=landplot_designer_memory.plot_axis_x_tag,
+        callback=painter,
+        user_data=(polygon,),
+        tag=f"{polygon.name}_series"
+    )
+
 def painter(sender:int|str, app_data:tuple[dict,list,list,Any,Any,Any], user_data:tuple[Polygon]):
     """
     A dpg.custom_series painter function to create the proper polygon shape inside the plot.
@@ -41,15 +59,15 @@ def painter(sender:int|str, app_data:tuple[dict,list,list,Any,Any,Any], user_dat
 
     dpg.draw_polygon(
         points=points,
-        fill=polygon.color_fill,
-        color=polygon.color_border,
+        fill=polygon.color,
+        color=polygon.color,
         thickness=1
     )
 
     # draw the points afterwards
     #   If this is done first, these will come behind the polygon, which is a desired placement
     for point in zip(transformed_x, transformed_y):
-        dpg.draw_circle(point, radius=5, fill=polygon.color_node)
+        dpg.draw_circle(point, radius=5, fill=polygon.color)
 
     # Always make sure to pop the container stack
     dpg.pop_container_stack()
