@@ -17,7 +17,7 @@ from AthenaDPGLib.models.landplot_designer.components._component import Landplot
 # - Code -
 # ----------------------------------------------------------------------------------------------------------------------
 @dataclass(slots=True, kw_only=True)
-class LandplotDesigner_Window(CustomDPGItem, LandplotDesigner_Component):
+class Window(CustomDPGItem, LandplotDesigner_Component):
     tag:str
 
     # ------------------------------------------------------------------------------------------------------------------

@@ -20,7 +20,7 @@ import AthenaDPGLib.functions.landplot_designer.custom_series_polygon as custom_
 # - Code -
 # ----------------------------------------------------------------------------------------------------------------------
 @dataclass(slots=True, kw_only=True)
-class LandplotDesigner_Plot(CustomDPGItem, LandplotDesigner_Component):
+class Plot(CustomDPGItem, LandplotDesigner_Component):
     tag:str
 
     #non init
