@@ -11,11 +11,13 @@ from dataclasses import dataclass, field
 # Custom Packages
 from AthenaDPGLib.models.custom_dpg_item import CustomDPGItem
 from AthenaDPGLib.models.landplot_designer.memory import LandplotDesignerMemory
+from AthenaDPGLib.models.landplot_designer.polygon import Polygon
 
 from AthenaDPGLib.models.landplot_designer.components.window import LandplotDesigner_Window
 from AthenaDPGLib.models.landplot_designer.components.plot import LandplotDesigner_Plot
 
 from AthenaDPGLib.data.landplot import landplot_designer_memory
+
 
 # ----------------------------------------------------------------------------------------------------------------------
 # - Code -

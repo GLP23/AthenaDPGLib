@@ -20,7 +20,7 @@ class Polygon:
 
     colors:InitVar[list[NUMBER]] = None
 
-    points:list[int] = field(default_factory=list)
+    points:list[int|str] = field(default_factory=list)
     color_fill:list[NUMBER] = field(default_factory=lambda : [0,0,0,255])
     color_border:list[NUMBER] = field(default_factory=lambda : [0,0,0,255])
     color_node:list[NUMBER] = field(default_factory=lambda : [0,0,0,255])
