@@ -19,14 +19,13 @@ def painter(sender:int|str, app_data:tuple[dict,list,list,Any,Any,Any], user_dat
     A dpg.custom_series painter function to create the proper polygon shape inside the plot.
     The actual shape of the plot doesn't add any functionality other than any visual benefits.
     """
-    polygon, *_ = user_data #type: Polygon
+    polygon, = user_data #type: Polygon
 
     # fixes an issue that relates to quickly redrawing the series
     if not dpg.does_item_exist(sender):
         return
 
     # gather all vars we need for the callback
-    # _, transformed_x, transformed_y, *__ = app_data
     transformed_x = app_data[1]
     transformed_y = app_data[2]
 

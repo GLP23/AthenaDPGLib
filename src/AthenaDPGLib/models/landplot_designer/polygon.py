@@ -28,6 +28,9 @@ class Polygon:
 
     def __post_init__(self, colors: list[NUMBER]):
         if colors is not None:
-            self.color_fill = colors
-            self.color_border = colors
-            self.color_node = colors
+            self.all_colors(colors)
+
+    def all_colors(self, value):
+        self.color_fill = value
+        self.color_border = value
+        self.color_node = value
