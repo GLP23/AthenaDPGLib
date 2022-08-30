@@ -9,8 +9,8 @@ from contextlib import contextmanager
 # Custom Library
 
 # Custom Packages
-from AthenaDPGLib.functions.fixes import fix_icon_for_taskbar
-from AthenaDPGLib.models.json_ui_parser.custom_dpg_items import CustomDPGItems
+from AthenaDPGLib.fixes.taskbar_icon import fix_icon_for_taskbar
+from AthenaDPGLib.json_ui_parser.models.custom_dpg_items import CustomDPGItems
 
 # ----------------------------------------------------------------------------------------------------------------------
 # - Code -

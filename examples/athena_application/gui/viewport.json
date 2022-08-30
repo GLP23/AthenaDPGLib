@@ -1,8 +1,0 @@
-{
-  "dpg": {
-    "_parser": {"version": 0},
-    "_children": [
-      {"viewport": {"title": "Athena Application Test","width":800, "height":600}}
-    ]
-  }
-}

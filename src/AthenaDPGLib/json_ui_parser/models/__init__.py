@@ -7,9 +7,7 @@ from __future__ import annotations
 # Custom Library
 
 # Custom Packages
-from AthenaDPGLib.models.landplot_designer.memory import LandplotDesignerMemory
 
 # ----------------------------------------------------------------------------------------------------------------------
 # - Code -
 # ----------------------------------------------------------------------------------------------------------------------
-landplot_designer_memory = LandplotDesignerMemory()

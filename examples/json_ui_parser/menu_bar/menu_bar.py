@@ -6,7 +6,7 @@ from __future__ import annotations
 import dearpygui.dearpygui as dpg
 
 # Custom Library
-from AthenaDPGLib.functions.json_ui_parser import json_ui_parser
+from AthenaDPGLib.json_ui_parser.functions.json_ui_parser import json_ui_parser
 
 # Custom Packages
 

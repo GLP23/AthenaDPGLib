@@ -9,9 +9,9 @@ import json
 from AthenaLib.data.types import PATHLIKE
 
 # Custom Packages
-from AthenaDPGLib.models.json_ui_parser.custom_dpg_items import CustomDPGItems
-from AthenaDPGLib.data.json_ui_parser_mappings import JSONUIPARSER_ITEMS, JSONUIPARSER_CONTEXT_MANAGERS
-from AthenaDPGLib.data.exceptions import error_item, error_file
+from AthenaDPGLib.json_ui_parser.models.custom_dpg_items import CustomDPGItems
+from AthenaDPGLib.json_ui_parser.data.json_ui_parser_mappings import JSONUIPARSER_ITEMS, JSONUIPARSER_CONTEXT_MANAGERS
+from AthenaDPGLib.json_ui_parser.data.exceptions import error_item, error_file
 
 # ----------------------------------------------------------------------------------------------------------------------
 # - Support Code -
