@@ -21,6 +21,8 @@ def main():
 
     dpg.set_primary_window("primary_window", True)
 
+    dpg.show_metrics()
+
     dpg.setup_dearpygui()
     dpg.show_viewport()
     dpg.start_dearpygui()

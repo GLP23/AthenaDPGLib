@@ -3,6 +3,9 @@
 # ----------------------------------------------------------------------------------------------------------------------
 # General Packages
 from __future__ import annotations
+
+import threading
+
 import dearpygui.dearpygui as dpg
 from dataclasses import dataclass, field
 from contextlib import contextmanager
@@ -26,6 +29,7 @@ class Plot(CustomDPGItem, LandplotDesigner_Component):
     #non init
     axis_x: str = field(init=False)
     axis_y: str = field(init=False)
+    thread: threading.Thread = field(init=False, default_factory=threading.Thread)
 
     def __post_init__(self):
         self.axis_x = f"{self.tag}_x"
@@ -49,7 +53,7 @@ class Plot(CustomDPGItem, LandplotDesigner_Component):
                     x=[0,1],
                     y=[0,1],
                     channel_count=2,
-                    callback=custom_series_polygon.painter,
+                    callback=self.thread_handler,
                 )
 
             yield plot
@@ -57,6 +61,10 @@ class Plot(CustomDPGItem, LandplotDesigner_Component):
         # after everything is constructed, assign the registries
         self.item_handler_registries()
 
+    def thread_handler(self, sender, app_data):
+        if not self.thread.is_alive():
+            self.thread = threading.Thread(target=custom_series_polygon.painter, args=(sender, app_data), daemon=True)
+            self.thread.start()
     # ------------------------------------------------------------------------------------------------------------------
     # - item handler registries -
     # ------------------------------------------------------------------------------------------------------------------

@@ -34,8 +34,12 @@ class PolygonSelector(CustomDPGItem, LandplotDesigner_Component):
     @contextmanager
     def constructor(self):
         with dpg.group(tag=self.tag) as group:
-            dpg.add_text("Create a new polygon with a unique name:")
-            dpg.add_button(label="pregenerate", callback=lambda :threading.Thread(target=self.pre_gen).start())
+            dpg.add_text("Polygon render test of 10_000 polygons with 4 points each")
+            dpg.add_text()
+            with dpg.group(horizontal=True):
+                dpg.add_button(label="pregenerate", callback=self.pre_gen)
+                dpg.add_text("Rendered polygons :")
+                dpg.add_text(tag="render_amount")
             with dpg.group(horizontal=True):
                 dpg.add_input_text(
                     tag=self.inputtxt_polygon_name,
@@ -47,7 +51,7 @@ class PolygonSelector(CustomDPGItem, LandplotDesigner_Component):
                     label="Save Polygon",
                     callback=self.polygon_new_callback
                 )
-            with dpg.table(tag=self.tbl_polygons, policy=dpg.mvTable_SizingStretchProp):
+            with dpg.table(tag=self.tbl_polygons, policy=dpg.mvTable_SizingStretchProp, scrollY=True):
                 dpg.add_table_column(label="", width=50)
                 dpg.add_table_column(label="Name")
                 dpg.add_table_column(label="Editors")
@@ -101,6 +105,7 @@ class PolygonSelector(CustomDPGItem, LandplotDesigner_Component):
 
         polygon.nodes_enabled = app_data
 
+        # with self.memory.polygons_pause_render():
         for point, _ in polygon.points:
             dpg.show_item(point) if app_data else dpg.hide_item(point)
 
@@ -125,28 +130,34 @@ class PolygonSelector(CustomDPGItem, LandplotDesigner_Component):
     # - pregen -
     # ------------------------------------------------------------------------------------------------------------------
     def pre_gen(self):
-        rectangle = [
-            [0,0],
-            [0,1],
-            [1,1],
-            [1,0],
-        ]
-        for i in range(1_000):
-            polygon: Polygon = Polygon(
-                name=f"{i}",
-                color=(random.randint(0,255),random.randint(0,255),random.randint(0,255),255)
-            )
-            for x,y in rectangle:
-                polygon.points.append([dpg.add_drag_point(
-                    parent=self.memory.plot_tag,
-                    default_value=[x+i, y+i],
-                    label=polygon.name,
-                    callback = self.drag_point_callbck,
-                    user_data = polygon
-                ),[x+i, y+i]])
+        rectangle = (
+            (0,0),
+            (0,1),
+            (1,1),
+            (1,0),
+        )
+        with self.memory.polygons_pause_render():
+            for i in range(1_000):
+                polygon: Polygon = Polygon(
+                    name=(name := f"{i}"),
+                    color=(random.randint(0,255),random.randint(0,255),255,255)
+                )
+                polygon.points = [
+                    [
+                        dpg.add_drag_point(
+                            parent=self.memory.plot_tag,
+                            default_value=(pos := (x + i, y + i)),
+                            label=name,
+                            callback=self.drag_point_callbck,
+                            user_data=polygon
+                        ),
+                        pos
+                    ]
+                    for x, y in rectangle
+                ]
 
-            self.table_row_add(polygon)
-            self.memory.polygons[polygon.name] = polygon
+                self.table_row_add(polygon)
+                self.memory.polygons[polygon.name] = polygon
 
     def drag_point_callbck(self, sender, __, polygon: Polygon):
         for i, (point, _) in enumerate(polygon.points):
