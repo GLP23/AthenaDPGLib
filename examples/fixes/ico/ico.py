@@ -6,7 +6,7 @@ from __future__ import annotations
 import dearpygui.dearpygui as dpg
 
 # Custom Library
-from AthenaDPGLib.functions.fixes import fix_icon_for_taskbar
+from AthenaDPGLib.fixes.taskbar_icon import fix_icon_for_taskbar
 
 # Custom Packages
 
