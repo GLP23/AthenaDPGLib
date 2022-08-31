@@ -61,4 +61,10 @@ def custom_series_callback(sender, app_data, polygons:set[Polygon]):
     dpg.pop_container_stack()
 
     # Update the text to show the items drawn
+    dpg.set_value(
+        item="txt_output",
+        value=len(dpg.get_item_children(sender, 2))
+    )
+
+    # Update the text to show the items drawn
     # print(f"children: {len(dpg.get_item_children(sender, 2))}")

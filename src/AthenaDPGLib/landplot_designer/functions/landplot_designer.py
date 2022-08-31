@@ -40,17 +40,18 @@ def create_items():
 def test():
     global polygons
 
-    x_limit0, x_limit1 = dpg.get_axis_limits("x_axis")
-    y_limit0, y_limit1 = dpg.get_axis_limits("y_axis")
+    with dpg.mutex():
 
-    for polygon in polygons:
+        x_limit0, x_limit1 = dpg.get_axis_limits("x_axis")
+        y_limit0, y_limit1 = dpg.get_axis_limits("y_axis")
 
-        x,y = (
-            np.array([point[0] for point in polygon.points]).sum()/(length := len(polygon.points)),
-            np.array([point[1] for point in polygon.points]).sum()/length
-        )
+        for polygon in polygons:
+            radius = polygon.largest_radius
+            polygon.do_render = (
+                (x_limit0-radius) < polygon.center_point.x < (x_limit1+radius) or
+                (y_limit0-radius) < polygon.center_point.y < (y_limit1+radius)
+            )
 
-        polygon.do_render = x_limit0 < x < x_limit1 or y_limit0 < y < y_limit1
 
 def registry():
     with dpg.item_handler_registry(tag="registry"):
@@ -80,11 +81,6 @@ def main():
             dpg.add_button(
                 label="Create items",
                 callback=create_items,
-                width=100
-            )
-            dpg.add_button(
-                label="test",
-                callback=test,
                 width=100
             )
             dpg.add_text(tag="txt_output")

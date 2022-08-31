@@ -3,10 +3,13 @@
 # ----------------------------------------------------------------------------------------------------------------------
 # General Packages
 from __future__ import annotations
+import numpy as np
+import math
 
 # Custom Library
 from AthenaLib.fixes.dataclasses import dataclass, field
 from AthenaLib.constants.types import NUMBER
+
 
 # Custom Packages
 
@@ -24,6 +27,40 @@ class Polygon:
     color:COLOR = field(default_factory=lambda:(0,0,0,255))
     do_render:bool = False
 
+    # non init
+    # math stuff for checking if everything is okay to render
+    points_as_array:np.ndarray = field(hash=False, init=False)
+    center_point:Point = field(init=False)
+    largest_radius:float = field(init=False)
+
+    def __post_init__(self):
+        self.points_as_array = self._points_as_array()
+        self.center_point = self._center_point()
+        self.largest_radius = self._largest_radius()
+
+    def _points_as_array(self) -> np.ndarray:
+        return np.array(
+            [[point.x, point.y] for point in self.points]
+        )
+
+    def _center_point(self) -> Point:
+        length = len(self.points)
+        return Point(
+            x = self.points_as_array[:, 0].sum() / length ,
+            y = self.points_as_array[:, 1].sum() / length
+        )
+
+    def _largest_radius(self) -> float:
+        return np.amax(
+            np.array(
+                [
+                    math.sqrt(math.pow(self.center_point.x - x, 2) + math.pow(self.center_point.y - y, 2))
+                    for x, y in self.points_as_array
+                ]
+            ),
+            axis=0
+        )
+
 # ----------------------------------------------------------------------------------------------------------------------
 @dataclass(slots=True, unsafe_hash=True)
 class Point:
@@ -37,6 +74,9 @@ class Point:
             return self.y
         else:
             raise IndexError(item)
+
+    def export(self):
+        return self.x, self.y
 
     def output_to_pixelspace(self, difference_point:POINT, zero_point:POINT) -> POINT:
         """
