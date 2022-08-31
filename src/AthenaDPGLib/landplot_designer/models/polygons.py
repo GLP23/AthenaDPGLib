@@ -39,9 +39,10 @@ class Polygon:
         self.largest_radius = self._largest_radius()
 
     def _points_as_array(self) -> np.ndarray:
-        return np.array(
-            [[point.x, point.y] for point in self.points]
-        )
+        return np.array([
+            [point.x, point.y]
+            for point in self.points
+        ])
 
     def _center_point(self) -> Point:
         length = len(self.points)
@@ -51,13 +52,16 @@ class Polygon:
         )
 
     def _largest_radius(self) -> float:
+        """
+        Find the distance between the center point and the outer points.
+            This will give all the radia
+            Which in turn allows us to find the largest
+        """
         return np.amax(
-            np.array(
-                [
-                    math.sqrt(math.pow(self.center_point.x - x, 2) + math.pow(self.center_point.y - y, 2))
-                    for x, y in self.points_as_array
-                ]
-            ),
+            np.array([
+                math.sqrt(math.pow(self.center_point.x - x, 2) + math.pow(self.center_point.y - y, 2))
+                for x, y in self.points_as_array
+            ]),
             axis=0
         )
 
