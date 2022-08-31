@@ -34,23 +34,24 @@ def create_items():
 
     print("started")
 
-    for i in range(4):
-        chunk = chunk_manager.add_chunk(
-            coord=Coordinate(i, i),
-        )
+    for i in range(100):
+        for j in range(100):
+            chunk = chunk_manager.add_chunk(
+                coord=Coordinate(i, j),
+            )
 
-        for a in range(10):
-            for b in range(10):
-                chunk.append(Polygon(
-                    coords=[
-                        Coordinate(
-                            x + a + (i*CHUNK_SIDE),
-                            y + b + (i*CHUNK_SIDE)
-                        )
-                        for x, y in POLYGON
-                    ],
-                    color=(random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
-                ))
+            for a in range(CHUNK_SIDE):
+                for b in range(CHUNK_SIDE):
+                    chunk.append(Polygon(
+                        coords=[
+                            Coordinate(
+                                x + a + (i*CHUNK_SIDE),
+                                y + b + (j*CHUNK_SIDE)
+                            )
+                            for x, y in POLYGON
+                        ],
+                        color=(i*a,j*b,127)
+                    ))
 
     print("finished")
 

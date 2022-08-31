@@ -45,12 +45,12 @@ class ChunkManager:
             x=coord.x * self.chunk_side,
             y=coord.y * self.chunk_side,
         )
-        print(coord_true)
 
         chunk = ChunkOfPolygons(
             point_of_origin=coord_true,
-            center_point=self._chunk_center_point(
-                point_of_origin=np.array([[coord.x * self.chunk_side, coord.y * self.chunk_side]])
+            center_point=Coordinate(
+                x=coord_true.x + (self.chunk_side / 2),
+                y=coord_true.y + (self.chunk_side / 2),
             )
         )
 
@@ -60,15 +60,7 @@ class ChunkManager:
     def renderable_get(self) -> Generator[ChunkOfPolygons, Any, None]:
         return (
             chunk_of_polygons
-            for chunk_of_polygons in self._chunks.values()
+            for chunk_of_polygons in self.chunks.values()
             if chunk_of_polygons.renderable
-        )
-
-    def _chunk_center_point(self, point_of_origin:np.array) -> Coordinate:
-        chunk_shape:np.ndarray = (CHUNK_SHAPE + point_of_origin)
-        print(chunk_shape)
-        return Coordinate(
-            x=chunk_shape[:, 0].sum() / 4,
-            y=chunk_shape[:, 1].sum() / 4
         )
 

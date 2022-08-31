@@ -30,8 +30,6 @@ class ChunkOfPolygons:
             + math.pow(self.center_point.y - self.point_of_origin.y, 2)
         )
 
-        print(f"{self._largest_radius=}, {self.center_point=}, {self.point_of_origin=}")
-
     @property
     def collection(self):
         return self._collection
