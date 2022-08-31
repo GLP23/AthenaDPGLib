@@ -12,49 +12,66 @@ import dearpygui.dearpygui as dpg
 # Custom Library
 
 # Custom Packages
-from AthenaDPGLib.landplot_designer.models.polygons import Polygon, Coordinate, ChunkOfPolygons
+from AthenaDPGLib.landplot_designer.models.polygons import Polygon, Coordinate, ChunkOfPolygons, ChunkManager
 from AthenaDPGLib.landplot_designer.functions.plot_custom_series import custom_series_callback
 
 # ----------------------------------------------------------------------------------------------------------------------
 # - Support Code -
 # ----------------------------------------------------------------------------------------------------------------------
-polygons:ChunkOfPolygons = ChunkOfPolygons()
 POLYGON = ((0.,0.),(0.,1.),(1.,1.),(1.,0.)) # shape of the polygon
-SHAPE = 100
+CHUNK_SIDE = 10
 
 x_limit0, x_limit1 = 0.,0.
 y_limit0, y_limit1 = 0.,0.
+
+chunk_manager:ChunkManager = ChunkManager(chunk_side=CHUNK_SIDE)
 
 def create_items():
     """
     Function to create the individual items in memory,so they can be drawn to the polygon
     """
-    global polygons
+    global chunk_manager
 
     print("started")
-    polygons.clear()
 
-    for a in range(SHAPE):
-        for b in range(SHAPE):
-            # noinspection PyArgumentList
-            polygons.append(Polygon(
-                coords=[
-                    Coordinate(x + a, y + b)
-                    for x, y in POLYGON
-                ],
-                color=(random.randint(0,255),random.randint(0,255),random.randint(0,255))
-            ))
+    for i in range(4):
+        chunk = chunk_manager.add_chunk(
+            coord=Coordinate(i, i),
+        )
+
+        for a in range(10):
+            for b in range(10):
+                chunk.append(Polygon(
+                    coords=[
+                        Coordinate(
+                            x + a + (i*CHUNK_SIDE),
+                            y + b + (i*CHUNK_SIDE)
+                        )
+                        for x, y in POLYGON
+                    ],
+                    color=(random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
+                ))
 
     print("finished")
 
-def update_renderable():
-    global polygons, x_limit0, x_limit1 ,y_limit0, y_limit1
+    print(len(chunk_manager.chunks))
 
-    with dpg.mutex():
-        for polygon in polygons.collection:
-            polygon.renderable_update(
-                x_limit0, x_limit1, y_limit0, y_limit1
-            )
+def update_renderable():
+    global chunk_manager , x_limit0, x_limit1 ,y_limit0, y_limit1
+
+    # with dpg.mutex():
+    for chunk in chunk_manager.chunks.values(): #type: ChunkOfPolygons
+        chunk.renderable_update(
+            x_limit0, x_limit1, y_limit0, y_limit1
+        )
+
+    for chunk in chunk_manager.renderable_get(): #type: ChunkOfPolygons
+        if chunk.renderable:
+            for polygon in chunk.collection:
+                # polygon.renderable = True
+                polygon.renderable_update(
+                    x_limit0, x_limit1, y_limit0, y_limit1
+                )
 
 def get_plot_limits():
     global x_limit0, x_limit1 ,y_limit0, y_limit1
@@ -79,19 +96,20 @@ def registry():
 # - Code -
 # ----------------------------------------------------------------------------------------------------------------------
 def main():
-    global polygons
+    global chunk_manager
 
     dpg.create_context()
     dpg.create_viewport(title='Plot with large Custom Series Example')
 
     with dpg.window(tag="primary_window"):
-        with dpg.group(horizontal=True, horizontal_spacing=375):
+        with dpg.group(horizontal=True, horizontal_spacing=50):
             dpg.add_button(
                 label="Create items",
                 callback=lambda : (threading.Thread(target=create_items).start()),
                 width=100
             )
-            dpg.add_text(tag="txt_output")
+            dpg.add_text(tag="txt_output_chunks")
+            dpg.add_text(tag="txt_output_polygons")
         with dpg.plot(width=500, height=500, tag="plot", callback=update_renderable):
             dpg.add_plot_axis(tag="x_axis",axis=dpg.mvXAxis)
             with dpg.plot_axis(tag="y_axis", axis=dpg.mvYAxis):
@@ -100,7 +118,7 @@ def main():
                     y= xy,
                     channel_count=2,
                     callback=custom_series_callback,
-                    user_data=polygons
+                    user_data=chunk_manager
                 )
 
     get_plot_limits()

@@ -19,7 +19,7 @@ class Coordinate:
     y:NUMBER
 
     def __iter__(self):
-        return iter(self.x, self.y)
+        return iter((self.x, self.y))
 
     def output_to_pixelspace(self, difference_point:POINT, zero_point:POINT) -> POINT:
         """
