@@ -16,7 +16,7 @@ import dearpygui.dearpygui as dpg
 # ----------------------------------------------------------------------------------------------------------------------
 def run_in_mutex(fnc):
     @functools.wraps(fnc)
-    def wrapper(*args, **kwargs):
+    def wrapper(sender, app_data, user_data):
         with dpg.mutex():
-            return fnc(*args,**kwargs)
+            return fnc(sender, app_data, user_data)
     return wrapper
