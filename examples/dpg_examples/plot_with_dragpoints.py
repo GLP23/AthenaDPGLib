@@ -4,7 +4,6 @@
 # General Packages
 from __future__ import annotations
 import dearpygui.dearpygui as dpg
-import numpy as np
 
 # Custom Library
 
@@ -13,78 +12,111 @@ import numpy as np
 # ----------------------------------------------------------------------------------------------------------------------
 # - Support Code -
 # ----------------------------------------------------------------------------------------------------------------------
-# a global storage of the individual points on the plot.
-#   This list holds the dpg tags of the dragpoints, and not the individual positions
-#   If you want to have a list of all points' postions at a specific moment
-#       you'll need to exectute the points_as_positions functions
-points:list[int] = []
+POLYGONS:int = 10_000 # the amount of polygons to be generated
+POLYGON = ((0.,0.),(0.,1.),(1.,1.),(1.,0.)) # shape of the polygon
+POLYGON_COLOR = (0,0,0)
 
-def points_as_pos(list_of_points:list[int]):
-    return [dpg.get_value(p)[:2] for p in list_of_points]
+MAX_RANGE:float = 750.
+MIN_RANGE:float = -MAX_RANGE
 
-def plot_mouseclick_left_callback():
-    global points
-
-    # retrieve the current mouse postion
-    #   and create point
-    pos = dpg.get_plot_mouse_pos()
-    point = dpg.add_drag_point(
-        parent="plot",
-        default_value=pos,
-        callback=lambda : print("Point dragged"), # this callback is executed on dragging dragpoint
-    )
-
-    # After the point has been created
-    #   Store the point tag somewhere (in this case auto generated)
-    #   This way the point can be easily retrieved later
-    points.append(point)
-
-def plot_mouseclick_right_callback():
-    global points
-
-    # Use numpy to find the nearest point through a simple algorithm
-    pos = dpg.get_plot_mouse_pos()
-    index_nearest = np.argmin(np.sum((np.asarray(points_as_pos(points)) - pos) ** 2, axis=1))
-
-    # Delete the item from the plot and from the stored values
-    #   Make sure to delete the removed point from the list of points as well
-    dpg.delete_item(points[index_nearest])
-    points.pop(index_nearest)
+polygons:list[tuple] = []
+drawn_polygons:list[str|int] = []
 
 # ----------------------------------------------------------------------------------------------------------------------
-# - Main Code -
+def custom_series_callback(sender, app_data):
+    global drawn_polygons
+
+    # Add mutex here to solve crashing issue
+    with dpg.mutex():
+        x0 = app_data[1][0]
+        y0 = app_data[2][0]
+        x1 = app_data[1][1]
+        y1 = app_data[2][1]
+
+        difference_x = x1 - x0
+        difference_y = y1 - y0
+
+        # delete old drawn items
+        #   else we won't update, but simply append to the old image
+        #   adding new layers on top of the drawn pieces
+        dpg.delete_item(sender, children_only=True)
+        dpg.push_container_stack(sender)
+
+        # DO STUFF (maybe threaded calculations in the future?)
+        # --------------------------------------------------------------------------------------------------------------
+        for polygon in polygons:
+            points = calculate_points(polygon,difference_x,difference_y,x0,y0)
+            if len(points) >= 3:
+                drawn_polygons.append(dpg.draw_polygon(
+                    points=points,
+                    color=POLYGON_COLOR,
+                    fill=POLYGON_COLOR,
+                    thickness=0
+                ))
+
+        # --------------------------------------------------------------------------------------------------------------
+        # After everything has been drawn
+
+        dpg.configure_item(sender, tooltip=False)
+        dpg.pop_container_stack()
+
+        # Update the text to show the items drawn
+        dpg.set_value(
+            item="txt_output",
+            value=len(dpg.get_item_children(sender, 2))
+        )
+
+# ----------------------------------------------------------------------------------------------------------------------
+def calculate_points(polygon, difference_x:float, difference_y:float, x0:float, y0:float) -> list[list[float,float]]:
+    points = []
+
+    # Calculate all the points in pixel space
+    #   don't store any points that are outside the given max range
+    for x_original, y_original in polygon:
+        if  MIN_RANGE < (x_new := ((x_original * difference_x) + x0)) < MAX_RANGE \
+        and MIN_RANGE < (y_new := ((y_original * difference_y) + y0)) < MAX_RANGE:
+            points.append([x_new, y_new])
+
+    return points
+
+# ----------------------------------------------------------------------------------------------------------------------
+def create_items():
+    """
+    Function to create the individual items in memory,so they can be drawn to the polygon
+    """
+    for i in range(POLYGONS):
+        polygons.append(
+            tuple((x+i,y+i) for x,y in POLYGON)
+        )
+
+# ----------------------------------------------------------------------------------------------------------------------
+# - Code -
 # ----------------------------------------------------------------------------------------------------------------------
 def main():
-    """
-    A simple example of how to set up a drag point handler for a plot
-    The handler makes it so that:
-    - on a left click on the plot, it will create a drag point
-    - on a right click on the plot, it will delete the nearest drag point
-    """
     dpg.create_context()
-    dpg.create_viewport(title='Dragpoint Example')
+    dpg.create_viewport(title='Plot with large Custom Series Example')
 
-    # Create a simple layout that has a plot within it
-    #   Make sure to store the plot tag somwhere
-    #       or use a custom tag as with this example
-    with dpg.window(label="Plot with dragpoints"):
-        dpg.add_plot(tag="plot", width=500, height=500, no_menus=True)
+    with dpg.window(tag="primary_window"):
+        with dpg.group(horizontal=True, horizontal_spacing=375):
+            dpg.add_button(
+                label="Create items",
+                callback=create_items,
+                width=100
+            )
+            dpg.add_text(tag="txt_output")
+        with dpg.plot(width=500, height=500, tag="plot"):
+            dpg.add_plot_axis(axis=dpg.mvXAxis)
+            with dpg.plot_axis(axis=dpg.mvYAxis):
+                dpg.add_custom_series(
+                    x= [0.,1.],
+                    y= [0.,1.],
+                    channel_count=2,
+                    callback=custom_series_callback
+                )
 
-    # Create a registry for the different callbacks on different mouse button clicks
-    with dpg.item_handler_registry(tag="registry"):
-        # Callback system for when the user left-clicks on the plot
-        dpg.add_item_clicked_handler(
-            button=dpg.mvMouseButton_Left,
-            callback=plot_mouseclick_left_callback
-        )
-        # Callback system for when the user right-clicks on the plot
-        dpg.add_item_clicked_handler(
-            button=dpg.mvMouseButton_Right,
-            callback=plot_mouseclick_right_callback
-        )
+    dpg.set_primary_window("primary_window", True)
 
-    # bind the registry to the item
-    dpg.bind_item_handler_registry("plot", "registry")
+    dpg.show_metrics()
 
     dpg.setup_dearpygui()
     dpg.show_viewport()
