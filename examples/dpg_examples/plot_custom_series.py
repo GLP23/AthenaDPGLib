@@ -70,8 +70,8 @@ def custom_series_callback(sender, app_data):
 def calculate_points(polygon, difference_x:float, difference_y:float, x0:float, y0:float) -> list[list[float,float]]:
     points = []
 
-    # Calculate all the points in pixel space
-    #   don't store any points that are outside the given max range
+    # Calculate all the coords in pixel space
+    #   don't store any coords that are outside the given max range
     for x_original, y_original in polygon:
         if  MIN_RANGE < (x_new := ((x_original * difference_x) + x0)) < MAX_RANGE \
         and MIN_RANGE < (y_new := ((y_original * difference_y) + y0)) < MAX_RANGE:

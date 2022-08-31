@@ -3,20 +3,27 @@
 # ----------------------------------------------------------------------------------------------------------------------
 # General Packages
 from __future__ import annotations
+
+import random
+import threading
+
 import dearpygui.dearpygui as dpg
-import numpy as np
 
 # Custom Library
 
 # Custom Packages
-from AthenaDPGLib.landplot_designer.models.polygons import Polygon, Point
+from AthenaDPGLib.landplot_designer.models.polygons import Polygon, Coordinate, ChunkOfPolygons
 from AthenaDPGLib.landplot_designer.functions.plot_custom_series import custom_series_callback
 
 # ----------------------------------------------------------------------------------------------------------------------
 # - Support Code -
 # ----------------------------------------------------------------------------------------------------------------------
-polygons:set[Polygon] = set()
+polygons:ChunkOfPolygons = ChunkOfPolygons()
 POLYGON = ((0.,0.),(0.,1.),(1.,1.),(1.,0.)) # shape of the polygon
+SHAPE = 100
+
+x_limit0, x_limit1 = 0.,0.
+y_limit0, y_limit1 = 0.,0.
 
 def create_items():
     """
@@ -24,44 +31,45 @@ def create_items():
     """
     global polygons
 
+    print("started")
     polygons.clear()
 
-    for i in range(10_000):
-        # noinspection PyArgumentList
-        polygons.add(
-            Polygon(
-                points=tuple(
-                    Point(x+i,y+i)
+    for a in range(SHAPE):
+        for b in range(SHAPE):
+            # noinspection PyArgumentList
+            polygons.append(Polygon(
+                coords=[
+                    Coordinate(x + a, y + b)
                     for x, y in POLYGON
-                )
-            )
-        )
+                ],
+                color=(random.randint(0,255),random.randint(0,255),random.randint(0,255))
+            ))
 
-def test():
-    global polygons
+    print("finished")
+
+def update_renderable():
+    global polygons, x_limit0, x_limit1 ,y_limit0, y_limit1
 
     with dpg.mutex():
-
-        x_limit0, x_limit1 = dpg.get_axis_limits("x_axis")
-        y_limit0, y_limit1 = dpg.get_axis_limits("y_axis")
-
-        for polygon in polygons:
-            radius = polygon.largest_radius
-            polygon.do_render = (
-                (x_limit0-radius) < polygon.center_point.x < (x_limit1+radius) or
-                (y_limit0-radius) < polygon.center_point.y < (y_limit1+radius)
+        for polygon in polygons.collection:
+            polygon.renderable_update(
+                x_limit0, x_limit1, y_limit0, y_limit1
             )
 
+def get_plot_limits():
+    global x_limit0, x_limit1 ,y_limit0, y_limit1
+
+    x_limit0, x_limit1 = dpg.get_axis_limits("x_axis")
+    y_limit0, y_limit1 = dpg.get_axis_limits("y_axis")
 
 def registry():
     with dpg.item_handler_registry(tag="registry"):
-        # dpg.add_item_clicked_handler(
-        #     callback=test
-        # )
-        dpg.add_item_active_handler(
-            callback=test
+        dpg.add_item_visible_handler(
+            callback=update_renderable
         )
-
+        dpg.add_item_hover_handler(
+            callback=get_plot_limits
+        )
     dpg.bind_item_handler_registry(
         handler_registry="registry",
         item="plot"
@@ -80,20 +88,22 @@ def main():
         with dpg.group(horizontal=True, horizontal_spacing=375):
             dpg.add_button(
                 label="Create items",
-                callback=create_items,
+                callback=lambda : (threading.Thread(target=create_items).start()),
                 width=100
             )
             dpg.add_text(tag="txt_output")
-        with dpg.plot(width=500, height=500, tag="plot", callback=test):
+        with dpg.plot(width=500, height=500, tag="plot", callback=update_renderable):
             dpg.add_plot_axis(tag="x_axis",axis=dpg.mvXAxis)
             with dpg.plot_axis(tag="y_axis", axis=dpg.mvYAxis):
                 dpg.add_custom_series(
-                    x= [0.,1.],
-                    y= [0.,1.],
+                    x= (xy:=[0.,1.]),
+                    y= xy,
                     channel_count=2,
                     callback=custom_series_callback,
                     user_data=polygons
                 )
+
+    get_plot_limits()
 
     dpg.set_primary_window("primary_window", True)
     registry()

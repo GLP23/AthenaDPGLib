@@ -9,7 +9,7 @@ import dearpygui.dearpygui as dpg
 
 # Custom Packages
 from AthenaDPGLib.fixes.mutex import run_in_mutex
-from AthenaDPGLib.landplot_designer.models.polygons import Polygon, Point
+from AthenaDPGLib.landplot_designer.models.polygons import ChunkOfPolygons
 
 # ----------------------------------------------------------------------------------------------------------------------
 # - Code -
@@ -18,7 +18,7 @@ MAX_RANGE:float = 750.
 MIN_RANGE:float = -MAX_RANGE
 
 @run_in_mutex
-def custom_series_callback(sender, app_data, polygons:set[Polygon]):
+def custom_series_callback(sender, app_data, polygons:ChunkOfPolygons):
     x0 = app_data[1][0]
     y0 = app_data[2][0]
     x1 = app_data[1][1]
@@ -35,20 +35,10 @@ def custom_series_callback(sender, app_data, polygons:set[Polygon]):
 
     # DO STUFF (maybe threaded calculations in the future?)
     # --------------------------------------------------------------------------------------------------------------
-    for polygon in (poly for poly in polygons if poly.do_render):
-
-        # points:tuple[tuple[float,float],...] = tuple(
-        #     pos
-        #     for point in polygon.points #type: Point
-        #     if (
-        #         MIN_RANGE < (pos:=point.output_to_pixelspace(difference_point, zero_point))[0] < MAX_RANGE and
-        #         MIN_RANGE < pos[1] < MAX_RANGE
-        #     )
-        # )
-
-        # if len(points) >= 3:
+    for polygon in polygons.renderable_get():
+        # if len(coords) >= 3:
         dpg.draw_polygon(
-            points=[point.output_to_pixelspace(difference_point, zero_point) for point in polygon.points ],
+            points=[coord.output_to_pixelspace(difference_point, zero_point) for coord in polygon.coords],
             color=polygon.color,
             fill=polygon.color,
             thickness=0
