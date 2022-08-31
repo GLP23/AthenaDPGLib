@@ -46,7 +46,7 @@ def custom_series_callback(sender, app_data):
         # --------------------------------------------------------------------------------------------------------------
         for polygon in polygons:
             points = calculate_points(polygon,difference_x,difference_y,x0,y0)
-            if min(len(points), 3) >= 3:
+            if len(points) >= 3:
                 drawn_polygons.append(dpg.draw_polygon(
                     points=points,
                     color=POLYGON_COLOR,
