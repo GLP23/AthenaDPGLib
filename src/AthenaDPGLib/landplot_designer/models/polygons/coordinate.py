@@ -26,6 +26,6 @@ class Coordinate:
         Output the x and y values of the current object to a tuple in pixelspace
         """
         return (
-           (self.x * difference_point[0]) + zero_point[0],  # X coord
-           (self.y * difference_point[1]) + zero_point[1]   # Y coord
+            (self.x * difference_point[0]) + zero_point[0],  # X coord
+            (self.y * difference_point[1]) + zero_point[1]   # Y coord
         )

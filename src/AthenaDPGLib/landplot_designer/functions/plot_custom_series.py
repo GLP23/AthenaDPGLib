@@ -36,7 +36,10 @@ def custom_series_callback(sender, app_data, chunk_manager:ChunkManager):
         for polygon in chunk.renderable_get():
             # if len(coords) >= 3:
             dpg.draw_polygon(
-                points=[coord.output_to_pixelspace(difference_point, zero_point) for coord in polygon.coords],
+                points=[
+                    coord.output_to_pixelspace(difference_point, zero_point)
+                    for coord in polygon.coords
+                ],
                 color=polygon.color,
                 fill=polygon.color,
                 thickness=0

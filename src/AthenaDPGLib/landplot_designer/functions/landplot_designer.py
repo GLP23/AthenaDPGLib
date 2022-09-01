@@ -19,7 +19,7 @@ from AthenaDPGLib.landplot_designer.functions.plot_custom_series import custom_s
 # - Support Code -
 # ----------------------------------------------------------------------------------------------------------------------
 POLYGON = ((0.,0.),(0.,1.),(1.,1.),(1.,0.)) # shape of the polygon
-CHUNK_SIDE = 10
+CHUNK_SIDE = 12
 
 x_limit0, x_limit1 = 0.,0.
 y_limit0, y_limit1 = 0.,0.
@@ -34,8 +34,8 @@ def create_items():
 
     print("started")
 
-    for i in range(100):
-        for j in range(100):
+    for i in range(10):
+        for j in range(10):
             chunk = chunk_manager.add_chunk(
                 coord=Coordinate(i, j),
             )
@@ -50,7 +50,7 @@ def create_items():
                             )
                             for x, y in POLYGON
                         ],
-                        color=(i*a,j*b,127)
+                        color=(i*a,j*b,(i*j)%255)
                     ))
 
     print("finished")
@@ -111,7 +111,7 @@ def main():
             )
             dpg.add_text(tag="txt_output_chunks")
             dpg.add_text(tag="txt_output_polygons")
-        with dpg.plot(width=500, height=500, tag="plot", callback=update_renderable):
+        with dpg.plot(width=750, height=750, tag="plot", callback=update_renderable):
             dpg.add_plot_axis(tag="x_axis",axis=dpg.mvXAxis)
             with dpg.plot_axis(tag="y_axis", axis=dpg.mvYAxis):
                 dpg.add_custom_series(
