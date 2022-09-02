@@ -7,6 +7,7 @@ import numpy as np
 from dataclasses import dataclass, field
 
 # Custom Library
+from AthenaLib.constants.types import COLOR
 
 # Custom Packages
 from AthenaDPGLib.landplot_designer.models.coordinate import Coordinate
@@ -23,6 +24,7 @@ from AthenaDPGLib.landplot_designer.functions.coordinate_math import (
 @dataclass(slots=True, kw_only=True)
 class Polygon:
     points:list[Coordinate] = field(default_factory=list)
+    color:COLOR = field(default_factory=lambda:(0,0,0,255))
 
     # non init
     # math stuff for checking if everything is okay to render

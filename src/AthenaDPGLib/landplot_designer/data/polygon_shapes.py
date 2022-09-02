@@ -32,6 +32,20 @@ HEXAGON = (
     (0.5,-1.),
 )
 HEXAGON_BIG = [
-    (x*5,y*5)
+    (x*10,y*10)
+    for x,y in HEXAGON
+]
+HEXAGON_HUGE = [
+    (x*50,y*50)
+    for x,y in HEXAGON
+]
+
+HEXAGON_IMMENSE = [
+    (x*100,y*100)
+    for x,y in HEXAGON
+]
+
+HEXAGON_COLOSSAL = [
+    (x*500,y*500)
     for x,y in HEXAGON
 ]

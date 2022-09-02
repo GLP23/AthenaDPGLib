@@ -18,16 +18,18 @@ from AthenaDPGLib.landplot_designer.models.land_plot import LandPlot
 from AthenaDPGLib.landplot_designer.models.coordinate import Coordinate
 from AthenaDPGLib.landplot_designer.functions.plot_custom_series import custom_series_callback
 
-from AthenaDPGLib.landplot_designer.data.polygon_shapes import SQUARE, RECTANGLE, HEXAGON,HEXAGON_BIG
+from AthenaDPGLib.landplot_designer.data.polygon_shapes import (
+    SQUARE, RECTANGLE, HEXAGON,HEXAGON_BIG,HEXAGON_HUGE, HEXAGON_IMMENSE, HEXAGON_COLOSSAL
+)
 
 # ----------------------------------------------------------------------------------------------------------------------
 # - Support Code -
 # ----------------------------------------------------------------------------------------------------------------------
 POLYGON = ((0.,0.),(0.,1.),(1.,1.),(1.,0.)) # shape of the polygon
 CHUNK_SIDE_LENGTH = 16
-SHAPES = (SQUARE,RECTANGLE,HEXAGON,HEXAGON_BIG)
+SHAPES = (SQUARE,RECTANGLE,HEXAGON,HEXAGON_BIG,HEXAGON_HUGE,HEXAGON_IMMENSE,HEXAGON_COLOSSAL)
 
-chunk_manager:ChunkManager = ChunkManager(chunk_side_length=CHUNK_SIDE_LENGTH)
+chunk_manager:ChunkManager = ChunkManager()
 
 def create_items():
     """
@@ -37,25 +39,21 @@ def create_items():
 
     print("started")
 
-    for i in range(10_000):
-        modifier_x = random.randint(-1000,1000)
-        modifier_y = random.randint(-1000,1000)
+    for i in range(1):
+        modifier_x = 0
+        modifier_y = 0
         chunk_manager.add_land_plot(
             land_plot=LandPlot(
                 points=[
                     Coordinate(x+modifier_x,y+modifier_y)
-                    for x,y in random.choice(SHAPES)
+                    for x,y in HEXAGON_COLOSSAL
                 ],
                 color=(255,255,255)
             )
         )
 
     print("finished")
-
-    with open("ouput.txt","w") as file:
-        file.write(repr(chunk_manager))
-
-    print(len(chunk_manager.chunks))
+    print(len(list(chunk_manager.chunks)))
 
 def update_renderable():
     global chunk_manager
@@ -64,7 +62,7 @@ def update_renderable():
         x_limit0, x_limit1 = dpg.get_axis_limits("x_axis")
         y_limit0, y_limit1 = dpg.get_axis_limits("y_axis")
 
-        for _, chunk in chunk_manager.chunks.items(): #type: Chunk
+        for chunk in chunk_manager.chunks: #type: Chunk
             chunk.renderable_update(
                 x_limit0, x_limit1, y_limit0, y_limit1
             )

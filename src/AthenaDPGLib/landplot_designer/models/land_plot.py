@@ -24,5 +24,5 @@ from AthenaDPGLib.landplot_designer.functions.coordinate_math import (
 # ----------------------------------------------------------------------------------------------------------------------
 @dataclass(slots=True, kw_only=True)
 class LandPlot(Polygon):
-    color:COLOR = field(default_factory=lambda:(0,0,0,255))
+    pass
 
