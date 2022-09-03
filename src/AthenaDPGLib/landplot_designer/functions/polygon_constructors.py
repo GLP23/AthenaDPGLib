@@ -3,30 +3,22 @@
 # ----------------------------------------------------------------------------------------------------------------------
 # General Packages
 from __future__ import annotations
-import dearpygui.dearpygui as dpg
+import numpy as np
 
 # Custom Library
-from AthenaDPGLib.landplot_designer.functions.landplot_constructor import landplot_constructor
-import AthenaDPGLib.landplot_designer.data.memory as Memory
 
 # Custom Packages
+from AthenaDPGLib.landplot_designer.models.polygon import Polygon
+from AthenaDPGLib.landplot_designer.models.point import Point
+
 
 # ----------------------------------------------------------------------------------------------------------------------
 # - Code -
 # ----------------------------------------------------------------------------------------------------------------------
-def main():
-    dpg.create_context()
-    dpg.create_viewport(title='Landplot designer Example')
-
-    landplot_constructor()
-
-    dpg.set_primary_window(Memory.landplot_designer.window_tag, True)
-
-    dpg.setup_dearpygui()
-    dpg.show_viewport()
-    dpg.start_dearpygui()
-    dpg.destroy_context()
-
-
-if __name__ == '__main__':
-    main()
+def polygon__square(origin:np.ndarray) -> Polygon:
+    return Polygon.new_from_local(origin=origin, points=np.array([
+        [-.5, -.5],
+        [-.5,  .5],
+        [.5 ,  .5],
+        [.5 , -.5]
+    ]))

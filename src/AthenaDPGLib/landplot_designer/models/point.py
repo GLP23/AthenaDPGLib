@@ -3,30 +3,20 @@
 # ----------------------------------------------------------------------------------------------------------------------
 # General Packages
 from __future__ import annotations
-import dearpygui.dearpygui as dpg
+from dataclasses import dataclass
 
 # Custom Library
-from AthenaDPGLib.landplot_designer.functions.landplot_constructor import landplot_constructor
-import AthenaDPGLib.landplot_designer.data.memory as Memory
 
 # Custom Packages
 
 # ----------------------------------------------------------------------------------------------------------------------
 # - Code -
 # ----------------------------------------------------------------------------------------------------------------------
-def main():
-    dpg.create_context()
-    dpg.create_viewport(title='Landplot designer Example')
+@dataclass(slots=True)
+class Point:
+    x:float|int
+    y:float|int
 
-    landplot_constructor()
-
-    dpg.set_primary_window(Memory.landplot_designer.window_tag, True)
-
-    dpg.setup_dearpygui()
-    dpg.show_viewport()
-    dpg.start_dearpygui()
-    dpg.destroy_context()
-
-
-if __name__ == '__main__':
-    main()
+    def __iter__(self):
+        yield self.x
+        yield self.y

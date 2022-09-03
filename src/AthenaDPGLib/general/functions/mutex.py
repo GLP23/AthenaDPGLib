@@ -19,3 +19,11 @@ def run_in_mutex(fnc):
         with dpg.mutex():
             return fnc(sender, app_data, user_data)
     return wrapper
+
+def run_in_mutex_method(fnc):
+    @functools.wraps(fnc)
+    def wrapper(obj, sender, app_data, user_data):
+        with dpg.mutex():
+            return fnc(obj, sender, app_data, user_data)
+    return wrapper
+
