@@ -11,9 +11,7 @@ import numpy as np
 # Custom Library
 
 # Custom Packages
-from AthenaDPGLib.landplot_designer.models.polygon import Polygon
-from AthenaDPGLib.landplot_designer.models.point import Point
-from AthenaDPGLib.landplot_designer.functions.polygon_constructors import polygon__square
+from AthenaDPGLib.landplot_designer.functions.polygon_constructors import test_polygons
 
 from AthenaDPGLib.general.functions.mutex import run_in_mutex_method
 from AthenaDPGLib.general.data.universal_tags import UniversalTags as ut
@@ -108,11 +106,10 @@ class LandplotDesigner:
     # ------------------------------------------------------------------------------------------------------------------
     @run_in_mutex_method
     def _custom_series_callback(self, sender, app_data, user_data):
-
-        pos_0_0 = np.array([app_data[1][0],app_data[2][0]])
-        pos_1_1 = np.array([app_data[1][1],app_data[2][1]])
-
-        pos_difference = pos_1_1-pos_0_0
+        # todo
+        #   check if this can be created once and then just stored
+        pos_0_0 = [app_data[1][0],app_data[2][0]]
+        pos_difference = np.array([app_data[1][1],app_data[2][1]])-pos_0_0
 
         # delete old drawn items
         #   else we won't update, but simply append to the old image
@@ -122,26 +119,23 @@ class LandplotDesigner:
 
         # DO STUFF
         # --------------------------------------------------------------------------------------------------------------
-        for poly in [
-            polygon__square(origin=np.array([0.5, 0.5])),
-            polygon__square(origin=np.array([1., 1.])),
-            polygon__square(origin=np.array([1., 5.])),
-            polygon__square(origin=np.array([-5.,2.])),
-        ]:
+        for poly in test_polygons():
             dpg.draw_polygon(
                 points=[
                     (point*pos_difference)+pos_0_0
-                    for point in poly.points_absolute
+                    for point in poly.points_absolute #type: np.ndarray
                 ],
-                fill=(0,0,0),
-                color=(0,0,0),
+                fill=poly.color_fill,
+                color=poly.color_border,
+                thickness=0
             )
 
             dpg.draw_circle(
                 center=(poly.origin*pos_difference)+pos_0_0,
                 radius=5,
-                fill=(255,0,0),
-                color=(255,0,0),
+                fill=poly.color_origin,
+                color=poly.color_origin,
+                thickness=0
             )
 
         # --------------------------------------------------------------------------------------------------------------

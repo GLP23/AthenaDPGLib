@@ -3,7 +3,9 @@
 # ----------------------------------------------------------------------------------------------------------------------
 # General Packages
 from __future__ import annotations
-from dataclasses import dataclass
+from dataclasses import dataclass, InitVar, field
+import numpy as np
+from numpy.typing import ArrayLike
 
 # Custom Library
 
@@ -12,11 +14,22 @@ from dataclasses import dataclass
 # ----------------------------------------------------------------------------------------------------------------------
 # - Code -
 # ----------------------------------------------------------------------------------------------------------------------
-@dataclass(slots=True)
+@dataclass(init=False, slots=True)
 class Point:
-    x:float|int
-    y:float|int
+    _pos:ArrayLike
+
+    def __init__(self, x:float, y:float):
+        self._pos = np.array([x,y])
+
+    @property
+    def x(self):
+        return self._pos[0]
+    @property
+    def y(self):
+        return self._pos[1]
+
+    def __hash__(self):
+        return hash((self._pos[0], self._pos[1]))
 
     def __iter__(self):
-        yield self.x
-        yield self.y
+        return iter(self._pos)
