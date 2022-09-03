@@ -17,11 +17,12 @@ def main():
     dpg.create_context()
     dpg.create_viewport(title='Landplot designer Example')
 
-    landplot_designer= LandplotDesigner()
-    with landplot_designer.dpg() as window:
-        pass
+    landplot_designer = LandplotDesigner()
+    landplot_designer.add_dpg()
+    # with landplot_designer.dpg():
+    #     pass
 
-    dpg.set_primary_window(window.window_tag, True)
+    dpg.set_primary_window(landplot_designer.window_tag, True)
 
     dpg.setup_dearpygui()
     dpg.show_viewport()
