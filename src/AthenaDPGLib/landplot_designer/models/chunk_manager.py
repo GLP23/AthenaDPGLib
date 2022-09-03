@@ -5,8 +5,7 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any, Generator
-import itertools
-import collections
+import numpy as np
 
 # Custom Library
 from AthenaLib.constants.types import NUMBER, COLOR
@@ -32,6 +31,7 @@ class ChunkManager:
     chunks_mapping: dict[int:dict[Coordinate:Chunk]] =  field(
         default_factory=lambda : {k:{} for k, _ in enumerate(ChunkSideSizes)}
     )
+    offset:np.ndarray = np.array([0.,0.])
 
     @property
     def chunks(self) -> Generator[Chunk, Any, None]:
@@ -62,8 +62,8 @@ class ChunkManager:
     def _assign_landplot_to_chunk(land_plot:LandPlot, side_length:NUMBER, chunk_mapping:CHUNK_MAPPING, color:COLOR):
         # Calculate in which chunk the polygon should be placed in
             chunk_coord = Coordinate(
-                x=(land_plot.center_coord.x // side_length) * side_length,
-                y=(land_plot.center_coord.y // side_length) * side_length
+                x=(land_plot.center_coord[0] // side_length) * side_length,
+                y=(land_plot.center_coord[1] // side_length) * side_length
             )
 
             # Assign landplot to correct chunk
@@ -90,3 +90,9 @@ class ChunkManager:
                 for chunk in chunk_group.values() #type: Coordinate,Chunk
                 if chunk.renderable
         )
+
+    def renderable_update(self, TL_limit:np.ndarray, BR_limit:np.ndarray):
+        for chunk in self.chunks:
+            chunk.renderable = np.logical_and(
+                chunk.center_coord > TL_limit, chunk.center_coord < BR_limit
+            ).all()

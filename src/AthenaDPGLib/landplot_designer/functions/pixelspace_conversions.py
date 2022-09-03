@@ -3,6 +3,7 @@
 # ----------------------------------------------------------------------------------------------------------------------
 # General Packages
 from __future__ import annotations
+import math
 
 # Custom Library
 from AthenaLib.constants.types import POINT
@@ -22,10 +23,11 @@ def tuple_to_pixelspace(original:POINT, difference_point: POINT, zero_point: POI
             (original[1] * difference_point[1]) + zero_point[1]
     )
 
-def coord_to_pixelspace(original:Coordinate, difference_point: POINT, zero_point: POINT) -> POINT:
+def coord_to_pixelspace(original:Coordinate, difference_point:POINT, zero_point: POINT) -> POINT:
     """
     Output the x and y values of the current object to a tuple in pixelspace
     """
+
     return (
             (original.x * difference_point[0]) + zero_point[0] ,
             (original.y * difference_point[1]) + zero_point[1]

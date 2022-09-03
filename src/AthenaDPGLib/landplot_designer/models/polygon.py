@@ -29,7 +29,7 @@ class Polygon:
     # non init
     # math stuff for checking if everything is okay to render
     points_as_np_array:np.ndarray = field(init=False)
-    center_coord:Coordinate = field(init=False)
+    center_coord:np.ndarray = field(init=False)
     largest_radius:float = field(init=False)
 
     def __post_init__(self):
