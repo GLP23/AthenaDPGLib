@@ -11,18 +11,14 @@ from AthenaColor.data.colors_html import GOLD
 
 # Custom Packages
 from AthenaDPGLib.landplot_designer.models.polygon import Polygon
+from AthenaDPGLib.landplot_designer.data.shapes import SQUARE
 
 
 # ----------------------------------------------------------------------------------------------------------------------
 # - Code -
 # ----------------------------------------------------------------------------------------------------------------------
 def polygon__square(origin:np.ndarray) -> Polygon:
-    return Polygon.new_from_local(origin=origin, points=np.array([
-        [-.5, -.5],
-        [-.5,  .5],
-        [.5 ,  .5],
-        [.5 , -.5]
-    ]))
+    return Polygon.new_from_local(origin=origin, points=SQUARE)
 
 def test_polygons() -> Generator[Polygon, Any, None]:
     yield polygon__square(origin=np.array([0.5, 0.5]))
@@ -35,7 +31,5 @@ def test_polygons() -> Generator[Polygon, Any, None]:
             [5., -2.5],
             [2.5, -2.5],
             [2.5, -5.]
-        ]),
-        color_fill=GOLD,
-        color_border=GOLD
+        ])
     )

@@ -3,15 +3,25 @@
 # ----------------------------------------------------------------------------------------------------------------------
 # General Packages
 from __future__ import annotations
+
+import itertools
+
 import dearpygui.dearpygui as dpg
 import contextlib
 from dataclasses import dataclass, field
 import numpy as np
+from numpy.typing import ArrayLike
 
 # Custom Library
+from AthenaLib.constants.types import COLOR
+from AthenaColor.data.colors_html import DARKRED, ROYALBLUE
 
 # Custom Packages
+from AthenaDPGLib.landplot_designer.models.polygon import Polygon
+from AthenaDPGLib.landplot_designer.models.chunk import Chunk
 from AthenaDPGLib.landplot_designer.functions.polygon_constructors import test_polygons
+import AthenaDPGLib.landplot_designer.data.memory as Memory
+
 
 from AthenaDPGLib.general.functions.mutex import run_in_mutex_method
 from AthenaDPGLib.general.data.universal_tags import UniversalTags as ut
@@ -19,6 +29,10 @@ from AthenaDPGLib.general.data.universal_tags import UniversalTags as ut
 # ----------------------------------------------------------------------------------------------------------------------
 # - Code -
 # ----------------------------------------------------------------------------------------------------------------------
+color_fill: COLOR = ROYALBLUE
+color_border: COLOR = ROYALBLUE
+color_origin: COLOR = DARKRED
+
 @dataclass(slots=True, kw_only=True)
 class LandplotDesigner:
     size_scale:float = 1.
@@ -98,7 +112,9 @@ class LandplotDesigner:
         # set the limits of the plot
         #   this is due to the fact that the plot will not be used as a plot
         #   but as the "center of the camera axis"
-        dpg.set_axis_limits(tag, ymin=-self.plot_axis_limit, ymax=self.plot_axis_limit)
+        # dpg.set_axis_limits(tag, ymin=-self.plot_axis_limit, ymax=self.plot_axis_limit)
+        # dpg.set_axis_limits(tag, ymin=-5000, ymax=5000)
+
 
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -106,9 +122,11 @@ class LandplotDesigner:
     # ------------------------------------------------------------------------------------------------------------------
     @run_in_mutex_method
     def _custom_series_callback(self, sender, app_data, user_data):
+        global color_border, color_fill, color_fill
+
         # todo
         #   check if this can be created once and then just stored
-        pos_0_0 = [app_data[1][0],app_data[2][0]]
+        pos_0_0 = np.array([app_data[1][0],app_data[2][0]])
         pos_difference = np.array([app_data[1][1],app_data[2][1]])-pos_0_0
 
         # delete old drawn items
@@ -119,22 +137,38 @@ class LandplotDesigner:
 
         # DO STUFF
         # --------------------------------------------------------------------------------------------------------------
-        for poly in test_polygons():
+        for chunk in Memory.chunk_manager.chunks(): #type: Polygon
             dpg.draw_polygon(
                 points=[
                     (point*pos_difference)+pos_0_0
-                    for point in poly.points_absolute #type: np.ndarray
+                    for point in chunk.points_absolute #type: ArrayLike
                 ],
-                fill=poly.color_fill,
-                color=poly.color_border,
+                fill=(0,255,0,32),
+                color=(0,255,0,32),
+                thickness=0
+            )
+
+        for poly in  (
+                landplot
+                for chunk in Memory.chunk_manager.chunks() #type: Chunk
+                for landplot in chunk.land_plots
+            ):
+            # print(poly)
+            dpg.draw_polygon(
+                points=[
+                    (point*pos_difference)+pos_0_0
+                    for point in poly.points_absolute #type: ArrayLike
+                ],
+                fill=color_fill,
+                color=color_border,
                 thickness=0
             )
 
             dpg.draw_circle(
                 center=(poly.origin*pos_difference)+pos_0_0,
                 radius=5,
-                fill=poly.color_origin,
-                color=poly.color_origin,
+                fill=color_origin,
+                color=color_origin,
                 thickness=0
             )
 
