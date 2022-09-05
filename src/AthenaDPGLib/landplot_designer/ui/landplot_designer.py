@@ -30,7 +30,7 @@ from AthenaDPGLib.general.data.universal_tags import UniversalTags as ut
 # ----------------------------------------------------------------------------------------------------------------------
 # - Code -
 # ----------------------------------------------------------------------------------------------------------------------
-color_fill: COLOR = (*ROYALBLUE,32)
+color_fill: COLOR = ROYALBLUE
 color_border: COLOR = color_fill
 color_origin: COLOR = DARKRED
 
@@ -113,8 +113,7 @@ class LandplotDesigner:
         # set the limits of the plot
         #   this is due to the fact that the plot will not be used as a plot
         #   but as the "center of the camera axis"
-        # dpg.set_axis_limits(tag, ymin=-self.plot_axis_limit, ymax=self.plot_axis_limit)
-        # dpg.set_axis_limits(tag, ymin=-10_000, ymax=10_000)
+        dpg.set_axis_limits(tag, ymin=-self.plot_axis_limit, ymax=self.plot_axis_limit)
 
     # ------------------------------------------------------------------------------------------------------------------
     # - Custom Series Callback -
@@ -146,11 +145,13 @@ class LandplotDesigner:
         # DO STUFF
         # --------------------------------------------------------------------------------------------------------------
         for n,chunk_level in Memory.chunk_manager.chunk_levels(): #type: int, dict[tuple[float,float]:Chunk]
-            offset = Memory.chunk_manager.chunk_side_lowest ** n
+            margin = Memory.chunk_manager.chunk_side_lowest ** n
+            TL_limit_margin = TL_limit-margin
+            BR_limit_margin = BR_limit+margin
 
             for origin, chunk in chunk_level.items():
                 if np.logical_and(
-                    chunk.origin > TL_limit-offset, chunk.origin < BR_limit+offset
+                    chunk.origin > TL_limit_margin, chunk.origin < BR_limit_margin
                 ).all():
                     dpg.draw_polygon(
                             points=[
@@ -180,28 +181,6 @@ class LandplotDesigner:
                             thickness=0
                         )
 
-
-
-        # for chunk in Memory.chunk_manager.chunks(): #type: Polygon
-        #     dpg.draw_polygon(
-        #         points=[
-        #             (point*pos_difference)+pos_0_0
-        #             for point in chunk.points_absolute #type: ArrayLike
-        #         ],
-        #         fill=(0,255,0,32),
-        #         color=(0,255,0,32),
-        #         thickness=0
-        #     )
-        #
-        # for poly in  (
-        #         landplot
-        #         for chunk in Memory.chunk_manager.chunks() #type: Chunk
-        #         for landplot in chunk.land_plots
-        #     ):
-        #     # print(poly)
-        #
-
         # --------------------------------------------------------------------------------------------------------------
         # After everything has been drawn
         dpg.pop_container_stack()
-        print(len(dpg.get_item_children(sender,2)))
