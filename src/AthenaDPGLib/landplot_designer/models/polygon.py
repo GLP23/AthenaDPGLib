@@ -11,7 +11,6 @@ from numpy.typing import ArrayLike
 from AthenaLib.math.arrays import calculate_center, calculate_largest_radius
 
 # Custom Packages
-from AthenaDPGLib.landplot_designer.models.point import Point
 
 # ----------------------------------------------------------------------------------------------------------------------
 # - Code -
@@ -73,12 +72,11 @@ class Polygon:
     # ------------------------------------------------------------------------------------------------------------------
     # - Changes to the points array -
     # ------------------------------------------------------------------------------------------------------------------
-    def add_local_point(self, pos:Point):
-        self.points = np.append(self.points, [[pos.x, pos.y]], axis=0)
+    def add_local_point(self, pos:tuple[float,float]):
+        self.points = np.append(self.points, [[*pos]], axis=0)
         self.recalculate()
 
-    def add_absolute_point(self, pos:Point):
-        pos_:ArrayLike = np.array([pos.x, pos.y])
-        self.points = np.append(self.points, pos_-self.origin, axis=0)
+    def add_absolute_point(self, pos:tuple[float,float]):
+        self.points = np.append(self.points, np.array(pos)-self.origin, axis=0)
         self.recalculate()
 

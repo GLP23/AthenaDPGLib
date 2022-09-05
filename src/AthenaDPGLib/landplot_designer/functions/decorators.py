@@ -13,36 +13,27 @@ import AthenaDPGLib.landplot_designer.data.memory as Memory
 # ----------------------------------------------------------------------------------------------------------------------
 # - Code -
 # ----------------------------------------------------------------------------------------------------------------------
-def update_renderable_chunks(before:bool=False):
-    if before:
-        def decorator_before(fnc):
-            @functools.wraps(fnc)
-            def wrapper(*args, **kwargs):
+def update_renderable_chunks(fnc):
+    """
+    Decorator which updates the boolean setting of all chunks dependent on the UI plot limits, scale and offset.
+    Both `Memory.chunk_manager` and `Memory.landplot_designer` have to be initialized before this method can be used.
+    Always executes the render checks after the wrapped function has been run.
+    """
+    @functools.wraps(fnc)
+    def wrapper(*args, **kwargs):
+        # Store the result to return afterwards
+        result = fnc(*args, **kwargs)
 
-                Memory.chunk_manager.update_chunks_if_renderable(
-                    plot_limit_min=Memory.landplot_designer.plot_limit_min,
-                    plot_limit_max=Memory.landplot_designer.plot_limit_max,
-                    plot_scale=Memory.landplot_designer.plot_scale,
-                    plot_offset=Memory.landplot_designer.plot_offset
-                )
-                return fnc(*args, **kwargs)
-            return wrapper
-        decorator = decorator_before
+        # The renderable boolean is stored on the actual chunk
+        #   This means we have to go through the `Memory.chunk_manager` to update these settings
+        Memory.chunk_manager.set_renderable_chunks(
+            plot_limit_min=Memory.landplot_designer.plot_limit_min,
+            plot_limit_max=Memory.landplot_designer.plot_limit_max,
+            plot_scale=Memory.landplot_designer.plot_scale,
+            plot_offset=Memory.landplot_designer.plot_offset
+        )
 
-    else:
-        def decorator_after(fnc):
-            @functools.wraps(fnc)
-            def wrapper(*args, **kwargs):
-                result = fnc(*args, **kwargs)
-
-                Memory.chunk_manager.update_chunks_if_renderable(
-                    plot_limit_min=Memory.landplot_designer.plot_limit_min,
-                    plot_limit_max=Memory.landplot_designer.plot_limit_max,
-                    plot_scale=Memory.landplot_designer.plot_scale,
-                    plot_offset=Memory.landplot_designer.plot_offset
-                )
-
-                return result
-            return wrapper
-        decorator = decorator_after
-    return decorator
+        # ALWAYS MAKE SURE YOU RETURN THE RESULT!
+        #   Else a decorator might have unexpected consequences
+        return result
+    return wrapper

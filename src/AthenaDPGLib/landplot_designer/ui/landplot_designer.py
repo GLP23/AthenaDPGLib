@@ -34,7 +34,7 @@ color_origin: COLOR = DARKRED
 # ----------------------------------------------------------------------------------------------------------------------
 @dataclass(slots=True, kw_only=True)
 class LandplotDesigner:
-    size_scale:float = 1.
+    size_scale:float = 1. # has to be a float for all numpy arrays to work correctly
 
     # tags used with dpg to assign items to
     #   defined as kwargs so the user can change these if for some reason a duplicate tag is created by the system
@@ -46,7 +46,7 @@ class LandplotDesigner:
     axis_y_tag:str = field(default=ut.landplot_axis_y.value)
 
     # - non init vars -
-    plot_axis_limit:float = field(init=False, default=10.) # Positive direction. Governs how "precise" the plot is
+    plot_axis_limit:float = field(init=False, default=100.) # Positive direction. Governs how "precise" the plot is
     _mouse_plot_pos_old:ArrayLike = field(init=False, default_factory=lambda :np.array((0., 0.)))
     _plot_offset:ArrayLike = field(init=False, default_factory=lambda :np.array((0., 0.)))
     _plot_scale:float = field(init=False, default=1.)
@@ -55,7 +55,11 @@ class LandplotDesigner:
     _plot_limit_max:ArrayLike = field(init=False)
     _plot_registry_callback:dict[int:Callable] = field(init=False)
 
+    # ------------------------------------------------------------------------------------------------------------------
+    # - Init and Properties-
+    # ------------------------------------------------------------------------------------------------------------------
     def __post_init__(self):
+        # Vars that depend on vars that are defined on init
         self._plot_limit_min = np.array([-self.plot_axis_limit, -self.plot_axis_limit])
         self._plot_limit_max = np.array([self.plot_axis_limit, self.plot_axis_limit])
         self._plot_registry_callback = {
@@ -63,6 +67,8 @@ class LandplotDesigner:
             dpg.mvKey_Subtract : self._plot_update_onvisible__key_down_subtract
         }
 
+    # Properties that are just getters of internal values
+    #   Most likely used for cross component functions
     @property
     def plot_limit_min(self):
         return self._plot_limit_min
@@ -97,7 +103,7 @@ class LandplotDesigner:
         with self.dpg(**kwargs):
             pass
 
-    @update_renderable_chunks()
+    @update_renderable_chunks
     @contextlib.contextmanager
     def dpg(self, width:int=1000, height:int=1000) -> int|str:
         """
@@ -116,7 +122,6 @@ class LandplotDesigner:
                             x=[0,1],
                             y=[0,1],
                             channel_count=2,
-                            # callback=self._custom_series_callback
                             callback=self._custom_series_callback
                         )
 
@@ -166,17 +171,24 @@ class LandplotDesigner:
     # - Custom Plot Offset system -
     # ------------------------------------------------------------------------------------------------------------------
     def _plot_update_onvisible(self):
+        """
+        Function which combines all callbacks for the "plot_on_visible" section of the registry
+        :return:
+        """
         if dpg.is_item_hovered(self.plot_tag):
             if dpg.is_mouse_button_dragging(dpg.mvMouseButton_Left, threshold=0.1):
                 self._plot_update_onvisible__dragging()
 
             for key, callback in self._plot_registry_callback.items():
-                if dpg.is_key_down(key=key):
+                if dpg.is_key_pressed(key=key) or dpg.is_key_down(key=key):
                     callback()
 
-    @update_renderable_chunks()
+    @update_renderable_chunks
     @run_in_mutex
     def _plot_update_onvisible__dragging(self):
+        """
+        When dragging on the plot
+        """
         pos_plot_space = np.array(dpg.get_plot_mouse_pos())
 
         if self._mouse_plot_pos_old.all() != np.array((0., 0.)).all():
@@ -184,20 +196,26 @@ class LandplotDesigner:
 
         self._mouse_plot_pos_old = pos_plot_space
 
-    @update_renderable_chunks()
+    @update_renderable_chunks
     @run_in_mutex
     def _plot_update_onvisible__key_down_add(self):
+        """
+        When the addition key is held down on the plot
+        """
         self._plot_scale += self._plot_scale_step
 
-    @update_renderable_chunks()
+    @update_renderable_chunks
     @run_in_mutex
     def _plot_update_onvisible__key_down_subtract(self):
+        """
+        When the subtraction key is held down on the plot
+        """
         if self._plot_scale <= self._plot_scale_step:
             self._plot_scale = self._plot_scale_step
         else:
             self._plot_scale -= self._plot_scale_step
 
-    @update_renderable_chunks()
+    @update_renderable_chunks
     @run_in_mutex
     def _plot_update_onclick(self):
         self._mouse_plot_pos_old = np.array([0.,0.])
@@ -224,34 +242,34 @@ class LandplotDesigner:
         # DO STUFF
         # --------------------------------------------------------------------------------------------------------------
         i = 0
-        for i, chunk in enumerate(Memory.chunk_manager.renderable_chunks()): #type: int, Chunk
-            dpg.draw_polygon(
-                    points=[
-                        (((point+self._plot_offset)*pos_difference)+pos_0_0)
-                        for point in chunk.points_absolute #type: ArrayLike
-                    ],
-                    fill=(0,255,0,32),
-                    color=(0,255,0,32),
-                    thickness=0
-                )
-            # for poly in chunk.land_plots: #type: Polygon
-            #     dpg.draw_polygon(
+        for i, chunk in enumerate(Memory.chunk_manager.get_renderable_chunks()): #type: int, Chunk
+            # dpg.draw_polygon(
             #         points=[
             #             (((point+self._plot_offset)*pos_difference)+pos_0_0)
-            #             for point in poly.points_absolute #type: ArrayLike
+            #             for point in chunk.points_absolute #type: ArrayLike
             #         ],
-            #         fill=color_fill,
-            #         color=color_border,
+            #         fill=(0,255,0,32),
+            #         color=(0,255,0,32),
             #         thickness=0
             #     )
-            #
-            #     dpg.draw_circle(
-            #         center=(((poly.origin+self._plot_offset)*pos_difference)+pos_0_0),
-            #         radius=5,
-            #         fill=color_origin,
-            #         color=color_origin,
-            #         thickness=0
-            #     )
+            for poly in chunk.land_plots: #type: Polygon
+                dpg.draw_polygon(
+                    points=[
+                        (((point+self._plot_offset)*pos_difference)+pos_0_0)
+                        for point in poly.points_absolute #type: ArrayLike
+                    ],
+                    fill=color_fill,
+                    color=color_border,
+                    thickness=0
+                )
+
+                dpg.draw_circle(
+                    center=(((poly.origin+self._plot_offset)*pos_difference)+pos_0_0),
+                    radius=5,
+                    fill=color_origin,
+                    color=color_origin,
+                    thickness=0
+                )
 
         # --------------------------------------------------------------------------------------------------------------
         # After everything has been drawn
