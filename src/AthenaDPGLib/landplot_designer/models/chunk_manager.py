@@ -34,12 +34,11 @@ class ChunkManager:
     def __post_init__(self):
         self._inverse_of_level_0_size = math.pow(self.chunk_side_lowest, -1)
 
-    def chunks(self) -> Generator[Chunk, Any, None]:
-        for level_of_chunks in self.chunk_levels(): #type:dict
-            for pos,chunk in level_of_chunks.items(): # type: Point, Chunk
-                if not chunk.renderable:
-                    continue
-                yield chunk
+    def renderable_chunks(self) -> Generator[Chunk, Any, None]:
+        for level_of_chunks in self._chunks.values(): #type: dict
+            for chunk in level_of_chunks.values(): # type: Chunk
+                if chunk.renderable:
+                    yield chunk
 
     def chunk_levels(self)-> Generator[tuple[int, dict[tuple[float,float]:Chunk]], Any, None]:
         for n, level_of_chunks in self._chunks.items(): #type:dict
@@ -81,3 +80,20 @@ class ChunkManager:
         chunk:Chunk = self.get_chunk(pos, level)
         chunk.land_plots.append(landplot)
 
+    def update_chunks_if_renderable(
+            self, plot_limit_min:ArrayLike, plot_limit_max:ArrayLike, plot_scale:float, plot_offset:ArrayLike
+    ):
+        for n,chunk_level in self.chunk_levels(): #type: int, dict[tuple[float,float]:Chunk]
+
+            margin = self.chunk_side_lowest ** n
+
+            TL_limit_margin = (plot_limit_min - margin ) * (1/plot_scale)
+            BR_limit_margin = (plot_limit_max + margin ) * (1/plot_scale)
+
+            for origin, chunk in chunk_level.items():
+                offset_chunk_origin = chunk.origin + plot_offset
+
+                chunk.renderable = np.logical_and(
+                    offset_chunk_origin > TL_limit_margin,
+                    offset_chunk_origin < BR_limit_margin
+                ).all()

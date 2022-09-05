@@ -15,5 +15,5 @@ from AthenaDPGLib.landplot_designer.models.polygon import Polygon
 # ----------------------------------------------------------------------------------------------------------------------
 @dataclass(slots=True, kw_only=True)
 class Chunk(Polygon):
-    renderable:bool = True
+    renderable:bool = False
     land_plots:list[Polygon] = field(init=False, default_factory=list)

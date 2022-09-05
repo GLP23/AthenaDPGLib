@@ -3,14 +3,12 @@
 # ----------------------------------------------------------------------------------------------------------------------
 # General Packages
 from __future__ import annotations
-
-import itertools
-
 import dearpygui.dearpygui as dpg
 import contextlib
 from dataclasses import dataclass, field
 import numpy as np
 from numpy.typing import ArrayLike
+from typing import Callable
 
 # Custom Library
 from AthenaLib.constants.types import COLOR
@@ -18,22 +16,23 @@ from AthenaColor.data.colors_html import DARKRED, ROYALBLUE
 
 # Custom Packages
 from AthenaDPGLib.landplot_designer.models.polygon import Polygon
-from AthenaDPGLib.landplot_designer.models.point import Point
 from AthenaDPGLib.landplot_designer.models.chunk import Chunk
-from AthenaDPGLib.landplot_designer.functions.polygon_constructors import test_polygons
 import AthenaDPGLib.landplot_designer.data.memory as Memory
+from AthenaDPGLib.landplot_designer.functions.decorators import update_renderable_chunks
 
-
-from AthenaDPGLib.general.functions.mutex import run_in_mutex_method
+from AthenaDPGLib.general.functions.mutex import run_in_mutex_method__as_callback, run_in_mutex
 from AthenaDPGLib.general.data.universal_tags import UniversalTags as ut
 
 # ----------------------------------------------------------------------------------------------------------------------
-# - Code -
+# - Support Code -
 # ----------------------------------------------------------------------------------------------------------------------
 color_fill: COLOR = ROYALBLUE
 color_border: COLOR = color_fill
 color_origin: COLOR = DARKRED
 
+# ----------------------------------------------------------------------------------------------------------------------
+# - Code -
+# ----------------------------------------------------------------------------------------------------------------------
 @dataclass(slots=True, kw_only=True)
 class LandplotDesigner:
     size_scale:float = 1.
@@ -55,10 +54,28 @@ class LandplotDesigner:
     _plot_scale_step:float = field(init=False, default=0.025)
     _plot_limit_min:ArrayLike = field(init=False)
     _plot_limit_max:ArrayLike = field(init=False)
+    _plot_registry_callback:dict[int:Callable] = field(init=False)
 
     def __post_init__(self):
         self._plot_limit_min = np.array([-self.plot_axis_limit, -self.plot_axis_limit])
         self._plot_limit_max = np.array([self.plot_axis_limit, self.plot_axis_limit])
+        self._plot_registry_callback = {
+            dpg.mvKey_Add : self._plot_update_onvisible__key_down_add,
+            dpg.mvKey_Subtract : self._plot_update_onvisible__key_down_subtract
+        }
+
+    @property
+    def plot_limit_min(self):
+        return self._plot_limit_min
+    @property
+    def plot_limit_max(self):
+        return self._plot_limit_max
+    @property
+    def plot_scale(self):
+        return self._plot_scale
+    @property
+    def plot_offset(self):
+        return self._plot_offset
 
     # ------------------------------------------------------------------------------------------------------------------
     # - Support methods for item scaling-
@@ -81,6 +98,7 @@ class LandplotDesigner:
         with self.dpg(**kwargs):
             pass
 
+    @update_renderable_chunks()
     @contextlib.contextmanager
     def dpg(self, width:int=1000, height:int=1000) -> int|str:
         """
@@ -107,6 +125,8 @@ class LandplotDesigner:
                 with dpg.group():
                     dpg.add_text(tag="chunks")
                     dpg.add_text(tag="polygons")
+                    dpg.add_text(tag="offset")
+                    dpg.add_text(tag="scale")
             yield window # what __enter__ returns
 
         # body of what otherwise would be: self.__exit__
@@ -147,32 +167,46 @@ class LandplotDesigner:
     # - Custom Plot Offset system -
     # ------------------------------------------------------------------------------------------------------------------
     def _plot_update_onvisible(self):
-        if dpg.is_mouse_button_dragging(dpg.mvMouseButton_Left, threshold=0.1):
-            with dpg.mutex():
-                pos_plot_space = np.array(dpg.get_plot_mouse_pos())
+        if dpg.is_item_hovered(self.plot_tag):
+            if dpg.is_mouse_button_dragging(dpg.mvMouseButton_Left, threshold=0.1):
+                self._plot_update_onvisible__dragging()
 
-                if self._mouse_plot_pos_old.all() != np.array((0., 0.)).all():
-                    self._plot_offset -= (self._mouse_plot_pos_old - pos_plot_space)*(1/self._plot_scale)
+            for key, callback in self._plot_registry_callback.items():
+                if dpg.is_key_down(key=key):
+                    callback()
 
-                self._mouse_plot_pos_old = pos_plot_space
+    @update_renderable_chunks()
+    @run_in_mutex
+    def _plot_update_onvisible__dragging(self):
+        pos_plot_space = np.array(dpg.get_plot_mouse_pos())
 
-        if dpg.is_key_down(key=dpg.mvKey_Add):
-            self._plot_scale += self._plot_scale_step
-            print(self._plot_scale)
+        if self._mouse_plot_pos_old.all() != np.array((0., 0.)).all():
+            self._plot_offset -= (self._mouse_plot_pos_old - pos_plot_space) * (1 / self._plot_scale)
 
-        if dpg.is_key_down(key=dpg.mvKey_Subtract):
+        self._mouse_plot_pos_old = pos_plot_space
+
+    @update_renderable_chunks()
+    @run_in_mutex
+    def _plot_update_onvisible__key_down_add(self):
+        self._plot_scale += self._plot_scale_step
+
+    @update_renderable_chunks()
+    @run_in_mutex
+    def _plot_update_onvisible__key_down_subtract(self):
+        if self._plot_scale <= self._plot_scale_step:
+            self._plot_scale = self._plot_scale_step
+        else:
             self._plot_scale -= self._plot_scale_step
-            if self._plot_scale <= 0:
-                self._plot_scale = 0.000_000_1
-            print(self._plot_scale)
 
+    @update_renderable_chunks()
+    @run_in_mutex
     def _plot_update_onclick(self):
         self._mouse_plot_pos_old = np.array([0.,0.])
 
     # ------------------------------------------------------------------------------------------------------------------
     # - Custom Series Callback -
     # ------------------------------------------------------------------------------------------------------------------
-    @run_in_mutex_method
+    @run_in_mutex_method__as_callback
     def _custom_series_callback(self, sender, app_data, user_data):
         global color_border, color_fill, color_fill
 
@@ -191,51 +225,39 @@ class LandplotDesigner:
         # DO STUFF
         # --------------------------------------------------------------------------------------------------------------
         i = 0
-        for n,chunk_level in Memory.chunk_manager.chunk_levels(): #type: int, dict[tuple[float,float]:Chunk]
-
-            margin = Memory.chunk_manager.chunk_side_lowest ** n
-
-            TL_limit_margin = (self._plot_limit_min - margin ) * (1/self._plot_scale)
-            BR_limit_margin = (self._plot_limit_max + margin ) * (1/self._plot_scale)
-
-            for origin, chunk in chunk_level.items():
-                offset_chunk_origin = chunk.origin + self._plot_offset
-
-                if np.logical_and(
-                    offset_chunk_origin > TL_limit_margin, offset_chunk_origin < BR_limit_margin
-                ).all():
-                    dpg.draw_polygon(
-                            points=[
-                                (((point+self._plot_offset)*pos_difference)+pos_0_0)
-                                for point in chunk.points_absolute #type: ArrayLike
-                            ],
-                            fill=(0,255,0,32),
-                            color=(0,255,0,32),
-                            thickness=0
-                        )
-                    for poly in chunk.land_plots: #type: Polygon
-                        dpg.draw_polygon(
-                            points=[
-                                (((point+self._plot_offset)*pos_difference)+pos_0_0)
-                                for point in poly.points_absolute #type: ArrayLike
-                            ],
-                            fill=color_fill,
-                            color=color_border,
-                            thickness=0
-                        )
-
-                        dpg.draw_circle(
-                            center=(((poly.origin+self._plot_offset)*pos_difference)+pos_0_0),
-                            radius=5,
-                            fill=color_origin,
-                            color=color_origin,
-                            thickness=0
-                        )
-
-                    i+=1
+        for i, chunk in enumerate(Memory.chunk_manager.renderable_chunks()): #type: int, Chunk
+            dpg.draw_polygon(
+                    points=[
+                        (((point+self._plot_offset)*pos_difference)+pos_0_0)
+                        for point in chunk.points_absolute #type: ArrayLike
+                    ],
+                    fill=(0,255,0,32),
+                    color=(0,255,0,32),
+                    thickness=0
+                )
+            # for poly in chunk.land_plots: #type: Polygon
+            #     dpg.draw_polygon(
+            #         points=[
+            #             (((point+self._plot_offset)*pos_difference)+pos_0_0)
+            #             for point in poly.points_absolute #type: ArrayLike
+            #         ],
+            #         fill=color_fill,
+            #         color=color_border,
+            #         thickness=0
+            #     )
+            #
+            #     dpg.draw_circle(
+            #         center=(((poly.origin+self._plot_offset)*pos_difference)+pos_0_0),
+            #         radius=5,
+            #         fill=color_origin,
+            #         color=color_origin,
+            #         thickness=0
+            #     )
 
         # --------------------------------------------------------------------------------------------------------------
         # After everything has been drawn
         dpg.pop_container_stack()
         dpg.set_value("polygons", f"poly: {len(dpg.get_item_children(sender,2))}")
         dpg.set_value("chunks", f"chunks: {i}")
+        dpg.set_value("offset", f"offset: {self._plot_offset}")
+        dpg.set_value("scale", f"scale: {self._plot_scale}")
