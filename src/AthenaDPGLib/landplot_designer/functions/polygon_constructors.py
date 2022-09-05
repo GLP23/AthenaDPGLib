@@ -7,7 +7,6 @@ import numpy as np
 from typing import Any, Generator
 
 # Custom Library
-from AthenaColor.data.colors_html import GOLD
 
 # Custom Packages
 from AthenaDPGLib.landplot_designer.models.polygon import Polygon

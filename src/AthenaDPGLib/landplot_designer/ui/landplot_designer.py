@@ -15,7 +15,6 @@ from AthenaLib.constants.types import COLOR
 from AthenaColor.data.colors_html import DARKRED, ROYALBLUE
 
 # Custom Packages
-from AthenaDPGLib.landplot_designer.models.polygon import Polygon
 from AthenaDPGLib.landplot_designer.models.chunk import Chunk
 import AthenaDPGLib.landplot_designer.data.memory as Memory
 from AthenaDPGLib.landplot_designer.functions.decorators import update_renderable_chunks

@@ -8,10 +8,10 @@ from dataclasses import dataclass, field
 from numpy.typing import ArrayLike
 
 # Custom Library
+from AthenaLib.math.arrays import calculate_center, calculate_largest_radius
 
 # Custom Packages
 from AthenaDPGLib.landplot_designer.models.point import Point
-from AthenaDPGLib.landplot_designer.functions.array_math import calculate_center, calculate_largest_radius
 
 # ----------------------------------------------------------------------------------------------------------------------
 # - Code -
