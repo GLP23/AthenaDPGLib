@@ -3,8 +3,6 @@
 # ----------------------------------------------------------------------------------------------------------------------
 # General Packages
 from __future__ import annotations
-
-import copy
 from dataclasses import dataclass, field
 import numpy as np
 from numpy.typing import ArrayLike
@@ -17,7 +15,7 @@ import math
 from AthenaDPGLib.landplot_designer.models.chunk import Chunk
 from AthenaDPGLib.landplot_designer.models.polygon import Polygon
 
-from AthenaDPGLib.landplot_designer.data.shapes import SQUARE
+from AthenaDPGLib.landplot_designer.data.shapes import SQUARE, SQUARE_FROM_CORNER
 
 # ----------------------------------------------------------------------------------------------------------------------
 # - Code -
@@ -66,7 +64,7 @@ class ChunkManager:
             #   The limits are grouped as positive and negative values and not the TopLeft and BottomRight coords
             #   This makes it very easy to check if the chunk origin is between these values
             #       Instead of doing a bit more complicated math
-            margin = self.chunk_side_lowest ** n
+            margin = self.chunk_side_lowest ** (n+1)
             negative_limits = (plot_limit_min - margin) * (1 / plot_scale)
             positive_limits = (plot_limit_max + margin) * (1 / plot_scale)
 
@@ -123,8 +121,13 @@ class ChunkManager:
         Simple function to create a new Chunk.
         The Chunk shape is always a perfect square
         """
-        return Chunk.new_from_absolute(
-            points=(SQUARE * (self.chunk_side_lowest ** level)) + pos
+        # TODO
+        #   Find a way to map out the chunks so that:
+        #   4 of the level-1 fit into the current level
+        #   Aka recursive shapes of nested 2x2 squares
+        return Chunk.new_from_local(
+            points=(SQUARE * (self.chunk_side_lowest ** level)),
+            origin=pos
         )
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -144,7 +147,7 @@ class ChunkManager:
         #   after the chunk has been gathered (or created)
         #   The landplot can be added to the chunk
         chunk:Chunk = self.get_chunk(
-            pos=chunk_side * (landplot.origin / chunk_side),
+            pos=chunk_side * np.round(landplot.origin / chunk_side),
             level=chunk_level
         )
         chunk.land_plots.append(landplot)

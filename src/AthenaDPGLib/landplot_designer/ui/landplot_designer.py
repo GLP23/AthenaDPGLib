@@ -173,7 +173,6 @@ class LandplotDesigner:
     def _plot_update_onvisible(self):
         """
         Function which combines all callbacks for the "plot_on_visible" section of the registry
-        :return:
         """
         if dpg.is_item_hovered(self.plot_tag):
             if dpg.is_mouse_button_dragging(dpg.mvMouseButton_Left, threshold=0.1):
@@ -191,6 +190,7 @@ class LandplotDesigner:
         """
         pos_plot_space = np.array(dpg.get_plot_mouse_pos())
 
+        # noinspection PyUnresolvedReferences
         if self._mouse_plot_pos_old.all() != np.array((0., 0.)).all():
             self._plot_offset -= (self._mouse_plot_pos_old - pos_plot_space) * (1 / self._plot_scale)
 
@@ -224,7 +224,7 @@ class LandplotDesigner:
     # - Custom Series Callback -
     # ------------------------------------------------------------------------------------------------------------------
     @run_in_mutex_method__as_callback
-    def _custom_series_callback(self, sender, app_data, user_data):
+    def _custom_series_callback(self, sender, app_data, _):
         global color_border, color_fill, color_fill
 
         # todo
@@ -243,28 +243,31 @@ class LandplotDesigner:
         # --------------------------------------------------------------------------------------------------------------
         i = 0
         for i, chunk in enumerate(Memory.chunk_manager.get_renderable_chunks()): #type: int, Chunk
-            # dpg.draw_polygon(
-            #         points=[
-            #             (((point+self._plot_offset)*pos_difference)+pos_0_0)
-            #             for point in chunk.points_absolute #type: ArrayLike
-            #         ],
-            #         fill=(0,255,0,32),
-            #         color=(0,255,0,32),
-            #         thickness=0
-            #     )
-            for poly in chunk.land_plots: #type: Polygon
-                dpg.draw_polygon(
-                    points=[
-                        (((point+self._plot_offset)*pos_difference)+pos_0_0)
-                        for point in poly.points_absolute #type: ArrayLike
-                    ],
-                    fill=color_fill,
-                    color=color_border,
-                    thickness=0
-                )
+            dpg.draw_polygon(
+                points=[
+                    (((point+self._plot_offset)*pos_difference)+pos_0_0)
+                    for point in chunk.points_absolute #type: ArrayLike
+                ],
+                fill=(0,255,0,32),
+                color=(0,255,0,32),
+                thickness=0
+            )
+
+        for i, chunk in enumerate(Memory.chunk_manager.get_renderable_chunks()):  # type: int, Chunk
+            for land_plot in chunk.land_plots:
+                pass
+                # dpg.draw_polygon(
+                #     points=[
+                #         (((point+self._plot_offset)*pos_difference)+pos_0_0)
+                #         for point in land_plot.points_absolute #type: ArrayLike
+                #     ],
+                #     fill=color_fill,
+                #     color=color_border,
+                #     thickness=0
+                # )
 
                 dpg.draw_circle(
-                    center=(((poly.origin+self._plot_offset)*pos_difference)+pos_0_0),
+                    center=(((land_plot.origin + self._plot_offset) * pos_difference) + pos_0_0),
                     radius=5,
                     fill=color_origin,
                     color=color_origin,

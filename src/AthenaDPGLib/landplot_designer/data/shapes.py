@@ -19,3 +19,10 @@ SQUARE:ArrayLike = np.array([
     [.5 ,  .5],
     [.5 , -.5]
 ])
+
+SQUARE_FROM_CORNER:ArrayLike = np.array([
+    [0., 0.],
+    [0., 1.],
+    [1., 1.],
+    [1., 0.]
+])
