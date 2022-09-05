@@ -25,34 +25,35 @@ from AthenaDPGLib.landplot_designer.data.shapes import SQUARE
 # ----------------------------------------------------------------------------------------------------------------------
 @dataclass(slots=True, kw_only=True)
 class ChunkManager:
-    level_0_size:float = 2.
+    chunk_side_lowest:float = 2.
 
     # - non init vars -
     _inverse_of_level_0_size:float = field(init=False)
-    _chunks:list[dict[tuple[float,float]:Chunk]] = field(init=False, default_factory=lambda:[None]*100)
+    _chunks:dict[int:dict[tuple[float,float]:Chunk]] = field(init=False, default_factory=dict)
 
     def __post_init__(self):
-        self._inverse_of_level_0_size = math.pow(self.level_0_size,-1)
+        self._inverse_of_level_0_size = math.pow(self.chunk_side_lowest, -1)
 
     def chunks(self) -> Generator[Chunk, Any, None]:
-        for level_of_chunks in self._chunks: #type:dict
-            if level_of_chunks is None:
-                continue
+        for level_of_chunks in self.chunk_levels(): #type:dict
             for pos,chunk in level_of_chunks.items(): # type: Point, Chunk
                 if not chunk.renderable:
                     continue
                 yield chunk
 
+    def chunk_levels(self)-> Generator[tuple[int, dict[tuple[float,float]:Chunk]], Any, None]:
+        for n, level_of_chunks in self._chunks.items(): #type:dict
+            yield n, level_of_chunks
+
     def _new_chunk(self, pos:Point, level:int) -> Chunk:
-        return Chunk.new_from_local(
-            origin=pos.pos,
-            points=(SQUARE * (self.level_0_size ** level))
+        return Chunk.new_from_absolute(
+            points=(SQUARE * (self.chunk_side_lowest ** level)) + pos.pos
         )
 
     def get_chunk(self, pos:Point, level:int)-> Chunk:
         pos_tuple = (pos.x, pos.y)
 
-        if self._chunks[level] is None:
+        if level not in self._chunks:
             self._chunks[level] = {pos_tuple: (chunk:=self._new_chunk(pos=pos, level=level))}
             return chunk
 
@@ -64,16 +65,18 @@ class ChunkManager:
             self._chunks[level][pos_tuple] = chunk
             return chunk
 
+
     def add_landplot(self, landplot:Polygon):
+        level = int(math.log2(math.ceil(landplot.largest_radius / self.chunk_side_lowest) * self.chunk_side_lowest)) + 1
 
-        level:int = round(math.pow(landplot.largest_radius, self._inverse_of_level_0_size))
-
-        pos = Point()
-        # new_array = np.array([0.,0.]) + landplot.origin
-        power = self.level_0_size**level
+        power = self.chunk_side_lowest ** level
         calc = lambda p : power * round(p / power)
 
-        pos._pos = np.array([calc(landplot.origin[0]), calc(landplot.origin[1])])
+        pos = Point.from_array(
+            np.array(
+                [calc(landplot.origin[0]), calc(landplot.origin[1])]
+            )
+        )
 
         chunk:Chunk = self.get_chunk(pos, level)
         chunk.land_plots.append(landplot)

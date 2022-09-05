@@ -18,6 +18,7 @@ from AthenaColor.data.colors_html import DARKRED, ROYALBLUE
 
 # Custom Packages
 from AthenaDPGLib.landplot_designer.models.polygon import Polygon
+from AthenaDPGLib.landplot_designer.models.point import Point
 from AthenaDPGLib.landplot_designer.models.chunk import Chunk
 from AthenaDPGLib.landplot_designer.functions.polygon_constructors import test_polygons
 import AthenaDPGLib.landplot_designer.data.memory as Memory
@@ -29,8 +30,8 @@ from AthenaDPGLib.general.data.universal_tags import UniversalTags as ut
 # ----------------------------------------------------------------------------------------------------------------------
 # - Code -
 # ----------------------------------------------------------------------------------------------------------------------
-color_fill: COLOR = ROYALBLUE
-color_border: COLOR = ROYALBLUE
+color_fill: COLOR = (*ROYALBLUE,32)
+color_border: COLOR = color_fill
 color_origin: COLOR = DARKRED
 
 @dataclass(slots=True, kw_only=True)
@@ -113,9 +114,7 @@ class LandplotDesigner:
         #   this is due to the fact that the plot will not be used as a plot
         #   but as the "center of the camera axis"
         # dpg.set_axis_limits(tag, ymin=-self.plot_axis_limit, ymax=self.plot_axis_limit)
-        # dpg.set_axis_limits(tag, ymin=-5000, ymax=5000)
-
-
+        # dpg.set_axis_limits(tag, ymin=-10_000, ymax=10_000)
 
     # ------------------------------------------------------------------------------------------------------------------
     # - Custom Series Callback -
@@ -127,7 +126,16 @@ class LandplotDesigner:
         # todo
         #   check if this can be created once and then just stored
         pos_0_0 = np.array([app_data[1][0],app_data[2][0]])
-        pos_difference = np.array([app_data[1][1],app_data[2][1]])-pos_0_0
+        pos_1_1 = np.array([app_data[1][1],app_data[2][1]])
+        pos_difference = pos_1_1-pos_0_0
+
+        x_min, x_max = dpg.get_axis_limits(self.axis_x_tag)
+        y_min, y_max = dpg.get_axis_limits(self.axis_y_tag)
+
+        TL_limit = np.array([float(x_min), float(y_min)])
+        BR_limit = np.array([float(x_max), float(y_max)])
+
+        chunk_side_lowest = Memory.chunk_manager.chunk_side_lowest
 
         # delete old drawn items
         #   else we won't update, but simply append to the old image
@@ -137,41 +145,63 @@ class LandplotDesigner:
 
         # DO STUFF
         # --------------------------------------------------------------------------------------------------------------
-        for chunk in Memory.chunk_manager.chunks(): #type: Polygon
-            dpg.draw_polygon(
-                points=[
-                    (point*pos_difference)+pos_0_0
-                    for point in chunk.points_absolute #type: ArrayLike
-                ],
-                fill=(0,255,0,32),
-                color=(0,255,0,32),
-                thickness=0
-            )
+        for n,chunk_level in Memory.chunk_manager.chunk_levels(): #type: int, dict[tuple[float,float]:Chunk]
+            offset = Memory.chunk_manager.chunk_side_lowest ** n
 
-        for poly in  (
-                landplot
-                for chunk in Memory.chunk_manager.chunks() #type: Chunk
-                for landplot in chunk.land_plots
-            ):
-            # print(poly)
-            dpg.draw_polygon(
-                points=[
-                    (point*pos_difference)+pos_0_0
-                    for point in poly.points_absolute #type: ArrayLike
-                ],
-                fill=color_fill,
-                color=color_border,
-                thickness=0
-            )
+            for origin, chunk in chunk_level.items():
+                if np.logical_and(
+                    chunk.origin > TL_limit-offset, chunk.origin < BR_limit+offset
+                ).all():
+                    dpg.draw_polygon(
+                            points=[
+                                (point*pos_difference)+pos_0_0
+                                for point in chunk.points_absolute #type: ArrayLike
+                            ],
+                            fill=(0,255,0,32),
+                            color=(0,255,0,32),
+                            thickness=0
+                        )
+                    for poly in chunk.land_plots: #type: Polygon
+                        dpg.draw_polygon(
+                            points=[
+                                (point*pos_difference)+pos_0_0
+                                for point in poly.points_absolute #type: ArrayLike
+                            ],
+                            fill=color_fill,
+                            color=color_border,
+                            thickness=0
+                        )
 
-            dpg.draw_circle(
-                center=(poly.origin*pos_difference)+pos_0_0,
-                radius=5,
-                fill=color_origin,
-                color=color_origin,
-                thickness=0
-            )
+                        dpg.draw_circle(
+                            center=(poly.origin*pos_difference)+pos_0_0,
+                            radius=5,
+                            fill=color_origin,
+                            color=color_origin,
+                            thickness=0
+                        )
+
+
+
+        # for chunk in Memory.chunk_manager.chunks(): #type: Polygon
+        #     dpg.draw_polygon(
+        #         points=[
+        #             (point*pos_difference)+pos_0_0
+        #             for point in chunk.points_absolute #type: ArrayLike
+        #         ],
+        #         fill=(0,255,0,32),
+        #         color=(0,255,0,32),
+        #         thickness=0
+        #     )
+        #
+        # for poly in  (
+        #         landplot
+        #         for chunk in Memory.chunk_manager.chunks() #type: Chunk
+        #         for landplot in chunk.land_plots
+        #     ):
+        #     # print(poly)
+        #
 
         # --------------------------------------------------------------------------------------------------------------
         # After everything has been drawn
         dpg.pop_container_stack()
+        print(len(dpg.get_item_children(sender,2)))
