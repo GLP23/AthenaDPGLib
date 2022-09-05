@@ -22,6 +22,8 @@ def main():
 
     dpg.set_primary_window(Memory.landplot_designer.window_tag, True)
 
+    dpg.show_metrics()
+
     dpg.setup_dearpygui()
     dpg.show_viewport()
     dpg.start_dearpygui()

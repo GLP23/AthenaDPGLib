@@ -43,11 +43,22 @@ class LandplotDesigner:
     #   by default they use tags imported from the UniversalTags enum
     window_tag:str = field(default=ut.landplot_window.value)
     plot_tag:str = field(default=ut.landplot_plot.value)
+    plot_registry_tag:str = field(default=ut.landplot_plot_registry.value)
     axis_x_tag:str = field(default=ut.landplot_axis_x.value)
     axis_y_tag:str = field(default=ut.landplot_axis_y.value)
 
     # - non init vars -
-    plot_axis_limit:int = field(init=False, default=10) # Positive direction. Governs how "precise" the plot is
+    plot_axis_limit:float = field(init=False, default=10.) # Positive direction. Governs how "precise" the plot is
+    _mouse_plot_pos_old:ArrayLike = field(init=False, default_factory=lambda :np.array((0., 0.)))
+    _plot_offset:ArrayLike = field(init=False, default_factory=lambda :np.array((0., 0.)))
+    _plot_scale:float = field(init=False, default=1.)
+    _plot_scale_step:float = field(init=False, default=0.025)
+    _plot_limit_min:ArrayLike = field(init=False)
+    _plot_limit_max:ArrayLike = field(init=False)
+
+    def __post_init__(self):
+        self._plot_limit_min = np.array([-self.plot_axis_limit, -self.plot_axis_limit])
+        self._plot_limit_max = np.array([self.plot_axis_limit, self.plot_axis_limit])
 
     # ------------------------------------------------------------------------------------------------------------------
     # - Support methods for item scaling-
@@ -78,23 +89,29 @@ class LandplotDesigner:
         """
         # body of what otherwise would be: self.__enter__
         with dpg.window(tag=self.window_tag,width=width,height=height) as window:
-            # ----------------------------------------------------------------------------------------------------------
-            # Create the plot and all it's systems
-            with dpg.plot(tag=self.plot_tag, width=self._s(750), height=self._s(750)):
-                with self._constructor_plot_axis(axis=dpg.mvXAxis, tag=self.axis_x_tag): pass
-                with self._constructor_plot_axis(axis=dpg.mvYAxis, tag=self.axis_y_tag):
-                    dpg.add_custom_series(
-                        x=[0,1],
-                        y=[0,1],
-                        channel_count=2,
-                        # callback=self._custom_series_callback
-                        callback=self._custom_series_callback
-                    )
+            with dpg.group(horizontal=True):
+                # ------------------------------------------------------------------------------------------------------
+                # Create the plot and all it's systems
+                with dpg.plot(tag=self.plot_tag, width=self._s(750), height=self._s(750)):
+                    with self._constructor_plot_axis(axis=dpg.mvXAxis, tag=self.axis_x_tag): pass
+                    with self._constructor_plot_axis(axis=dpg.mvYAxis, tag=self.axis_y_tag):
+                        dpg.add_custom_series(
+                            x=[0,1],
+                            y=[0,1],
+                            channel_count=2,
+                            # callback=self._custom_series_callback
+                            callback=self._custom_series_callback
+                        )
 
-            # ----------------------------------------------------------------------------------------------------------
+                # ------------------------------------------------------------------------------------------------------
+                with dpg.group():
+                    dpg.add_text(tag="chunks")
+                    dpg.add_text(tag="polygons")
             yield window # what __enter__ returns
 
         # body of what otherwise would be: self.__exit__
+        #   Functions that depend on DPG items already existing
+        self.registry_system()
 
     @contextlib.contextmanager
     def _constructor_plot_axis(self, axis:int, tag:str) -> int|str:
@@ -115,6 +132,43 @@ class LandplotDesigner:
         #   but as the "center of the camera axis"
         dpg.set_axis_limits(tag, ymin=-self.plot_axis_limit, ymax=self.plot_axis_limit)
 
+    def registry_system(self):
+        # Registry : PLOT
+        with dpg.item_handler_registry(tag=self.plot_registry_tag):
+            dpg.add_item_visible_handler(callback=self._plot_update_onvisible)
+            dpg.add_item_clicked_handler(callback=self._plot_update_onclick)
+
+        dpg.bind_item_handler_registry(
+            handler_registry=self.plot_registry_tag,
+            item=self.plot_tag
+        )
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # - Custom Plot Offset system -
+    # ------------------------------------------------------------------------------------------------------------------
+    def _plot_update_onvisible(self):
+        if dpg.is_mouse_button_dragging(dpg.mvMouseButton_Left, threshold=0.1):
+            with dpg.mutex():
+                pos_plot_space = np.array(dpg.get_plot_mouse_pos())
+
+                if self._mouse_plot_pos_old.all() != np.array((0., 0.)).all():
+                    self._plot_offset -= (self._mouse_plot_pos_old - pos_plot_space)*(1/self._plot_scale)
+
+                self._mouse_plot_pos_old = pos_plot_space
+
+        if dpg.is_key_down(key=dpg.mvKey_Add):
+            self._plot_scale += self._plot_scale_step
+            print(self._plot_scale)
+
+        if dpg.is_key_down(key=dpg.mvKey_Subtract):
+            self._plot_scale -= self._plot_scale_step
+            if self._plot_scale <= 0:
+                self._plot_scale = 0.000_000_1
+            print(self._plot_scale)
+
+    def _plot_update_onclick(self):
+        self._mouse_plot_pos_old = np.array([0.,0.])
+
     # ------------------------------------------------------------------------------------------------------------------
     # - Custom Series Callback -
     # ------------------------------------------------------------------------------------------------------------------
@@ -126,15 +180,7 @@ class LandplotDesigner:
         #   check if this can be created once and then just stored
         pos_0_0 = np.array([app_data[1][0],app_data[2][0]])
         pos_1_1 = np.array([app_data[1][1],app_data[2][1]])
-        pos_difference = pos_1_1-pos_0_0
-
-        x_min, x_max = dpg.get_axis_limits(self.axis_x_tag)
-        y_min, y_max = dpg.get_axis_limits(self.axis_y_tag)
-
-        TL_limit = np.array([float(x_min), float(y_min)])
-        BR_limit = np.array([float(x_max), float(y_max)])
-
-        chunk_side_lowest = Memory.chunk_manager.chunk_side_lowest
+        pos_difference = (pos_1_1-pos_0_0) * self._plot_scale
 
         # delete old drawn items
         #   else we won't update, but simply append to the old image
@@ -144,18 +190,23 @@ class LandplotDesigner:
 
         # DO STUFF
         # --------------------------------------------------------------------------------------------------------------
+        i = 0
         for n,chunk_level in Memory.chunk_manager.chunk_levels(): #type: int, dict[tuple[float,float]:Chunk]
+
             margin = Memory.chunk_manager.chunk_side_lowest ** n
-            TL_limit_margin = TL_limit-margin
-            BR_limit_margin = BR_limit+margin
+
+            TL_limit_margin = (self._plot_limit_min - margin ) * (1/self._plot_scale)
+            BR_limit_margin = (self._plot_limit_max + margin ) * (1/self._plot_scale)
 
             for origin, chunk in chunk_level.items():
+                offset_chunk_origin = chunk.origin + self._plot_offset
+
                 if np.logical_and(
-                    chunk.origin > TL_limit_margin, chunk.origin < BR_limit_margin
+                    offset_chunk_origin > TL_limit_margin, offset_chunk_origin < BR_limit_margin
                 ).all():
                     dpg.draw_polygon(
                             points=[
-                                (point*pos_difference)+pos_0_0
+                                (((point+self._plot_offset)*pos_difference)+pos_0_0)
                                 for point in chunk.points_absolute #type: ArrayLike
                             ],
                             fill=(0,255,0,32),
@@ -165,7 +216,7 @@ class LandplotDesigner:
                     for poly in chunk.land_plots: #type: Polygon
                         dpg.draw_polygon(
                             points=[
-                                (point*pos_difference)+pos_0_0
+                                (((point+self._plot_offset)*pos_difference)+pos_0_0)
                                 for point in poly.points_absolute #type: ArrayLike
                             ],
                             fill=color_fill,
@@ -174,13 +225,17 @@ class LandplotDesigner:
                         )
 
                         dpg.draw_circle(
-                            center=(poly.origin*pos_difference)+pos_0_0,
+                            center=(((poly.origin+self._plot_offset)*pos_difference)+pos_0_0),
                             radius=5,
                             fill=color_origin,
                             color=color_origin,
                             thickness=0
                         )
 
+                    i+=1
+
         # --------------------------------------------------------------------------------------------------------------
         # After everything has been drawn
         dpg.pop_container_stack()
+        dpg.set_value("polygons", f"poly: {len(dpg.get_item_children(sender,2))}")
+        dpg.set_value("chunks", f"chunks: {i}")

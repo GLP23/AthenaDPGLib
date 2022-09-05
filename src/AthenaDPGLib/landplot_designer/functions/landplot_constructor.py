@@ -38,11 +38,11 @@ def landplot_constructor():
     # chunk manager system
     Memory.chunk_manager = ChunkManager()
     for i in range(1_000):
-        offset_x = float(random.randint(-10_000, 10_000))
-        offset_y = float(random.randint(-10_000, 10_000))
+        offset_x = float(random.randint(-100, 100))
+        offset_y = float(random.randint(-100, 100))
 
-        scale_x = float(random.randint(1, 100))
-        scale_y = float(random.randint(1, 100))
+        scale_x = float(random.randint(1, 10))
+        scale_y = float(random.randint(1, 10))
 
         Memory.chunk_manager.add_landplot(
             landplot=Polygon.new_from_local(
