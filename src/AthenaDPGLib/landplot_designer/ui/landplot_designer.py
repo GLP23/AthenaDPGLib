@@ -15,6 +15,7 @@ from AthenaLib.constants.types import COLOR
 from AthenaColor.data.colors_html import DARKRED, ROYALBLUE
 
 # Custom Packages
+from AthenaDPGLib.landplot_designer.ui._custom_dpg_item import CustomDPGItem
 from AthenaDPGLib.landplot_designer.models.chunk import Chunk
 import AthenaDPGLib.landplot_designer.data.memory as Memory
 from AthenaDPGLib.landplot_designer.functions.decorators import update_renderable_chunks
@@ -33,7 +34,7 @@ color_origin: COLOR = DARKRED
 # - Code -
 # ----------------------------------------------------------------------------------------------------------------------
 @dataclass(slots=True, kw_only=True)
-class LandplotDesigner:
+class LandplotDesigner(CustomDPGItem):
     size_scale:float = 1. # has to be a float for all numpy arrays to work correctly
 
     # tags used with dpg to assign items to
@@ -44,6 +45,10 @@ class LandplotDesigner:
     plot_registry_tag:str = field(default=ut.landplot_plot_registry.value)
     axis_x_tag:str = field(default=ut.landplot_axis_x.value)
     axis_y_tag:str = field(default=ut.landplot_axis_y.value)
+
+    plot_show_chunks:bool = False
+    plot_show_polygons:bool = True
+    plot_show_origins:bool = True
 
     # - non init vars -
     plot_axis_limit:float = field(init=False, default=100.) # Positive direction. Governs how "precise" the plot is
@@ -96,20 +101,12 @@ class LandplotDesigner:
     # - DPG methods -
     # ------------------------------------------------------------------------------------------------------------------
     def add_dpg(self, **kwargs):
-        """
-        Equivalent of a dpg function that adds an item to the stack without being context managed
-        It runs the context managed functions and doesn't return anything.
-        """
         with self.dpg(**kwargs):
             pass
 
     @update_renderable_chunks
     @contextlib.contextmanager
     def dpg(self, width:int=1000, height:int=1000) -> int|str:
-        """
-        Equivalent of a dpg function that is context managed.
-        Returns the tag of the window. This way it can be used to define more functions within it's `with` body.
-        """
         # body of what otherwise would be: self.__enter__
         with dpg.window(tag=self.window_tag,width=width,height=height) as window:
             with dpg.group(horizontal=True):
@@ -125,17 +122,17 @@ class LandplotDesigner:
                             callback=self._custom_series_callback
                         )
 
-                # ------------------------------------------------------------------------------------------------------
-                with dpg.group():
-                    dpg.add_text(tag="chunks")
-                    dpg.add_text(tag="polygons")
-                    dpg.add_text(tag="offset")
-                    dpg.add_text(tag="scale")
+                dpg.add_button(label="Show Debug", callback=self._show_debug_callback)
+
             yield window # what __enter__ returns
 
         # body of what otherwise would be: self.__exit__
         #   Functions that depend on DPG items already existing
         self.registry_system()
+
+    def _show_debug_callback(self):
+        if not dpg.is_item_shown(ut.landplot_debug_window.value):
+            dpg.show_item(ut.landplot_debug_window.value)
 
     @contextlib.contextmanager
     def _constructor_plot_axis(self, axis:int, tag:str) -> int|str:
@@ -145,9 +142,9 @@ class LandplotDesigner:
         with dpg.plot_axis(
             axis=axis,
             tag=tag,
-            # no_gridlines=True,
-            # no_tick_marks=True,
-            # no_tick_labels=True
+            no_gridlines=True,
+            no_tick_marks=True,
+            no_tick_labels=True
         ) as plot:
             yield plot
 
@@ -232,6 +229,7 @@ class LandplotDesigner:
         pos_0_0 = np.array([app_data[1][0],app_data[2][0]])
         pos_1_1 = np.array([app_data[1][1],app_data[2][1]])
         pos_difference = (pos_1_1-pos_0_0) * self._plot_scale
+        i=0
 
         # delete old drawn items
         #   else we won't update, but simply append to the old image
@@ -241,38 +239,39 @@ class LandplotDesigner:
 
         # DO STUFF
         # --------------------------------------------------------------------------------------------------------------
-        i = 0
-        for i, chunk in enumerate(Memory.chunk_manager.get_renderable_chunks()): #type: int, Chunk
-            dpg.draw_polygon(
-                points=[
-                    (((point+self._plot_offset)*pos_difference)+pos_0_0)
-                    for point in chunk.points_absolute #type: ArrayLike
-                ],
-                fill=(0,255,0,32),
-                color=(0,255,0,32),
-                thickness=0
-            )
-
-        for i, chunk in enumerate(Memory.chunk_manager.get_renderable_chunks()):  # type: int, Chunk
-            for land_plot in chunk.land_plots:
-                pass
-                # dpg.draw_polygon(
-                #     points=[
-                #         (((point+self._plot_offset)*pos_difference)+pos_0_0)
-                #         for point in land_plot.points_absolute #type: ArrayLike
-                #     ],
-                #     fill=color_fill,
-                #     color=color_border,
-                #     thickness=0
-                # )
-
-                dpg.draw_circle(
-                    center=(((land_plot.origin + self._plot_offset) * pos_difference) + pos_0_0),
-                    radius=5,
-                    fill=color_origin,
-                    color=color_origin,
+        if self.plot_show_chunks:
+            for i, chunk in enumerate(Memory.chunk_manager.get_renderable_chunks()): #type: int, Chunk
+                dpg.draw_polygon(
+                    points=[
+                        (((point+self._plot_offset)*pos_difference)+pos_0_0)
+                        for point in chunk.points_absolute #type: ArrayLike
+                    ],
+                    fill=(0,255,0,32),
+                    color=(0,255,0,32),
                     thickness=0
                 )
+
+        if self.plot_show_polygons or self.plot_show_origins:
+            for i, chunk in enumerate(Memory.chunk_manager.get_renderable_chunks()):  # type: int, Chunk
+                for land_plot in chunk.land_plots:
+                    if self.plot_show_polygons:
+                        dpg.draw_polygon(
+                            points=[
+                                (((point+self._plot_offset)*pos_difference)+pos_0_0)
+                                for point in land_plot.points_absolute #type: ArrayLike
+                            ],
+                            fill=color_fill,
+                            color=color_border,
+                            thickness=0
+                        )
+                    if self.plot_show_origins:
+                        dpg.draw_circle(
+                            center=(((land_plot.origin + self._plot_offset) * pos_difference) + pos_0_0),
+                            radius=5,
+                            fill=color_origin,
+                            color=color_origin,
+                            thickness=0
+                        )
 
         # --------------------------------------------------------------------------------------------------------------
         # After everything has been drawn

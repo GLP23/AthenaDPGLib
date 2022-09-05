@@ -10,6 +10,7 @@ import numpy as np
 
 # Custom Packages
 from AthenaDPGLib.landplot_designer.ui.landplot_designer import LandplotDesigner
+from AthenaDPGLib.landplot_designer.ui.landplot_designer_debug import LandplotDesignerDebug
 
 from AthenaDPGLib.landplot_designer.models.chunk_manager import ChunkManager
 from AthenaDPGLib.landplot_designer.models.polygon import Polygon
@@ -35,11 +36,11 @@ def landplot_constructor():
     # chunk manager system
     Memory.chunk_manager = ChunkManager()
     for i in range(10_000):
-        offset_x = float(random.randint(-10_000, 10_000))
-        offset_y = float(random.randint(-10_000, 10_000))
+        offset_x = float(random.randint(-1_000, 1_000))
+        offset_y = float(random.randint(-1_000, 1_000))
 
-        scale_x = float(random.randint(1, 100))
-        scale_y = float(random.randint(1, 100))
+        scale_x = random.randint(1, 10_000)/100
+        scale_y = random.randint(1, 10_000)/100
 
         Memory.chunk_manager.add_landplot(
             landplot=Polygon.new_from_local(
@@ -54,3 +55,6 @@ def landplot_constructor():
     # landplot designer main window
     Memory.landplot_designer = LandplotDesigner()
     Memory.landplot_designer.add_dpg()
+
+    Memory.landplot_designer_debug = LandplotDesignerDebug()
+    Memory.landplot_designer_debug.add_dpg()

@@ -14,3 +14,4 @@ from __future__ import annotations
 # ----------------------------------------------------------------------------------------------------------------------
 global chunk_manager
 global landplot_designer
+global landplot_designer_debug
