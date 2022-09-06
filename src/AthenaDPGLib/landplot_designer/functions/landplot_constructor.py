@@ -36,8 +36,8 @@ def landplot_constructor():
     # chunk manager system
     Memory.chunk_manager = ChunkManager()
     for i in range(10_000):
-        offset_x = float(random.randint(-1_000, 1_000))
-        offset_y = float(random.randint(-1_000, 1_000))
+        offset_x = float(random.randint(-10_000, 10_000))
+        offset_y = float(random.randint(-10_000, 10_000))
 
         scale_x = random.randint(1, 10_000)/100
         scale_y = random.randint(1, 10_000)/100

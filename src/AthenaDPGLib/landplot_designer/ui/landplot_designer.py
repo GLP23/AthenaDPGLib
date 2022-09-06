@@ -21,7 +21,7 @@ import AthenaDPGLib.landplot_designer.data.memory as Memory
 from AthenaDPGLib.landplot_designer.functions.decorators import update_renderable_chunks
 
 from AthenaDPGLib.general.functions.mutex import run_in_mutex_method__as_callback, run_in_mutex
-from AthenaDPGLib.general.data.universal_tags import UniversalTags as ut
+import AthenaDPGLib.general.data.universal_tags as ut
 
 # ----------------------------------------------------------------------------------------------------------------------
 # - Support Code -
@@ -40,11 +40,11 @@ class LandplotDesigner(CustomDPGItem):
     # tags used with dpg to assign items to
     #   defined as kwargs so the user can change these if for some reason a duplicate tag is created by the system
     #   by default they use tags imported from the UniversalTags enum
-    window_tag:str = field(default=ut.landplot_window.value)
-    plot_tag:str = field(default=ut.landplot_plot.value)
-    plot_registry_tag:str = field(default=ut.landplot_plot_registry.value)
-    axis_x_tag:str = field(default=ut.landplot_axis_x.value)
-    axis_y_tag:str = field(default=ut.landplot_axis_y.value)
+    window_tag:str = field(default=ut.landplot_window)
+    plot_tag:str = field(default=ut.landplot_plot)
+    plot_registry_tag:str = field(default=ut.landplot_plot_registry)
+    axis_x_tag:str = field(default=ut.landplot_axis_x)
+    axis_y_tag:str = field(default=ut.landplot_axis_y)
 
     plot_show_chunks:bool = False
     plot_show_polygons:bool = True
@@ -131,8 +131,8 @@ class LandplotDesigner(CustomDPGItem):
         self.registry_system()
 
     def _show_debug_callback(self):
-        if not dpg.is_item_shown(ut.landplot_debug_window.value):
-            dpg.show_item(ut.landplot_debug_window.value)
+        if not dpg.is_item_shown(ut.landplot_debug_window):
+            dpg.show_item(ut.landplot_debug_window)
 
     @contextlib.contextmanager
     def _constructor_plot_axis(self, axis:int, tag:str) -> int|str:

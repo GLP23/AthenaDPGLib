@@ -13,7 +13,7 @@ from dataclasses import dataclass, field
 from AthenaDPGLib.landplot_designer.ui._custom_dpg_item import CustomDPGItem
 import AthenaDPGLib.landplot_designer.data.memory as Memory
 
-from AthenaDPGLib.general.data.universal_tags import UniversalTags as ut
+import AthenaDPGLib.general.data.universal_tags as ut
 
 # ----------------------------------------------------------------------------------------------------------------------
 # - Code -
@@ -25,7 +25,7 @@ class LandplotDesignerDebug(CustomDPGItem):
     # tags used with dpg to assign items to
     #   defined as kwargs so the user can change these if for some reason a duplicate tag is created by the system
     #   by default they use tags imported from the UniversalTags enum
-    window_tag:str = field(default=ut.landplot_debug_window.value)
+    window_tag:str = field(default=ut.landplot_debug_window)
 
     # - non init vars -
 
