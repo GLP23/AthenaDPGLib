@@ -8,7 +8,7 @@ import functools
 # Custom Library
 
 # Custom Packages
-import AthenaDPGLib.landplot_designer.data.memory as Memory
+from AthenaDPGLib.landplot_designer.models.core import Core
 
 # ----------------------------------------------------------------------------------------------------------------------
 # - Code -
@@ -16,7 +16,7 @@ import AthenaDPGLib.landplot_designer.data.memory as Memory
 def update_renderable_chunks(fnc):
     """
     Decorator which updates the boolean setting of all chunks dependent on the UI plot limits, scale and offset.
-    Both `Memory.chunk_manager` and `Memory.landplot_designer` have to be initialized before this method can be used.
+    Both `Core.chunk_manager` and `Core.designer_plot` have to be initialized before this method can be used.
     Always executes the render checks after the wrapped function has been run.
     """
     @functools.wraps(fnc)
@@ -25,12 +25,12 @@ def update_renderable_chunks(fnc):
         result = fnc(*args, **kwargs)
 
         # The renderable boolean is stored on the actual chunk
-        #   This means we have to go through the `Memory.chunk_manager` to update these settings
-        Memory.chunk_manager.set_renderable_chunks(
-            plot_limit_min=Memory.landplot_designer.plot_limit_min,
-            plot_limit_max=Memory.landplot_designer.plot_limit_max,
-            plot_scale=Memory.landplot_designer.plot_scale,
-            plot_offset=Memory.landplot_designer.plot_offset
+        #   This means we have to go through the `Core.chunk_manager` to update these settings
+        Core.chunk_manager.set_renderable_chunks(
+            plot_limit_min=Core.designer_plot.plot_limit_min,
+            plot_limit_max=Core.designer_plot.plot_limit_max,
+            plot_scale=Core.designer_plot.plot_scale,
+            plot_offset=Core.designer_plot.plot_offset
         )
 
         # ALWAYS MAKE SURE YOU RETURN THE RESULT!

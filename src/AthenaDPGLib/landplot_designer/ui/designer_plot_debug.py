@@ -10,8 +10,8 @@ from dataclasses import dataclass, field
 # Custom Library
 
 # Custom Packages
-from AthenaDPGLib.landplot_designer.ui._custom_dpg_item import CustomDPGItem
-import AthenaDPGLib.landplot_designer.data.memory as Memory
+from AthenaDPGLib.landplot_designer.ui.custom_dpg_item import CustomDPGItem
+from AthenaDPGLib.landplot_designer.models.core import Core
 
 import AthenaDPGLib.general.data.universal_tags as ut
 
@@ -19,7 +19,7 @@ import AthenaDPGLib.general.data.universal_tags as ut
 # - Code -
 # ----------------------------------------------------------------------------------------------------------------------
 @dataclass(slots=True, kw_only=True)
-class LandplotDesignerDebug(CustomDPGItem):
+class DesignerPlotDebug(CustomDPGItem):
     size_scale:float = 1. # has to be a float for all numpy arrays to work correctly
 
     # tags used with dpg to assign items to
@@ -56,17 +56,17 @@ class LandplotDesignerDebug(CustomDPGItem):
                 dpg.add_text("Custom Series: Drawing Options")
                 dpg.add_checkbox(
                     label="Show Chunks",
-                    default_value=Memory.landplot_designer.plot_show_chunks,
+                    default_value=Core.designer_plot.plot_show_chunks,
                     callback=self.callback_show_chunks
                 )
                 dpg.add_checkbox(
                     label="Show Polygons",
-                    default_value=Memory.landplot_designer.plot_show_polygons,
+                    default_value=Core.designer_plot.plot_show_polygons,
                     callback=self.callback_show_polygons
                 )
                 dpg.add_checkbox(
                     label="Show Origins",
-                    default_value=Memory.landplot_designer.plot_show_origins,
+                    default_value=Core.designer_plot.plot_show_origins,
                     callback=self.callback_show_origins
                 )
             with dpg.group():
@@ -82,12 +82,12 @@ class LandplotDesignerDebug(CustomDPGItem):
         #   Functions that depend on DPG items already existing
     @staticmethod
     def callback_show_chunks(_, app_data):
-        Memory.landplot_designer.plot_show_chunks = app_data
+        Core.designer_plot.plot_show_chunks = app_data
 
     @staticmethod
     def callback_show_polygons(_, app_data):
-        Memory.landplot_designer.plot_show_polygons = app_data
+        Core.designer_plot.plot_show_polygons = app_data
 
     @staticmethod
     def callback_show_origins(_, app_data):
-        Memory.landplot_designer.plot_show_origins = app_data
+        Core.designer_plot.plot_show_origins = app_data

@@ -57,7 +57,7 @@ class ChunkManager:
         Function which loops over all chunks.
         Dependent on the input arguments a chunk will be toggled renderable.
         The function is often called by user IO changes on the UI's main plot by means of a decorator.
-            See: `AthenaDPGLib/landplot_designer/functions/decorators.py` -> `update_renderable_chunks`
+            See: `AthenaDPGLib/designer_plot/functions/decorators.py` -> `update_renderable_chunks`
         """
         for n,chunk_level in self.get_chunk_levels(): #type: int, dict[tuple[float,float]:Chunk]
             # Precalculate all vars that can are determined by the chunk level's size

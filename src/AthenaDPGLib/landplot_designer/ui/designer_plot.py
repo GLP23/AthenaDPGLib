@@ -15,9 +15,9 @@ from AthenaLib.constants.types import COLOR
 from AthenaColor.data.colors_html import DARKRED, ROYALBLUE
 
 # Custom Packages
-from AthenaDPGLib.landplot_designer.ui._custom_dpg_item import CustomDPGItem
+from AthenaDPGLib.landplot_designer.ui.custom_dpg_item import CustomDPGItem
 from AthenaDPGLib.landplot_designer.models.chunk import Chunk
-import AthenaDPGLib.landplot_designer.data.memory as Memory
+from AthenaDPGLib.landplot_designer.models.core import Core
 from AthenaDPGLib.landplot_designer.functions.decorators import update_renderable_chunks
 
 from AthenaDPGLib.general.functions.mutex import run_in_mutex_method__as_callback, run_in_mutex
@@ -34,7 +34,7 @@ color_origin: COLOR = DARKRED
 # - Code -
 # ----------------------------------------------------------------------------------------------------------------------
 @dataclass(slots=True, kw_only=True)
-class LandplotDesigner(CustomDPGItem):
+class DesignerPlot(CustomDPGItem):
     size_scale:float = 1. # has to be a float for all numpy arrays to work correctly
 
     # tags used with dpg to assign items to
@@ -240,7 +240,7 @@ class LandplotDesigner(CustomDPGItem):
         # DO STUFF
         # --------------------------------------------------------------------------------------------------------------
         if self.plot_show_chunks:
-            for i, chunk in enumerate(Memory.chunk_manager.get_renderable_chunks()): #type: int, Chunk
+            for i, chunk in enumerate(Core.chunk_manager.get_renderable_chunks()): #type: int, Chunk
                 dpg.draw_polygon(
                     points=[
                         (((point+self._plot_offset)*pos_difference)+pos_0_0)
@@ -252,7 +252,7 @@ class LandplotDesigner(CustomDPGItem):
                 )
 
         if self.plot_show_polygons or self.plot_show_origins:
-            for i, chunk in enumerate(Memory.chunk_manager.get_renderable_chunks()):  # type: int, Chunk
+            for i, chunk in enumerate(Core.chunk_manager.get_renderable_chunks()):  # type: int, Chunk
                 for land_plot in chunk.land_plots:
                     if self.plot_show_polygons:
                         dpg.draw_polygon(

@@ -21,7 +21,7 @@ class CustomDPGItem(ABC):
     def add_dpg(self, **kwargs):
         """
         Equivalent of a dpg function that adds an item to the stack without being context managed
-        It runs the context managed functions and doesn't return anything.
+        It runs the context Any functions and doesn't return anything.
         """
 
     @abstractmethod

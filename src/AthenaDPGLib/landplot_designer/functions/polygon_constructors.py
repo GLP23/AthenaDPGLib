@@ -17,6 +17,6 @@ from AthenaDPGLib.landplot_designer.data.shapes import SQUARE
 # ----------------------------------------------------------------------------------------------------------------------
 def polygon__square(origin:np.ndarray) -> Polygon:
     """
-    Creates a Plottable Square polygon which can be displayed on the landplot_designer's Plot item
+    Creates a Plottable Square polygon which can be displayed on the designer_plot's Plot item
     """
     return Polygon.new_from_local(origin=origin, points=SQUARE)
