@@ -19,7 +19,9 @@ def main():
     dpg.create_context()
     dpg.create_viewport(title='Landplot designer Example')
 
-    landplot_designer_main()
+    landplot_designer_main(
+        settings_filepath="settings.json"
+    )
 
     dpg.set_primary_window(Core.designer_plot.window_tag, True)
 
@@ -27,7 +29,10 @@ def main():
 
     dpg.setup_dearpygui()
     dpg.show_viewport()
-    dpg.start_dearpygui()
+    dpg.start_dearpygui() # blocking call
+    Core.output_settings(
+        filepath="settings.json"
+    )
     dpg.destroy_context()
 
 

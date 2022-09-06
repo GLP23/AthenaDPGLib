@@ -21,7 +21,7 @@ from AthenaDPGLib.landplot_designer.models.core import Core
 from AthenaDPGLib.landplot_designer.functions.decorators import update_renderable_chunks
 
 from AthenaDPGLib.general.functions.mutex import run_in_mutex_method__as_callback, run_in_mutex
-import AthenaDPGLib.general.data.universal_tags as ut
+from AthenaDPGLib.general.data.universal_tags import LandplotItems, LandplotSettings, LandplotDebug
 
 # ----------------------------------------------------------------------------------------------------------------------
 # - Support Code -
@@ -40,15 +40,11 @@ class DesignerPlot(CustomDPGItem):
     # tags used with dpg to assign items to
     #   defined as kwargs so the user can change these if for some reason a duplicate tag is created by the system
     #   by default they use tags imported from the UniversalTags enum
-    window_tag:str = field(default=ut.landplot_window)
-    plot_tag:str = field(default=ut.landplot_plot)
-    plot_registry_tag:str = field(default=ut.landplot_plot_registry)
-    axis_x_tag:str = field(default=ut.landplot_axis_x)
-    axis_y_tag:str = field(default=ut.landplot_axis_y)
-
-    plot_show_chunks:bool = False
-    plot_show_polygons:bool = True
-    plot_show_origins:bool = True
+    window_tag:str = field(default=LandplotItems.window)
+    plot_tag:str = field(default=LandplotItems.plot)
+    plot_registry_tag:str = field(default=LandplotItems.plot_registry)
+    axis_x_tag:str = field(default=LandplotItems.axis_x)
+    axis_y_tag:str = field(default=LandplotItems.axis_y)
 
     # - non init vars -
     plot_axis_limit:float = field(init=False, default=100.) # Positive direction. Governs how "precise" the plot is
@@ -131,8 +127,8 @@ class DesignerPlot(CustomDPGItem):
         self.registry_system()
 
     def _show_debug_callback(self):
-        if not dpg.is_item_shown(ut.landplot_debug_window):
-            dpg.show_item(ut.landplot_debug_window)
+        if not dpg.is_item_shown(LandplotItems.debug_window):
+            dpg.show_item(LandplotItems.debug_window)
 
     @contextlib.contextmanager
     def _constructor_plot_axis(self, axis:int, tag:str) -> int|str:
@@ -231,6 +227,10 @@ class DesignerPlot(CustomDPGItem):
         pos_difference = (pos_1_1-pos_0_0) * self._plot_scale
         i=0
 
+        show_chunks = dpg.get_value(LandplotSettings.plot_show_chunks)
+        show_polygons = dpg.get_value(LandplotSettings.plot_show_polygons)
+        show_origins = dpg.get_value(LandplotSettings.plot_show_origins)
+
         # delete old drawn items
         #   else we won't update, but simply append to the old image
         #   adding new layers on top of the drawn pieces
@@ -239,7 +239,7 @@ class DesignerPlot(CustomDPGItem):
 
         # DO STUFF
         # --------------------------------------------------------------------------------------------------------------
-        if self.plot_show_chunks:
+        if show_chunks:
             for i, chunk in enumerate(Core.chunk_manager.get_renderable_chunks()): #type: int, Chunk
                 dpg.draw_polygon(
                     points=[
@@ -251,10 +251,10 @@ class DesignerPlot(CustomDPGItem):
                     thickness=0
                 )
 
-        if self.plot_show_polygons or self.plot_show_origins:
+        if show_polygons or show_origins:
             for i, chunk in enumerate(Core.chunk_manager.get_renderable_chunks()):  # type: int, Chunk
                 for land_plot in chunk.land_plots:
-                    if self.plot_show_polygons:
+                    if show_polygons:
                         dpg.draw_polygon(
                             points=[
                                 (((point+self._plot_offset)*pos_difference)+pos_0_0)
@@ -264,7 +264,7 @@ class DesignerPlot(CustomDPGItem):
                             color=color_border,
                             thickness=0
                         )
-                    if self.plot_show_origins:
+                    if show_origins:
                         dpg.draw_circle(
                             center=(((land_plot.origin + self._plot_offset) * pos_difference) + pos_0_0),
                             radius=5,
@@ -276,7 +276,5 @@ class DesignerPlot(CustomDPGItem):
         # --------------------------------------------------------------------------------------------------------------
         # After everything has been drawn
         dpg.pop_container_stack()
-        dpg.set_value("polygons", f"poly: {len(dpg.get_item_children(sender,2))}")
-        dpg.set_value("chunks", f"chunks: {i}")
-        dpg.set_value("offset", f"offset: {self._plot_offset}")
-        dpg.set_value("scale", f"scale: {self._plot_scale}")
+        dpg.set_value(LandplotDebug.shown_polygons, f"poly: {len(dpg.get_item_children(sender,2))}")
+        dpg.set_value(LandplotDebug.shown_chunks, f"chunks: {i}")

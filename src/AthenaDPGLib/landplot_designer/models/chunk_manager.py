@@ -15,7 +15,7 @@ import math
 from AthenaDPGLib.landplot_designer.models.chunk import Chunk
 from AthenaDPGLib.landplot_designer.models.polygon import Polygon
 
-from AthenaDPGLib.landplot_designer.data.shapes import SQUARE, SQUARE_FROM_CORNER
+from AthenaDPGLib.landplot_designer.data.shapes import SQUARE
 
 # ----------------------------------------------------------------------------------------------------------------------
 # - Code -

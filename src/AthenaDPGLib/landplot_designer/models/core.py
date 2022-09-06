@@ -3,8 +3,9 @@
 # ----------------------------------------------------------------------------------------------------------------------
 # General Packages
 from __future__ import annotations
-from typing import ClassVar, Any
+
 # Custom Library
+from AthenaLib.constants.types import CV_UNDEFINED
 
 # Custom Packages
 
@@ -12,9 +13,13 @@ from typing import ClassVar, Any
 # - Code -
 # ----------------------------------------------------------------------------------------------------------------------
 class Core:
-    chunk_manager: ClassVar[Any]
-    designer_plot: ClassVar[Any]
-    designer_plot_debug: ClassVar[Any]
+    # functionality
+    chunk_manager: CV_UNDEFINED
+
+    # ui
+    viewport : CV_UNDEFINED
+    designer_plot: CV_UNDEFINED
+    designer_plot_debug: CV_UNDEFINED
 
     __slots__ = [
         "chunk_manager",

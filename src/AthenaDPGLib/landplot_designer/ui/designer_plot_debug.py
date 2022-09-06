@@ -13,7 +13,7 @@ from dataclasses import dataclass, field
 from AthenaDPGLib.landplot_designer.ui.custom_dpg_item import CustomDPGItem
 from AthenaDPGLib.landplot_designer.models.core import Core
 
-import AthenaDPGLib.general.data.universal_tags as ut
+from AthenaDPGLib.general.data.universal_tags import LandplotItems,LandplotSettings, LandplotDebug
 
 # ----------------------------------------------------------------------------------------------------------------------
 # - Code -
@@ -25,7 +25,7 @@ class DesignerPlotDebug(CustomDPGItem):
     # tags used with dpg to assign items to
     #   defined as kwargs so the user can change these if for some reason a duplicate tag is created by the system
     #   by default they use tags imported from the UniversalTags enum
-    window_tag:str = field(default=ut.landplot_debug_window)
+    window_tag:str = field(default=LandplotItems.debug_window)
 
     # - non init vars -
 
@@ -37,44 +37,41 @@ class DesignerPlotDebug(CustomDPGItem):
     # - DPG methods -
     # ------------------------------------------------------------------------------------------------------------------
     def add_dpg(self, **kwargs):
-        """
-        Equivalent of a dpg function that adds an item to the stack without being context managed
-        It runs the context managed functions and doesn't return anything.
-        """
         with self.dpg(**kwargs):
             pass
 
     @contextlib.contextmanager
     def dpg(self, width:int=0, height:int=0) -> int|str:
-        """
-        Equivalent of a dpg function that is context managed.
-        Returns the tag of the window. This way it can be used to define more functions within it's `with` body.
-        """
         # body of what otherwise would be: self.__enter__
         with dpg.window(tag=self.window_tag,width=width,height=height, show=False) as window:
             with dpg.group():
                 dpg.add_text("Custom Series: Drawing Options")
                 dpg.add_checkbox(
                     label="Show Chunks",
-                    default_value=Core.designer_plot.plot_show_chunks,
+                    source=LandplotSettings.plot_show_chunks,
                     callback=self.callback_show_chunks
                 )
                 dpg.add_checkbox(
                     label="Show Polygons",
-                    default_value=Core.designer_plot.plot_show_polygons,
+                    source=LandplotSettings.plot_show_polygons,
                     callback=self.callback_show_polygons
                 )
                 dpg.add_checkbox(
                     label="Show Origins",
-                    default_value=Core.designer_plot.plot_show_origins,
+                    source=LandplotSettings.plot_show_origins,
                     callback=self.callback_show_origins
                 )
             with dpg.group():
                 dpg.add_text("Custom Series: Drawn Items")
-                dpg.add_text(tag="chunks")
-                dpg.add_text(tag="polygons")
-                dpg.add_text(tag="offset")
-                dpg.add_text(tag="scale")
+                with dpg.group(horizontal=True):
+                    dpg.add_text(source=LandplotDebug.shown_chunks)
+                    dpg.add_text(source=LandplotDebug.shown_polygons)
+                with dpg.group(horizontal=True):
+                    dpg.add_text(source=LandplotDebug.plot_scale)
+                    dpg.add_text(source=LandplotDebug.plot_offset)
+                with dpg.group(horizontal=True):
+                    dpg.add_text(source=LandplotDebug.plot_limit_min)
+                    dpg.add_text(source=LandplotDebug.plot_limit_max)
 
             yield window # what __enter__ returns
 

@@ -25,7 +25,7 @@ class CustomDPGItem(ABC):
         """
 
     @abstractmethod
-    def dpg(self, width: int, height: int) -> int | str:
+    def dpg(self, **kwargs) -> int | str:
         """
         Equivalent of a dpg function that is context managed.
         Returns the tag of the window. This way it can be used to define more functions within it's `with` body.
