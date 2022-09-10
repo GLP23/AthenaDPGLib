@@ -43,6 +43,20 @@ def _constructor_functionality():
 
     # chunk manager system
     Core.chunk_manager = ChunkManager()
+
+    Core.chunk_manager.add_landplot(
+        landplot=Polygon.new_from_local(
+            points=SQUARE * np.array([1, 100]),
+            origin=np.array([0, 0]),
+        )
+    )
+    Core.chunk_manager.add_landplot(
+        landplot=Polygon.new_from_local(
+            points=SQUARE * np.array([100, 1]),
+            origin=np.array([0, 0]),
+        )
+    )
+
     for i in range(10_000):
         offset_x = float(random.randint(-10_000, 10_000))
         offset_y = float(random.randint(-10_000, 10_000))
@@ -56,6 +70,12 @@ def _constructor_functionality():
                 origin=np.array([offset_x, offset_y]),
             )
         )
+
+    i = 0
+    for level_of_chunks in Core.chunk_manager._chunks.values():
+        for chunk in level_of_chunks.values():
+            i += 1
+    print(i)
 
 def _constructor_ui():
     # Creates the UI models

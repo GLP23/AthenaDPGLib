@@ -8,6 +8,7 @@ import dearpygui.dearpygui as dpg
 # Custom Library
 from AthenaDPGLib.landplot_designer.models.core import Core
 from AthenaDPGLib.landplot_designer.main import main as landplot_designer_main
+from AthenaDPGLib.landplot_designer.functions.settings import output_settings
 
 # Custom Packages
 
@@ -30,7 +31,7 @@ def main():
     dpg.setup_dearpygui()
     dpg.show_viewport()
     dpg.start_dearpygui() # blocking call
-    Core.output_settings(
+    output_settings(
         filepath="settings.json"
     )
     dpg.destroy_context()

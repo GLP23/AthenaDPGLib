@@ -240,7 +240,7 @@ class DesignerPlot(CustomDPGItem):
         # DO STUFF
         # --------------------------------------------------------------------------------------------------------------
         if show_chunks:
-            for i, chunk in enumerate(Core.chunk_manager.get_renderable_chunks()): #type: int, Chunk
+            for i, chunk in enumerate(Core.chunk_manager.get_renderable_chunks(), start=1): #type: int, Chunk
                 dpg.draw_polygon(
                     points=[
                         (((point+self._plot_offset)*pos_difference)+pos_0_0)
@@ -252,7 +252,7 @@ class DesignerPlot(CustomDPGItem):
                 )
 
         if show_polygons or show_origins:
-            for i, chunk in enumerate(Core.chunk_manager.get_renderable_chunks()):  # type: int, Chunk
+            for i, chunk in enumerate(Core.chunk_manager.get_renderable_chunks(), start=1):  # type: int, Chunk
                 for land_plot in chunk.land_plots:
                     if show_polygons:
                         dpg.draw_polygon(

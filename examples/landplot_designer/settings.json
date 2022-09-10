@@ -2,8 +2,8 @@
   "ui": {
     "plot": {
       "show_chunks": true,
-      "show_polygons": false,
-      "show_origins": false
+      "show_polygons": true,
+      "show_origins": true
     }
   }
 }

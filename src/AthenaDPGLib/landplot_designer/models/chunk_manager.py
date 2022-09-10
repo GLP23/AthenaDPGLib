@@ -10,6 +10,7 @@ from typing import Generator, Any
 import math
 
 # Custom Library
+from AthenaLib.math.arrays import calculate_nearest, calculate_distance_between_two_coords
 
 # Custom Packages
 from AthenaDPGLib.landplot_designer.models.chunk import Chunk
@@ -59,25 +60,32 @@ class ChunkManager:
         The function is often called by user IO changes on the UI's main plot by means of a decorator.
             See: `AthenaDPGLib/designer_plot/functions/decorators.py` -> `update_renderable_chunks`
         """
+
         for n,chunk_level in self.get_chunk_levels(): #type: int, dict[tuple[float,float]:Chunk]
             # Precalculate all vars that can are determined by the chunk level's size
             #   The limits are grouped as positive and negative values and not the TopLeft and BottomRight coords
             #   This makes it very easy to check if the chunk origin is between these values
             #       Instead of doing a bit more complicated math
-            margin = self.chunk_side_lowest ** (n+1)
-            negative_limits = (plot_limit_min - margin) * (1 / plot_scale)
-            positive_limits = (plot_limit_max + margin) * (1 / plot_scale)
+            margin = self.chunk_side_lowest ** (n + 1)
+            negative_limits = (plot_limit_min + plot_offset - margin ) * (1/plot_scale)
+            positive_limits = (plot_limit_max - plot_offset + margin ) * (1/plot_scale)
 
+            for chunk in chunk_level.values():
+                chunk.renderable = False
+
+            chunk_levels = list(chunk_level.keys())
             for origin, chunk in chunk_level.items():
-                # Again precalculate it, so it can be referenced by the logical_and check and not run twice
-                offset_chunk_origin = chunk.origin + plot_offset
+                # # Again precalculate it, so it can be referenced by the logical_and check and not run twice
+                nearest_chunk = calculate_nearest(plot_offset, chunk_levels)
+                chunk_levels.remove(nearest_chunk)
 
-                # The outcome of `np.logical_and` is a boolean
-                #   Meaning we can immediately use it to set the renderable flag
-                chunk.renderable = np.logical_and(
-                    offset_chunk_origin > negative_limits,
-                    offset_chunk_origin < positive_limits
-                ).all()
+                if np.logical_and(
+                    nearest_chunk > negative_limits,
+                    nearest_chunk < positive_limits
+                ).all():
+                    chunk.renderable = True
+                else:
+                    break
 
     # ------------------------------------------------------------------------------------------------------------------
     # - Functions to gather Chunks with specific features -
