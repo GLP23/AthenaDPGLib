@@ -132,3 +132,4 @@ dmypy.json
 .pyre/
 res/architectureOnion.psd
 examples/landplot_desginer/img.png
+/src/AthenaDPGLib/landplot_designer/.old/

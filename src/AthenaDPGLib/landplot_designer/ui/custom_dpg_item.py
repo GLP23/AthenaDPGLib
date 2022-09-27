@@ -3,9 +3,9 @@
 # ----------------------------------------------------------------------------------------------------------------------
 # General Packages
 from __future__ import annotations
-import functools
 import dearpygui.dearpygui as dpg
-
+import contextlib
+from abc import ABC, abstractmethod
 
 # Custom Library
 
@@ -14,9 +14,19 @@ import dearpygui.dearpygui as dpg
 # ----------------------------------------------------------------------------------------------------------------------
 # - Code -
 # ----------------------------------------------------------------------------------------------------------------------
-def run_in_mutex(fnc):
-    @functools.wraps(fnc)
-    def wrapper(*args, **kwargs):
-        with dpg.mutex():
-            return fnc(*args,**kwargs)
-    return wrapper
+class CustomDPGItem(ABC):
+    window_tag: str
+
+    @abstractmethod
+    def add_dpg(self, **kwargs):
+        """
+        Equivalent of a dpg function that adds an item to the stack without being context managed
+        It runs the context Any functions and doesn't return anything.
+        """
+
+    @abstractmethod
+    def dpg(self, **kwargs) -> int | str:
+        """
+        Equivalent of a dpg function that is context managed.
+        Returns the tag of the window. This way it can be used to define more functions within it's `with` body.
+        """
