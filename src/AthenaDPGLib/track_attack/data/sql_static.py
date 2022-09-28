@@ -3,29 +3,32 @@
 # ----------------------------------------------------------------------------------------------------------------------
 # General Packages
 from __future__ import annotations
-import dearpygui.dearpygui as dpg
-from contextlib import contextmanager
-from dataclasses import dataclass
 
 # Custom Library
 
 # Custom Packages
-from AthenaDPGLib.general.data.universal_tags import UniversalTags
-from AthenaDPGLib.general.ui.custom_dpg_component import CustomDPGComponent
 
 # ----------------------------------------------------------------------------------------------------------------------
 # - Code -
 # ----------------------------------------------------------------------------------------------------------------------
-@dataclass(kw_only=True)
-class UiRoot(CustomDPGComponent):
-    primary_window_tag:str
+CREATE_DB:str = """
+/* Create the Admin table. this stores values like the version numbering, etc... */
+CREATE TABLE IF NOT EXISTS 'Admin' (
+    'head' Text not Null,
+    'val' Text not Null
+);
+INSERT INTO 'Admin' 
+    ('head', 'val') 
+VALUES 
+    ("version", "0.0.0")
+;
 
-    @contextmanager
-    def dpg(self):
-        with dpg.window(tag=self.primary_window_tag) as window:
-            dpg.add_text("hello worlds")
-            dpg.add_button(
-                label="press me",
-            )
+/* Because of relational behaviour, create all the sub tabel */
+CREATE TABLE IF NOT EXISTS 'Projects'(
+    'id' INTEGER PRIMARY KEY AUTOINCREMENT,
+    'name' TEXT not Null,
+    'info' TEXT
+);
+"""
 
-            yield window
+QUERY_GET_ALL_PROJECTS:str = "SELECT * FROM Projects;"

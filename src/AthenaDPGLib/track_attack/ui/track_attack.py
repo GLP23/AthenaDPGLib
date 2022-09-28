@@ -3,44 +3,41 @@
 # ----------------------------------------------------------------------------------------------------------------------
 # General Packages
 from __future__ import annotations
+import dearpygui.dearpygui as dpg
+from contextlib import contextmanager
+from dataclasses import dataclass
 
 # Custom Library
 
 # Custom Packages
+from AthenaDPGLib.general.functions.threaded_executor import threaded_method
+from AthenaDPGLib.general.ui.custom_dpg_component import CustomDPGComponent
+from AthenaDPGLib.track_attack.models.core import Core
 
 # ----------------------------------------------------------------------------------------------------------------------
-# - Static SQL -
+# - Support Code -
 # ----------------------------------------------------------------------------------------------------------------------
-CREATE_DB:str = """
-/* Create the Admin table. this stores values like the version numbering, etc... */
-CREATE TABLE IF NOT EXISTS 'Admin' (
-    'head' Text not Null,
-    'val' Text not Null
-);
-INSERT INTO 'Admin' 
-    ('head', 'val') 
-VALUES 
-    ("version", "0.0.0")
-;
 
-/* Because of relational behaviour, create all the sub tabel */
-CREATE TABLE IF NOT EXISTS 'Projects'(
-    'id' INTEGER PRIMARY KEY AUTOINCREMENT,
-    'name' TEXT not Null,
-    'info' TEXT
-);
-"""
-
-QUERY_GET_ALL_PROJECTS:str = "SELECT * FROM Projects;"
 
 # ----------------------------------------------------------------------------------------------------------------------
-# - Dynamic SQL -
+# - Code -
 # ----------------------------------------------------------------------------------------------------------------------
-def insert_new_project(name:str, info:str|None):
-    return f"""
-INSERT INTO 'PROJECTS' 
-    ('name', 'info') 
-VALUES 
-    ({f"'{name}'"}, {f"'{info}'" if isinstance(info, str) else "Null"});
-"""
+@dataclass(kw_only=True)
+class TrackAttack(CustomDPGComponent):
+    """
+    Credits:
+        Name of 'Track Attack' by Wh4i3
+    """
+    primary_window_tag:str
+
+    @contextmanager
+    def dpg(self):
+        with dpg.window(tag=self.primary_window_tag) as window:
+            dpg.add_text("hello worlds")
+            dpg.add_button(
+                label="Gather_all_projects",
+            )
+
+            yield window
+
 

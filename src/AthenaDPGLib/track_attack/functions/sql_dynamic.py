@@ -7,13 +7,15 @@ from __future__ import annotations
 # Custom Library
 
 # Custom Packages
-from AthenaDPGLib.track_attack.models.constructor import Constructor
 
 # ----------------------------------------------------------------------------------------------------------------------
-# - Code -
+# - Dynamic SQL -
 # ----------------------------------------------------------------------------------------------------------------------
-def main():
-    Constructor.construct()
+def insert_new_project(name:str, info:str|None):
+    return f"""
+INSERT INTO 'PROJECTS' 
+    ('name', 'info') 
+VALUES 
+    ({f"'{name}'"}, {f"'{info}'" if isinstance(info, str) else "Null"});
+"""
 
-if __name__ == '__main__':
-    main()

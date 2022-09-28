@@ -14,7 +14,8 @@ from AthenaLib.constants.types import PATHLIKE
 from AthenaLib.database_connectors.sqlite import ConnectorSqlite3
 
 # Custom Packages
-import AthenaDPGLib.project_tracking_tool.functions.data_tracker as SQL
+import AthenaDPGLib.track_attack.data.sql_static as SQL
+import AthenaDPGLib.track_attack.functions.sql_dynamic as sql
 
 # ----------------------------------------------------------------------------------------------------------------------
 # - Code -
@@ -73,6 +74,6 @@ class DataTracker:
         Returns the id of the inserted record on the 'Project' table.
         """
         with self.connector.get_cursor(commit=True) as cursor: #type: sqlite3.Cursor
-            cursor.execute(SQL.insert_new_project(name, info))
+            cursor.execute(sql.insert_new_project(name, info))
             return cursor.lastrowid
 

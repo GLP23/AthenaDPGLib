@@ -6,8 +6,8 @@ from __future__ import annotations
 import unittest
 
 # Custom Library
-from AthenaDPGLib.project_tracking_tool.models.data_tracker import DataTracker
-import AthenaDPGLib.project_tracking_tool.functions.data_tracker as SQL
+from AthenaDPGLib.track_attack.models.data_tracker import DataTracker
+import AthenaDPGLib.track_attack.functions.sql_dynamic as SQL
 # Custom Packages
 
 # ----------------------------------------------------------------------------------------------------------------------
