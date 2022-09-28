@@ -11,7 +11,7 @@ import queue
 
 # Custom Packages
 from AthenaDPGLib.general.data.universal_tags import UniversalTags
-from AthenaDPGLib.project_tracking_tool.models.project_tracking_tool import ProjectTrackingTool
+from AthenaDPGLib.project_tracking_tool.models.constructor import Constructor
 from AthenaDPGLib.general.functions.threaded_executor import get_threaded_executor
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -22,7 +22,7 @@ def main():
 
     dpg.create_viewport(title='Project Tracking tool', width=600, height=200)
 
-    ptt = ProjectTrackingTool()
+    ptt = Constructor()
     ptt.ui.add_dpg()
 
     dpg.setup_dearpygui()
