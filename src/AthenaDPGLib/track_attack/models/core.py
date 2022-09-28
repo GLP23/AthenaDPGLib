@@ -18,6 +18,7 @@ from AthenaDPGLib.general.models.threaded_application import ThreadedExecutor
 class Core(GlobalCore):
     # data components
     texture_registry:CV_UNDEFINED
+    shortcut_registry:CV_UNDEFINED
 
     # functionality components
     threaded_executor:ClassVar[ThreadedExecutor] = ThreadedExecutor() # because decorators depend on it

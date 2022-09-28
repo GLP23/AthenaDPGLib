@@ -5,7 +5,7 @@
 from __future__ import annotations
 import dearpygui.dearpygui as dpg
 import pathlib
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, InitVar
 
 # Custom Library
 from AthenaLib.constants.types import PATHLIKE
@@ -24,11 +24,14 @@ DPG_ALLOWED_IMAGE_EXT = [".jpg", ".png", ".bmp", ".psd", ".gif", ".hdr",".pic", 
 @dataclass(kw_only=True, slots=True)
 class TextureRegistry:
 
+    # post init vars
+    tag:InitVar[str | UniversalTags]
+
     #non init
     _registry:str|int = field(init=False)
 
-    def __post_init__(self):
-        self._registry = dpg.add_texture_registry(tag=UniversalTags.TA_texture_registry)
+    def __post_init__(self, tag: str|UniversalTags):
+        self._registry = dpg.add_texture_registry(tag=tag)
 
     def load_image(self, filepath:PATHLIKE, tag:str|UniversalTags):
         """

@@ -3,20 +3,18 @@
 # ----------------------------------------------------------------------------------------------------------------------
 # General Packages
 from __future__ import annotations
-from enum import Enum
 
 # Custom Library
 
 # Custom Packages
+from AthenaDPGLib.track_attack.models.core import Core
 
 # ----------------------------------------------------------------------------------------------------------------------
-# - LandplotDesigner components -
+# - Code -
 # ----------------------------------------------------------------------------------------------------------------------
-class UniversalTags(str, Enum):
-    # Thanks to TwidiAngel for showing me (str, Enum) possibility
+def assign_shortcuts():
+    # assign key combinations to a callback
+    pass
 
-    TA = "TA_PrimaryWindow"
-    TA_texture_registry = "TA_texture_registry"
-    TA_shortcut_registry = "TA_shortcut_registry"
-    TA_img_icon = "TA_img_icon"
-    TA_img_title = "TA_img_title"
+    # At the end: assemble the registry
+    Core.shortcut_registry.assemble_registry()
