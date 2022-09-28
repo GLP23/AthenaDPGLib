@@ -17,6 +17,7 @@ from AthenaDPGLib.general.models.threaded_application import ThreadedExecutor
 # ----------------------------------------------------------------------------------------------------------------------
 class Core(GlobalCore):
     # data components
+    settings:CV_UNDEFINED
     texture_registry:CV_UNDEFINED
     shortcut_registry:CV_UNDEFINED
 

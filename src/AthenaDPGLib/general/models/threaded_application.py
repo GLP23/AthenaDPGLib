@@ -27,7 +27,7 @@ class ThreadedExecutor:
             return self._executor.submit(fnc, *args, **kwargs)
         return decorator
 
-    def run_in_thread(self, fnc, /, *args, **kwargs):
+    def run_as_async_future(self, fnc, /, *args, **kwargs):
         return asyncio.run(self._ran_in_thread((fnc, args, kwargs)))
 
     async def _ran_in_thread(self, callback_setup:tuple[Callable, tuple, dict]):

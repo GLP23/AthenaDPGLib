@@ -19,6 +19,7 @@ from AthenaDPGLib.track_attack.functions.assign_shortcuts import assign_shortcut
 
 from AthenaDPGLib.track_attack.models.core import Core
 from AthenaDPGLib.track_attack.models.data_tracker import DataTracker
+from AthenaDPGLib.track_attack.models.settings import Settings
 
 from AthenaDPGLib.track_attack.ui.track_attack import TrackAttack
 from AthenaDPGLib.track_attack.ui.ta_viewport import TA_Viewport
@@ -36,10 +37,11 @@ class Constructor(AbstractConstructor):
 
     @staticmethod
     def _stage1_data():
+        Core.settings = Settings(json_file="config/settings.json")
+
         Core.texture_registry = TextureRegistry(tag=UniversalTags.TA_texture_registry)
         for path, tag in images:
             Core.texture_registry.load_image(path, tag)
-
 
     @staticmethod
     def _stage2_functionality():

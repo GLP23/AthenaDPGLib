@@ -57,7 +57,6 @@ class AbstractConstructor(ABC):
         This doesn't have a defined stage subject,
             but is meant for other systems that have to be called upon after the ui has been defined, but before the ui
             will block the main thread
-        :return:
         """
 
     @staticmethod
@@ -66,7 +65,6 @@ class AbstractConstructor(ABC):
         """
         Stage 5 of the application constructor.
         This usually contains the main thread's blocking call of the ui
-        :return:
         """
 
     @staticmethod
@@ -75,7 +73,6 @@ class AbstractConstructor(ABC):
         """
         Stage 6 of the application constructor.
         This usually contains the shutdown process of the application
-        :return:
         """
     @classmethod
     def construct(cls):

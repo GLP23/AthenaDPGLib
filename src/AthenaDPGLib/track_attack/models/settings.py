@@ -3,37 +3,39 @@
 # ----------------------------------------------------------------------------------------------------------------------
 # General Packages
 from __future__ import annotations
-from contextlib import contextmanager
-import dearpygui.dearpygui as dpg
 from dataclasses import dataclass, field
+import dearpygui.dearpygui as dpg
+import pathlib
+import json
+from typing import Any
 
 # Custom Library
 from AthenaLib.constants.types import PATHLIKE
 
 # Custom Packages
-from AthenaDPGLib.general.ui.custom_dpg_component import CustomDPGComponent
-from AthenaDPGLib.fixes.taskbar_icon import fix_icon_for_taskbar
-from AthenaDPGLib.track_attack.models.core import Core
 
 # ----------------------------------------------------------------------------------------------------------------------
 # - Code -
 # ----------------------------------------------------------------------------------------------------------------------
 @dataclass(kw_only=True, slots=True)
-class TA_Viewport(CustomDPGComponent):
-    icon:PATHLIKE
+class Settings:
+    json_file:PATHLIKE
 
     # non init
-    vp:str|int = field(init=False)
+    show_viewport_titlebar:bool=field(init=False, default=True)
 
-    @contextmanager
-    def dpg(self):
-        dpg.create_viewport(
-            title='TrackAttack',
-            small_icon=self.icon,
-            large_icon=self.icon,
-            decorated=Core.settings.show_viewport_titlebar
-        )
-        fix_icon_for_taskbar(app_model_id="TrackAttack")
+    def load_from_file(self):
+        # Load from file
+        #   If the file doesn't exist, use some form of "default" settings
+        if not pathlib.Path(self.json_file).exists():
+            return
 
-        yield
+        with open(self.json_file) as file:
+            loaded_settings: dict = json.load(file)
 
+        for key, value in loaded_settings: #type: str, Any
+            setattr(self, key, value)
+
+
+    def dump_to_file(self):
+        pass
