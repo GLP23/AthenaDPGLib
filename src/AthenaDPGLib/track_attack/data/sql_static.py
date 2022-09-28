@@ -20,14 +20,14 @@ CREATE TABLE IF NOT EXISTS 'Admin' (
 INSERT INTO 'Admin' 
     ('head', 'val') 
 VALUES 
-    ("version", "0.0.0")
+    ('version', '0.0.0')
 ;
 
 /* Because of relational behaviour, create all the sub tabel */
 CREATE TABLE IF NOT EXISTS 'Projects'(
     'id' INTEGER PRIMARY KEY AUTOINCREMENT,
     'name' TEXT not Null,
-    'info' TEXT
+    'info' TEXT 
 );
 """
 

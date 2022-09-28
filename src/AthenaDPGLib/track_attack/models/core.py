@@ -19,8 +19,8 @@ class Core(GlobalCore):
     # data components
 
     # functionality components
-    threaded_executor:ClassVar[ThreadedExecutor]
+    threaded_executor:ClassVar[ThreadedExecutor] = ThreadedExecutor() # because decorators depend on it
     data_tracker:CV_UNDEFINED
 
     # ui components
-    ui_root: CV_UNDEFINED
+    ui_track_attack: CV_UNDEFINED

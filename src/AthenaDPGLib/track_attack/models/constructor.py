@@ -10,10 +10,10 @@ import dearpygui.dearpygui as dpg
 # Custom Packages
 from AthenaDPGLib.general.data.universal_tags import UniversalTags
 from AthenaDPGLib.general.models.abstract_constructor import AbstractConstructor
-from AthenaDPGLib.general.models.threaded_application import ThreadedExecutor
 
 from AthenaDPGLib.track_attack.models.core import Core
-from AthenaDPGLib.track_attack.ui.track_attack import UiRoot
+from AthenaDPGLib.track_attack.models.data_tracker import DataTracker
+from AthenaDPGLib.track_attack.ui.track_attack import TrackAttack
 
 # ----------------------------------------------------------------------------------------------------------------------
 # - Code -
@@ -25,17 +25,17 @@ class Constructor(AbstractConstructor):
 
     @staticmethod
     def _functionality():
-        Core.threaded_executor = ThreadedExecutor()
+        Core.data_tracker = DataTracker(db="project_tracking.db")
 
     @staticmethod
     def _ui():
         # context( has already been created by the .construct() method
         dpg.create_viewport(title='Project Tracking tool', width=600, height=200)
 
-        Core.ui_root = UiRoot(
+        Core.ui_track_attack = TrackAttack(
             primary_window_tag=UniversalTags.PTT
         )
-        Core.ui_root.add_dpg()
+        Core.ui_track_attack.add_dpg()
 
         dpg.setup_dearpygui()
         dpg.show_viewport()
