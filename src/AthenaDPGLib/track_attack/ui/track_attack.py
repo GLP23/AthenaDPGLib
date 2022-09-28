@@ -10,9 +10,9 @@ from dataclasses import dataclass
 # Custom Library
 
 # Custom Packages
-from AthenaDPGLib.general.functions.threaded_executor import threaded_method
 from AthenaDPGLib.general.ui.custom_dpg_component import CustomDPGComponent
 from AthenaDPGLib.track_attack.models.core import Core
+from AthenaDPGLib.general.data.universal_tags import UniversalTags
 
 # ----------------------------------------------------------------------------------------------------------------------
 # - Support Code -
@@ -48,7 +48,7 @@ class TrackAttack(CustomDPGComponent):
             dpg.add_text(
                 tag="TEST_output"
             )
-
+            dpg.add_image(UniversalTags.TA_img_title)
 
             yield window
 

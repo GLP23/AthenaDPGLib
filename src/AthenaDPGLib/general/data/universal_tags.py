@@ -15,4 +15,7 @@ from enum import Enum
 class UniversalTags(str, Enum):
     # Thanks to TwidiAngel for showing me (str, Enum) possibility
 
-    PTT = "PTT_PrimaryWindow"
+    TA = "TA_PrimaryWindow"
+    TA_texture_registry = "TA_texture_registry"
+    TA_img_icon = "TA_img_icon"
+    TA_img_title = "TA_img_title"
