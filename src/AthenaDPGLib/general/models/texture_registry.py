@@ -17,6 +17,7 @@ from AthenaDPGLib.general.data.universal_tags import UniversalTags
 # - Support Code -
 # ----------------------------------------------------------------------------------------------------------------------
 DPG_ALLOWED_IMAGE_EXT = [".jpg", ".png", ".bmp", ".psd", ".gif", ".hdr",".pic", ".ppm", ".pgm"]
+
 # ----------------------------------------------------------------------------------------------------------------------
 # - Code -
 # ----------------------------------------------------------------------------------------------------------------------
@@ -30,11 +31,15 @@ class TextureRegistry:
         self._registry = dpg.add_texture_registry(tag=UniversalTags.TA_texture_registry)
 
     def load_image(self, filepath:PATHLIKE, tag:str|UniversalTags):
+        """
+        Method to store and load the image to the dpg registry
+        """
         # this is not a sufficient check
         #   As an extension doesn't change the filetype
         #   But for now, this is fine
         if not (path:=pathlib.Path(filepath)).suffix.lower() in DPG_ALLOWED_IMAGE_EXT:
             raise ValueError(path)
+
         # Retrieve the data from the loaded image and store it in the registry
         width, height, channels, data = dpg.load_image(filepath)
         dpg.add_static_texture(

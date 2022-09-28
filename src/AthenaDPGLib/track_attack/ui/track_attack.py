@@ -33,7 +33,7 @@ class TrackAttack(CustomDPGComponent):
     @contextmanager
     def dpg(self):
         with dpg.window(tag=self.primary_window_tag) as window:
-            dpg.add_image(UniversalTags.TA_img_title)
+            dpg.add_image(UniversalTags.TA_img_title, width=100, height=int(100/(32.24/15.61)))
             dpg.add_button(
                 label="remove me",
                 callback=lambda: Core.texture_registry.unload_image(tag=UniversalTags.TA_img_title)
