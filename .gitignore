@@ -1,7 +1,7 @@
 .idea/
 *.sqlite
 /src/AthenaDPGLib/landplot_designer/.old/
-/examples/project_tracking_tool/project_tracking.db
+project_tracking.db
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
