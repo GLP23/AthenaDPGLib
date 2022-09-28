@@ -24,7 +24,7 @@ def main():
         settings_filepath="settings.json"
     )
 
-    dpg.set_primary_window(Core.designer_plot.window_tag, True)
+    dpg.set_primary_window(Core.designer_plot.primary_window_tag, True)
 
     dpg.show_metrics()
 

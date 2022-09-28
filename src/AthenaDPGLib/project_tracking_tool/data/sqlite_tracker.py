@@ -3,16 +3,30 @@
 # ----------------------------------------------------------------------------------------------------------------------
 # General Packages
 from __future__ import annotations
-from enum import Enum
 
 # Custom Library
 
 # Custom Packages
 
 # ----------------------------------------------------------------------------------------------------------------------
-# - LandplotDesigner components -
+# - Code -
 # ----------------------------------------------------------------------------------------------------------------------
-class UniversalTags(str, Enum):
-    # Thanks to TwidiAngel for showing me (str, Enum) possibility
+SQLITE_CREATE_FILE_QUERIES:str = """
+    /* Create the Admin table. this stores values like the version numbering, etc... */
+    CREATE TABLE IF NOT EXISTS Admin (
+        head varchar(255),
+        val varchar(255)
+    );
+    INSERT INTO Admin 
+        (head, val) 
+    VALUES 
+        ("version", "0.0.0")
+    ;
+    
+    /* Because of relational behaviour, create all the sub tabel */
+    CREATE TABLE IF NOT EXISTS TABLE Projects(
+        id int,
+        name varchar(255)
+    );
 
-    PTT = "PTT_PrimaryWindow"
+    """

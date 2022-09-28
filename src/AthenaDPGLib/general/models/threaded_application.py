@@ -3,16 +3,27 @@
 # ----------------------------------------------------------------------------------------------------------------------
 # General Packages
 from __future__ import annotations
-from enum import Enum
+from concurrent.futures import ThreadPoolExecutor
+from dataclasses import dataclass, field
+from typing import overload
+
 
 # Custom Library
 
 # Custom Packages
 
 # ----------------------------------------------------------------------------------------------------------------------
-# - LandplotDesigner components -
+# - Code -
 # ----------------------------------------------------------------------------------------------------------------------
-class UniversalTags(str, Enum):
-    # Thanks to TwidiAngel for showing me (str, Enum) possibility
+@dataclass()
+class ThreadedExecutor:
+    _executor:ThreadPoolExecutor = field(init=False, default_factory=ThreadPoolExecutor)
 
-    PTT = "PTT_PrimaryWindow"
+    def shutdown(self):
+        self._executor.shutdown()
+
+    def threaded_method(self, fnc):
+        def decorator(*args, **kwargs):
+            return self._executor.submit(fnc, *args, **kwargs)
+        return decorator
+

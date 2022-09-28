@@ -11,8 +11,11 @@ from __future__ import annotations
 # ----------------------------------------------------------------------------------------------------------------------
 # - Code -
 # ----------------------------------------------------------------------------------------------------------------------
-athena_dpg_lib = "AthenaDpgLib"
-athena_dpg_lib_landplot_designer = "AthenaDpgLib_landplot_designer"
-athena_dpg_lib_landplot_designer_debug = "AthenaDpgLib_landplot_designer_debug"
-athena_dpg_lib_landplot_designer_settings = "AthenaDpgLib_landplot_designer_settings"
-athena_dpg_lib_landplot_designer_settings_ui_plot = "AthenaDpgLib_landplot_designer_settings_ui_plot"
+ADL = "ADL"
+
+LANDPLOT_DESIGNER = f"{ADL}_LD"
+LANDPLOT_DESIGNER_DEBUG = f"{ADL}_LDD"
+LANDPLOT_DESIGNER_SETTINGS = f"{ADL}_LDS"
+LANDPLOT_DESIGNER_SETTINGS_PLOT = f"{ADL}_LDSP"
+
+PTT = "PTT" # tag for Project Tracking Tool

@@ -3,16 +3,27 @@
 # ----------------------------------------------------------------------------------------------------------------------
 # General Packages
 from __future__ import annotations
-from enum import Enum
 
 # Custom Library
 
 # Custom Packages
+from AthenaDPGLib.general.models.threaded_application import ThreadedExecutor
 
 # ----------------------------------------------------------------------------------------------------------------------
-# - LandplotDesigner components -
+# - Code -
 # ----------------------------------------------------------------------------------------------------------------------
-class UniversalTags(str, Enum):
-    # Thanks to TwidiAngel for showing me (str, Enum) possibility
+_threaded_executor: ThreadedExecutor | None = None
 
-    PTT = "PTT_PrimaryWindow"
+def get_threaded_executor()-> ThreadedExecutor:
+    """
+    A simple managed getter for the ThreadedExecutor object
+    In one python instance, only one ThreadedExecutor is allowed to exist
+    """
+
+    global _threaded_executor
+
+    if _threaded_executor is None:
+        _threaded_executor = ThreadedExecutor()
+
+    return _threaded_executor
+

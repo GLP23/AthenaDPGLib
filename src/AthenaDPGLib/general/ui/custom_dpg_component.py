@@ -3,16 +3,27 @@
 # ----------------------------------------------------------------------------------------------------------------------
 # General Packages
 from __future__ import annotations
-from enum import Enum
+from abc import ABC, abstractmethod
 
 # Custom Library
 
 # Custom Packages
 
 # ----------------------------------------------------------------------------------------------------------------------
-# - LandplotDesigner components -
+# - Code -
 # ----------------------------------------------------------------------------------------------------------------------
-class UniversalTags(str, Enum):
-    # Thanks to TwidiAngel for showing me (str, Enum) possibility
+class CustomDPGComponent(ABC):
+    def add_dpg(self):
+        """
+        If the user doesn't need to extend the window's functionality, this method can be used to immediately run the
+        dpg functions, without having to manually use a with statement
+        """
+        with self.dpg():
+            pass
 
-    PTT = "PTT_PrimaryWindow"
+    @abstractmethod
+    def dpg(self):
+        """
+        Context managed method, so that the user can extend the window's functionality with ease.
+        """
+        pass

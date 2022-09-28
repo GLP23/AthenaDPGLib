@@ -3,16 +3,29 @@
 # ----------------------------------------------------------------------------------------------------------------------
 # General Packages
 from __future__ import annotations
-from enum import Enum
+import dearpygui.dearpygui as dpg
+from contextlib import contextmanager
+from dataclasses import dataclass
 
 # Custom Library
 
 # Custom Packages
+from AthenaDPGLib.general.data.universal_tags import UniversalTags
+from AthenaDPGLib.general.ui.custom_dpg_component import CustomDPGComponent
 
 # ----------------------------------------------------------------------------------------------------------------------
-# - LandplotDesigner components -
+# - Code -
 # ----------------------------------------------------------------------------------------------------------------------
-class UniversalTags(str, Enum):
-    # Thanks to TwidiAngel for showing me (str, Enum) possibility
+@dataclass(kw_only=True)
+class UiRoot(CustomDPGComponent):
+    primary_window_tag:str
 
-    PTT = "PTT_PrimaryWindow"
+    @contextmanager
+    def dpg(self):
+        with dpg.window(tag=self.primary_window_tag) as window:
+            dpg.add_text("hello worlds")
+            dpg.add_button(
+                label="press me",
+            )
+
+            yield window

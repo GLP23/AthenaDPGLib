@@ -3,35 +3,31 @@
 # ----------------------------------------------------------------------------------------------------------------------
 # General Packages
 from __future__ import annotations
-import dearpygui.dearpygui as dpg
-import threading
-import queue
+from dataclasses import dataclass, field
+import pathlib
 
 # Custom Library
+from AthenaLib.constants.types import PATHLIKE
+from AthenaLib.database_connectors.sqlite import ConnectorSqlite3
 
 # Custom Packages
-from AthenaDPGLib.general.data.universal_tags import UniversalTags
-from AthenaDPGLib.project_tracking_tool.models.project_tracking_tool import ProjectTrackingTool
 from AthenaDPGLib.general.functions.threaded_executor import get_threaded_executor
+from AthenaDPGLib.project_tracking_tool.data.sqlite_tracker import SQLITE_CREATE_FILE_QUERIES
 
 # ----------------------------------------------------------------------------------------------------------------------
 # - Code -
 # ----------------------------------------------------------------------------------------------------------------------
-def main():
-    dpg.create_context()
+@dataclass(kw_only=True, slots=True)
+class TrackerDataHandler:
+    sqlite_filepath:PATHLIKE
 
-    dpg.create_viewport(title='Project Tracking tool', width=600, height=200)
+    # non init
+    connector:ConnectorSqlite3 = field(init=False)
 
-    ptt = ProjectTrackingTool()
-    ptt.ui.add_dpg()
+    def __post_init__(self):
+        self.connector = ConnectorSqlite3(path=self.sqlite_filepath)
 
-    dpg.setup_dearpygui()
-    dpg.show_viewport()
-    dpg.set_primary_window(UniversalTags.PTT, True)
-
-    dpg.start_dearpygui() # blocking call
-    get_threaded_executor().shutdown()
-    dpg.destroy_context()
-
-if __name__ == '__main__':
-    main()
+        if not pathlib.Path(self.sqlite_filepath).exists():
+            self.connector.create_file(
+                queries=SQLITE_CREATE_FILE_QUERIES
+            )
