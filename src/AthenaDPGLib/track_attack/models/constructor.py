@@ -27,7 +27,7 @@ class Constructor(AbstractConstructor):
     def _data():
         Core.texture_registry = TextureRegistry()
         for path, tag in images:
-            Core.texture_registry.load_picture(path, tag)
+            Core.texture_registry.load_image(path, tag)
 
     @staticmethod
     def _functionality():

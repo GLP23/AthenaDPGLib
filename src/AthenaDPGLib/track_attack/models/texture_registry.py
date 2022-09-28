@@ -29,7 +29,7 @@ class TextureRegistry:
     def __post_init__(self):
         self._registry = dpg.add_texture_registry(tag=UniversalTags.TA_texture_registry)
 
-    def load_picture(self, filepath:PATHLIKE, tag:str|UniversalTags):
+    def load_image(self, filepath:PATHLIKE, tag:str|UniversalTags):
         # this is not a sufficient check
         #   As an extension doesn't change the filetype
         #   But for now, this is fine

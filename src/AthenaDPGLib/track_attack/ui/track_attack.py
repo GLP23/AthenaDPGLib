@@ -33,33 +33,11 @@ class TrackAttack(CustomDPGComponent):
     @contextmanager
     def dpg(self):
         with dpg.window(tag=self.primary_window_tag) as window:
-            dpg.add_text("hello worlds")
-            dpg.add_button(
-                label="Gather_all_projects",
-                callback=self.btn_gather_all_projects
-            )
-            dpg.add_input_text(
-                tag="TEST"
-            )
-            dpg.add_button(
-                label="SAVE PROJECT",
-                callback=self.btn_save_project
-            )
-            dpg.add_text(
-                tag="TEST_output"
-            )
             dpg.add_image(UniversalTags.TA_img_title)
+            dpg.add_button(
+                label="remove me",
+                callback=lambda: Core.texture_registry.unload_image(tag=UniversalTags.TA_img_title)
+            )
 
             yield window
-
-    @Core.threaded_executor.threaded_method
-    def btn_gather_all_projects(self):
-        print(Core.data_tracker.get_all_projects())
-
-    @Core.threaded_executor.threaded_method
-    def btn_save_project(self):
-        dpg.set_value(
-            "TEST_output",
-            Core.data_tracker.new_project(name=dpg.get_value("TEST"))
-        )
 
