@@ -85,4 +85,4 @@ class AbstractConstructor(ABC):
         cls._stage3_ui()
         cls._stage4_other()
         cls._stage5_blocking()
-        cls._stage5_blocking()
+        cls._stage6_shutdown()

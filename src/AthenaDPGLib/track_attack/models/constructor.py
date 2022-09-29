@@ -37,7 +37,7 @@ class Constructor(AbstractConstructor):
 
     @staticmethod
     def _stage1_data():
-        Core.settings = Settings(json_file="config/settings.json")
+        Core.settings.load_from_file(filepath="config/settings.json")
 
         Core.texture_registry = TextureRegistry(tag=UniversalTags.TA_texture_registry)
         for path, tag in images:
@@ -76,3 +76,4 @@ class Constructor(AbstractConstructor):
     @staticmethod
     def _stage6_shutdown():
         dpg.destroy_context()
+        Core.settings.dump_to_file(filepath="config/settings.json")
