@@ -15,7 +15,7 @@ import asyncio
 # ----------------------------------------------------------------------------------------------------------------------
 # - Code -
 # ----------------------------------------------------------------------------------------------------------------------
-@dataclass()
+@dataclass(slots=True)
 class ThreadedExecutor:
     _executor:ThreadPoolExecutor = field(init=False, default_factory=ThreadPoolExecutor)
 

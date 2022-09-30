@@ -37,6 +37,7 @@ class Constructor(AbstractConstructor):
 
     @staticmethod
     def _stage1_data():
+        Core.settings = Settings()
         Core.settings.load_from_file(filepath="config/settings.json")
 
         Core.texture_registry = TextureRegistry(tag=UniversalTags.TA_texture_registry)

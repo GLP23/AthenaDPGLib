@@ -14,13 +14,15 @@ from AthenaLib.constants.types import PATHLIKE
 from AthenaDPGLib.general.ui.custom_dpg_component import CustomDPGComponent
 from AthenaDPGLib.fixes.taskbar_icon import fix_icon_for_taskbar
 from AthenaDPGLib.track_attack.models.core import Core
-from AthenaDPGLib.track_attack.models.settings import SettingEnum
+from AthenaDPGLib.track_attack.models.settings import SettingsEnum
+from AthenaDPGLib.track_attack.models.settings.hooks import HasSettingsHooks
+from AthenaDPGLib.track_attack.functions.decorations import register_settings_hook
 
 # ----------------------------------------------------------------------------------------------------------------------
 # - Code -
 # ----------------------------------------------------------------------------------------------------------------------
 @dataclass(kw_only=True, slots=True)
-class TA_Viewport(CustomDPGComponent):
+class TA_Viewport(CustomDPGComponent, HasSettingsHooks):
     icon:PATHLIKE
 
     # non init
@@ -38,9 +40,8 @@ class TA_Viewport(CustomDPGComponent):
 
         yield
 
-    @staticmethod
-    @Core.settings.assign_as_hook(SettingEnum.show_viewport_title)
-    def switch_title_visibility():
+    @register_settings_hook(SettingsEnum.show_viewport_title)
+    def switch_title_visibility(self):
         dpg.set_viewport_decorated(Core.settings.show_viewport_title)
 
 
