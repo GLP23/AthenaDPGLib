@@ -25,6 +25,7 @@ class SettingsValues:
     viewport_x:int = 1000
     viewport_y:int = 1000
     viewport_vsync:bool = True
+    viewport_fullscreen:bool = False
 
 class SettingsEnum(enum.Enum):
     """
@@ -37,3 +38,4 @@ class SettingsEnum(enum.Enum):
     viewport_x = enum.auto()
     viewport_y = enum.auto()
     viewport_vsync = enum.auto()
+    viewport_fullscreen = enum.auto()

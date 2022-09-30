@@ -74,6 +74,7 @@ class Settings:
     def viewport_width(self):
         return self._values.viewport_width
     @viewport_width.setter
+    @apply_settings_hooks_after_property_setter
     def viewport_width(self, value):
         self._values.viewport_width = value
 
@@ -81,6 +82,7 @@ class Settings:
     def viewport_height(self):
         return self._values.viewport_height
     @viewport_height.setter
+    @apply_settings_hooks_after_property_setter
     def viewport_height(self, value):
         self._values.viewport_height = value
 
@@ -88,6 +90,7 @@ class Settings:
     def viewport_x(self):
         return self._values.viewport_x
     @viewport_x.setter
+    @apply_settings_hooks_after_property_setter
     def viewport_x(self, value):
         self._values.viewport_x = value
 
@@ -95,6 +98,7 @@ class Settings:
     def viewport_y(self):
         return self._values.viewport_y
     @viewport_y.setter
+    @apply_settings_hooks_after_property_setter
     def viewport_y(self, value):
         self._values.viewport_y = value
 
@@ -102,5 +106,14 @@ class Settings:
     def viewport_vsync(self):
         return self._values.viewport_vsync
     @viewport_vsync.setter
+    @apply_settings_hooks_after_property_setter
     def viewport_vsync(self, value):
         self._values.viewport_vsync = value
+
+    @property
+    def viewport_fullscreen(self):
+        return self._values.viewport_fullscreen
+    @viewport_fullscreen.setter
+    @apply_settings_hooks_after_property_setter
+    def viewport_fullscreen(self, value):
+        self._values.viewport_fullscreen = value

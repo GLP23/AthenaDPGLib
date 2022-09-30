@@ -1,7 +1,10 @@
 {
-  "viewport_show_title": true,
-  "viewport_width": 1201,
-  "viewport_height": 676,
-  "viewport_x": 1413,
-  "viewport_y": 229
+  "viewport_show_title": false,
+  "viewport_width": 968,
+  "viewport_height": 642,
+  "viewport_x": 1421,
+  "viewport_y": 204,
+  "viewport_vsync": true,
+  "viewport_fullscreen": false,
+  "viewport_maximized": true
 }

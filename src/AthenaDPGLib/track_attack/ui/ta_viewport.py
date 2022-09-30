@@ -48,6 +48,10 @@ class TA_Viewport(CustomDPGComponent, HasSettingsHooks):
             callback=self.store_pos_and_size
         )
 
+        # toggle fullscreen if enabled
+        if Core.settings.viewport_fullscreen:
+            dpg.toggle_viewport_fullscreen()
+
         yield
 
     @register_settings_hook(SettingsEnum.viewport_show_title)
