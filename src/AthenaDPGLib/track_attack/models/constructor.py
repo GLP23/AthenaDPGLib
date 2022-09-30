@@ -12,13 +12,10 @@ from AthenaDPGLib.general.data.universal_tags import UniversalTags
 from AthenaDPGLib.general.models.abstract_constructor import AbstractConstructor
 from AthenaDPGLib.general.models.texture_registry import TextureRegistry
 from AthenaDPGLib.general.models.shortcut_registry import ShortcutRegistry
-
-from AthenaDPGLib.track_attack.data.res import images
-
 from AthenaDPGLib.track_attack.functions.assign_shortcuts import assign_shortcuts
 
 from AthenaDPGLib.track_attack.models.core import Core
-from AthenaDPGLib.track_attack.models.data_tracker import DataTracker
+from AthenaDPGLib.track_attack.models.data_interaction import DataInteraction
 from AthenaDPGLib.track_attack.models.settings import Settings
 
 from AthenaDPGLib.track_attack.ui.track_attack import TrackAttack
@@ -40,13 +37,19 @@ class Constructor(AbstractConstructor):
         Core.settings = Settings()
         Core.settings.load_from_file(filepath="config/settings.json")
 
+        # Texture registry:
+        #   Loads images into DPG memory
         Core.texture_registry = TextureRegistry(tag=UniversalTags.TA_texture_registry)
+        images = [
+            ("res/TrackAttack_Icon.png", UniversalTags.TA_img_icon),
+            ("res/TrackAttack_Title.png", UniversalTags.TA_img_title)
+        ]
         for path, tag in images:
             Core.texture_registry.load_image(path, tag)
 
     @staticmethod
     def _stage2_functionality():
-        Core.data_tracker = DataTracker(db="project_tracking.db")
+        Core.data_interaction = DataInteraction(db="project_tracking.db")
 
     @staticmethod
     def _stage3_ui():

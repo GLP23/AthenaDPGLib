@@ -76,9 +76,18 @@ class AbstractConstructor(ABC):
         """
     @classmethod
     def construct(cls):
+        """
+        Method that controls the flow of construction of the application
+        """
         if cls._constructed:
             raise PermissionError("Cannot construct an application multiple times")
 
+        # set the attr to true,
+        #   Can't construct an application twice
+        cls._constructed = True
+
+        # Startup all the static methods
+        #   Sequence matters!
         cls._stage0_pre()
         cls._stage1_data()
         cls._stage2_functionality()

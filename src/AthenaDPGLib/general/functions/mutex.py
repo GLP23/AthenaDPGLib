@@ -14,23 +14,12 @@ import dearpygui.dearpygui as dpg
 # - Code -
 # ----------------------------------------------------------------------------------------------------------------------
 def run_in_mutex(fnc):
+    """
+    Decorator that runs the function iun a locked dpg.mutex state.
+    Unlocks the mutex after the function has been run.
+    """
     @functools.wraps(fnc)
     def wrapper(*args, **kwargs):
         with dpg.mutex():
             return fnc(*args, **kwargs)
     return wrapper
-
-def run_in_mutex__as_callback(fnc):
-    @functools.wraps(fnc)
-    def wrapper(sender, app_data, user_data):
-        with dpg.mutex():
-            return fnc(sender, app_data, user_data)
-    return wrapper
-
-def run_in_mutex_method__as_callback(fnc):
-    @functools.wraps(fnc)
-    def wrapper(obj, sender, app_data, user_data):
-        with dpg.mutex():
-            return fnc(obj, sender, app_data, user_data)
-    return wrapper
-
