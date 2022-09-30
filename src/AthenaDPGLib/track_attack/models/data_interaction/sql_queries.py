@@ -11,7 +11,11 @@ from __future__ import annotations
 # ----------------------------------------------------------------------------------------------------------------------
 # - Code -
 # ----------------------------------------------------------------------------------------------------------------------
-CREATE_DB:str = """
+class SQLQueries:
+    # ------------------------------------------------------------------------------------------------------------------
+    # - Static sql queries -
+    # ------------------------------------------------------------------------------------------------------------------
+    create_db:str = """
 /* Create the Admin table. this stores values like the version numbering, etc... */
 CREATE TABLE IF NOT EXISTS 'Admin' (
     'head' Text not Null,
@@ -30,5 +34,17 @@ CREATE TABLE IF NOT EXISTS 'Projects'(
     'info' TEXT 
 );
 """
+    query_get_all_projects: str = "SELECT * FROM Projects;"
 
-QUERY_GET_ALL_PROJECTS:str = "SELECT * FROM Projects;"
+    # ------------------------------------------------------------------------------------------------------------------
+    # - Dynamic sql queries -
+    # ------------------------------------------------------------------------------------------------------------------
+    @staticmethod
+    def insert_new_project(name:str, info:str|None):
+        return f"""
+INSERT INTO 'PROJECTS' 
+    ('name', 'info') 
+VALUES 
+    ({f"'{name}'"}, {f"'{info}'" if isinstance(info, str) else "Null"});
+"""
+
