@@ -15,7 +15,7 @@ from AthenaDPGLib.track_attack.models.core import Core
 # ----------------------------------------------------------------------------------------------------------------------
 
 def test_shortcut():
-    Core.settings.show_viewport_title = not Core.settings.show_viewport_title
+    Core.settings.viewport_show_title = not Core.settings.viewport_show_title
 
 def assign_shortcuts():
     # assign key combinations to a callback

@@ -3,7 +3,6 @@
 # ----------------------------------------------------------------------------------------------------------------------
 # General Packages
 from __future__ import annotations
-import functools
 from dataclasses import dataclass, field
 import pathlib
 from typing import Callable
@@ -49,7 +48,9 @@ class Settings:
         """
         dump_dataclass_to_jsonfile(
             obj=self._values,
-            filepath=filepath
+            filepath=filepath,
+            # **json_kwargs
+            indent=2
         )
 
     def register_hook(self, callback, setting:SettingsEnum):
@@ -62,10 +63,44 @@ class Settings:
     # - Properties with their hooks -
     # ------------------------------------------------------------------------------------------------------------------
     @property
-    def show_viewport_title(self):
-        return self._values.show_viewport_title
-
-    @show_viewport_title.setter
+    def viewport_show_title(self):
+        return self._values.viewport_show_title
+    @viewport_show_title.setter
     @apply_settings_hooks_after_property_setter
-    def show_viewport_title(self, value):
-        self._values.show_viewport_title = value
+    def viewport_show_title(self, value):
+        self._values.viewport_show_title = value
+
+    @property
+    def viewport_width(self):
+        return self._values.viewport_width
+    @viewport_width.setter
+    def viewport_width(self, value):
+        self._values.viewport_width = value
+
+    @property
+    def viewport_height(self):
+        return self._values.viewport_height
+    @viewport_height.setter
+    def viewport_height(self, value):
+        self._values.viewport_height = value
+
+    @property
+    def viewport_x(self):
+        return self._values.viewport_x
+    @viewport_x.setter
+    def viewport_x(self, value):
+        self._values.viewport_x = value
+
+    @property
+    def viewport_y(self):
+        return self._values.viewport_y
+    @viewport_y.setter
+    def viewport_y(self, value):
+        self._values.viewport_y = value
+
+    @property
+    def viewport_vsync(self):
+        return self._values.viewport_vsync
+    @viewport_vsync.setter
+    def viewport_vsync(self, value):
+        self._values.viewport_vsync = value

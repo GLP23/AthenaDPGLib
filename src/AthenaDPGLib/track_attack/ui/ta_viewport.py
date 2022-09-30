@@ -34,14 +34,31 @@ class TA_Viewport(CustomDPGComponent, HasSettingsHooks):
             title='TrackAttack',
             small_icon=self.icon,
             large_icon=self.icon,
-            decorated=Core.settings.show_viewport_title
+            decorated=Core.settings.viewport_show_title,
+            x_pos=Core.settings.viewport_x,
+            y_pos=Core.settings.viewport_y,
+            width=Core.settings.viewport_width,
+            height=Core.settings.viewport_height,
+            vsync=Core.settings.viewport_vsync,
         )
         fix_icon_for_taskbar(app_model_id="TrackAttack")
 
+        # Add certain other systems to it
+        dpg.set_viewport_resize_callback(
+            callback=self.store_pos_and_size
+        )
+
         yield
 
-    @register_settings_hook(SettingsEnum.show_viewport_title)
+    @register_settings_hook(SettingsEnum.viewport_show_title)
     def switch_title_visibility(self):
-        dpg.set_viewport_decorated(Core.settings.show_viewport_title)
+        dpg.set_viewport_decorated(Core.settings.viewport_show_title)
+
+    def store_pos_and_size(self):
+        x,y = dpg.get_viewport_pos()
+        Core.settings.viewport_x = x
+        Core.settings.viewport_y = y
+        Core.settings.viewport_width = dpg.get_viewport_width()
+        Core.settings.viewport_height = dpg.get_viewport_height()
 
 

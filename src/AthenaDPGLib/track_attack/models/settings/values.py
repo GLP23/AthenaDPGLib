@@ -19,11 +19,21 @@ class SettingsValues:
     Dataclass to store all the Settings values in.
     Default values are hardcoded.
     """
-    show_viewport_title:bool = True
+    viewport_show_title:bool = True
+    viewport_width:int = 1000
+    viewport_height:int = 1000
+    viewport_x:int = 1000
+    viewport_y:int = 1000
+    viewport_vsync:bool = True
 
 class SettingsEnum(enum.Enum):
     """
     Enum class to store all available settings in,
     Used by various systems to indirectly reference the "SettingsValues" data objects
     """
-    show_viewport_title = enum.auto()
+    viewport_show_title = enum.auto()
+    viewport_width = enum.auto()
+    viewport_height = enum.auto()
+    viewport_x = enum.auto()
+    viewport_y = enum.auto()
+    viewport_vsync = enum.auto()

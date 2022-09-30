@@ -75,9 +75,15 @@ class Constructor(AbstractConstructor):
     @staticmethod
     def _stage5_blocking():
         dpg.start_dearpygui()  # blocking call
-        Core.threaded_executor.shutdown() # make sure the threaded systems are shut down
+
+        # Any functions that need to be run before the settings are dumped to file
+        Core.ui_viewport.store_pos_and_size() # workaround for DPG not having a function torun on viewport move
+
+        Core.settings.dump_to_file(filepath="config/settings.json")
 
     @staticmethod
     def _stage6_shutdown():
         dpg.destroy_context()
-        Core.settings.dump_to_file(filepath="config/settings.json")
+        # make sure the threaded systems are shut down
+        #   Technically is blocking
+        Core.threaded_executor.shutdown()
