@@ -42,9 +42,20 @@ CREATE TABLE IF NOT EXISTS 'Projects'(
     @staticmethod
     def insert_new_project(name:str, info:str|None):
         return f"""
-INSERT INTO 'PROJECTS' 
+INSERT INTO 'Projects' 
     ('name', 'info') 
 VALUES 
     ({f"'{name}'"}, {f"'{info}'" if isinstance(info, str) else "Null"});
 """
+
+    @staticmethod
+    def update_project(project_id:int, name: str|None, info: str | None):
+        return f"""
+UPDATE 'Projects' 
+SET 
+    name = {f"'{name}'"},
+    info = {f"'{info}'"}
+WHERE id = {project_id};
+"""
+
 

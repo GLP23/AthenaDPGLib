@@ -34,5 +34,20 @@ class TrackAttack(CustomDPGComponent):
     def dpg(self):
         with dpg.window(tag=self.primary_window_tag) as window:
             dpg.add_image(UniversalTags.TA_img_title, width=100, height=int(100/(32.24/15.61)))
+
+            dpg.add_input_int(label="id",tag="project_id")
+            dpg.add_input_text(label="name",tag="project_name")
+            dpg.add_input_text(label="info",tag="project_info")
+            dpg.add_button(label="update",tag="project_update", callback=self.callback_project_update)
+
             yield window
+
+    @Core.threaded_executor.threaded_method
+    def callback_project_update(self):
+        Core.data_interaction.change_project(
+            project_id=dpg.get_value("project_id"),
+            name=dpg.get_value("project_name"),
+            info=dpg.get_value("project_info")
+        )
+
 

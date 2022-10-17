@@ -48,9 +48,13 @@ class TA_Viewport(CustomDPGComponent, HasSettingsHooks):
             callback=self.store_pos_and_size
         )
 
-        # toggle fullscreen if enabled
+        # More settings that adhere to something
         if Core.settings.viewport_fullscreen:
             dpg.toggle_viewport_fullscreen()
+        if Core.settings.debug_show:
+            self.debug_show()
+        if Core.settings.metrics_show:
+            self.metrics_show()
 
         yield
 
@@ -65,4 +69,12 @@ class TA_Viewport(CustomDPGComponent, HasSettingsHooks):
         Core.settings.viewport_width = dpg.get_viewport_width()
         Core.settings.viewport_height = dpg.get_viewport_height()
 
+
+    @register_settings_hook(SettingsEnum.debug_show)
+    def debug_show(self):
+        dpg.show_debug()
+
+    @register_settings_hook(SettingsEnum.metrics_show)
+    def metrics_show(self):
+        dpg.show_metrics()
 

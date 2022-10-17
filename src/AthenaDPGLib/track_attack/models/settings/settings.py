@@ -117,3 +117,20 @@ class Settings:
     @apply_settings_hooks_after_property_setter
     def viewport_fullscreen(self, value):
         self._values.viewport_fullscreen = value
+
+    @property
+    def debug_show(self):
+        return self._values.debug_show
+    @debug_show.setter
+    @apply_settings_hooks_after_property_setter
+    def debug_show(self, value):
+        self._values.debug_show = value
+
+    @property
+    def metrics_show(self):
+        return self._values.metrics_show
+    @metrics_show.setter
+    @apply_settings_hooks_after_property_setter
+    def metrics_show(self, value):
+        self._values.metrics_show = value
+

@@ -27,6 +27,9 @@ class SettingsValues:
     viewport_vsync:bool = True
     viewport_fullscreen:bool = False
 
+    debug_show:bool = False
+    metrics_show:bool = False
+
 class SettingsEnum(enum.Enum):
     """
     Enum class to store all available settings in,
@@ -39,3 +42,6 @@ class SettingsEnum(enum.Enum):
     viewport_y = enum.auto()
     viewport_vsync = enum.auto()
     viewport_fullscreen = enum.auto()
+
+    debug_show = enum.auto()
+    metrics_show = enum.auto()

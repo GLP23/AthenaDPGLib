@@ -76,3 +76,10 @@ class DataInteraction:
             cursor.execute(SQLQueries.insert_new_project(name, info))
             return cursor.lastrowid
 
+    def change_project(self, project_id:int, name:str=None, info:str=None):
+        with self.connector.get_cursor(commit=True) as cursor: #type: sqlite3.Cursor
+            cursor.execute(SQLQueries.update_project(project_id, name, info))
+            print(cursor.fetchall())
+            return cursor.lastrowid
+
+
