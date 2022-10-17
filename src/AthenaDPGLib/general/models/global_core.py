@@ -11,8 +11,7 @@ from __future__ import annotations
 # ----------------------------------------------------------------------------------------------------------------------
 # - Code -
 # ----------------------------------------------------------------------------------------------------------------------
-athena_dpg_lib = "AthenaDpgLib"
-athena_dpg_lib_landplot_designer = "AthenaDpgLib_landplot_designer"
-athena_dpg_lib_landplot_designer_debug = "AthenaDpgLib_landplot_designer_debug"
-athena_dpg_lib_landplot_designer_settings = "AthenaDpgLib_landplot_designer_settings"
-athena_dpg_lib_landplot_designer_settings_ui_plot = "AthenaDpgLib_landplot_designer_settings_ui_plot"
+class GlobalCore:
+    """
+    A simple global class that will hold all the application elements as class variables
+    """

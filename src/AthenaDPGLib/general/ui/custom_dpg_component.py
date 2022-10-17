@@ -3,8 +3,7 @@
 # ----------------------------------------------------------------------------------------------------------------------
 # General Packages
 from __future__ import annotations
-import functools
-import dearpygui.dearpygui as dpg
+from abc import ABC, abstractmethod
 
 # Custom Library
 
@@ -13,13 +12,18 @@ import dearpygui.dearpygui as dpg
 # ----------------------------------------------------------------------------------------------------------------------
 # - Code -
 # ----------------------------------------------------------------------------------------------------------------------
-def run_in_mutex(fnc):
-    """
-    Decorator that runs the function iun a locked dpg.mutex state.
-    Unlocks the mutex after the function has been run.
-    """
-    @functools.wraps(fnc)
-    def wrapper(*args, **kwargs):
-        with dpg.mutex():
-            return fnc(*args, **kwargs)
-    return wrapper
+class CustomDPGComponent(ABC):
+    def add_dpg(self):
+        """
+        If the user doesn't need to extend the window's functionality, this method can be used to immediately run the
+        dpg functions, without having to manually use a with statement
+        """
+        with self.dpg():
+            pass
+
+    @abstractmethod
+    def dpg(self):
+        """
+        Context managed method, so that the user can extend the window's functionality with ease.
+        """
+        pass

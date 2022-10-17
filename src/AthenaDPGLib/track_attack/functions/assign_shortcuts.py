@@ -3,23 +3,27 @@
 # ----------------------------------------------------------------------------------------------------------------------
 # General Packages
 from __future__ import annotations
-import functools
 import dearpygui.dearpygui as dpg
 
 # Custom Library
 
 # Custom Packages
+from AthenaDPGLib.track_attack.models.core import Core
 
 # ----------------------------------------------------------------------------------------------------------------------
 # - Code -
 # ----------------------------------------------------------------------------------------------------------------------
-def run_in_mutex(fnc):
-    """
-    Decorator that runs the function iun a locked dpg.mutex state.
-    Unlocks the mutex after the function has been run.
-    """
-    @functools.wraps(fnc)
-    def wrapper(*args, **kwargs):
-        with dpg.mutex():
-            return fnc(*args, **kwargs)
-    return wrapper
+
+def test_shortcut():
+    Core.settings.viewport_show_title = not Core.settings.viewport_show_title
+
+def assign_shortcuts():
+    # assign key combinations to a callback
+    Core.shortcut_registry.add_shortcut(
+        key_1=dpg.mvKey_Alt,
+        key_2=dpg.mvKey_P,
+        callback=test_shortcut
+    )
+
+    # At the end: assemble the registry
+    Core.shortcut_registry.assemble_registry()
